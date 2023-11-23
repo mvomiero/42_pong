@@ -100,21 +100,11 @@ CHANNEL_LAYERS = {
 
 * create the folder templates and the files `pong/templates/base.html` and `pong/templates/pong/index.html`
 
-* create te appropriate route in `urls.py`
-```python
-# urls.py
-from django.urls import path
-from game.views import index
-
-urlpatterns = [
-# ... Other URLS
-path('', index),
-]
-```
-
-
-
 * create the corresponding view in `pong/views.py`
+
+* create the routes to redirect in `pong/urls.py` (creating the file as well) and include it in `transcendence/urls`
+
+
 
 
 
