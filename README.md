@@ -1,3 +1,17 @@
+# Usage:
+### running the server
+
+* first change in the website folder, then run the servers
+```bash
+python3 manage.py runserver
+```
+* to run tests
+```bash
+python3 manage.py test polls
+```
+
+# Installation
+
 ### Virtual environments in python
 * create a venv called "venv"
 ```bash
@@ -21,7 +35,9 @@ python get-pip.py
 pip3 install -r requirements.txt
 ```
 
-### Starting the Django project and creating an app
+# PROCESS
+
+## Creating and configuring the project
 
 * to start a new project
 ```bash
@@ -31,14 +47,56 @@ django-admin startproject transcendence
 ```bash
 python3 manage.py startapp pong
 ```
+* Add "channels" and "pong" to the installed apps in *settings.py*
 
-### running the server
+* run migrate to apply migrations
+```python
+python3 manage.py migrate
+```
+* add  “STATICFILES_DIRS” to *settings.py*
+```python
+# settings.py
+import os
+STATICFILES_DIRS = [
+os.path.join(BASE_DIR, "static"),
+]
+```
+## Integrating and configuring Channels library
 
-* first change in the website folder, then run the servers
-```bash
-python3 manage.py runserver
+* modify the `asgi.py` file:
+```python
+# mysite/asgi.py
+import os
+
+from channels.routing import ProtocolTypeRouter
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
+
+application = ProtocolTypeRouter(
+    {
+        "http": get_asgi_application(),
+        # Just HTTP for now. (We can add other protocols later.)
+    }
+)
 ```
-* to run tests
-```bash
-python3 manage.py test polls
+* add `daphne` to the installed apps in `settings.py`
+
+* point to `daphne` for the routing configuration:
+```python
+# mysite/settings.py
+# Daphne
+ASGI_APPLICATION = "mysite.asgi.application"
 ```
+* add the `CHANNEL_LAYERS` setting in `settings.py` (it is the layer that handle the backend... could be for example redis as well --- To be continued...)
+```python
+CHANNEL_LAYERS = {
+    'default': {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    },
+}
+```
+
+
+
+
