@@ -104,7 +104,35 @@ CHANNEL_LAYERS = {
 
 * create the routes to redirect in `pong/urls.py` (creating the file as well) and include it in `transcendence/urls`
 
+## Designing the game page
 
+* setting the route for `play/<room_code>` *(room code will be passed as a parameter to the view function)*
+
+* implementing the `pong` view
+
+* creating `templates/pong/pong.html`
+
+## Creating and setting the consumer
+
+Consumer and routing -> like Views and Urls
+
+* add the file `pong/routing.py` to route the web socket connection to be handled by the consumer
+
+```python
+websocket_urlpatterns = [
+    url(r'^ws/play/(?P<room_code>\w+)/$', PongConsumer.as_asgi()),
+]
+```
+(explanation of the string parsing commented out on the code)
+
+* in `asgi.py` add the following key `"websocket"`. ProtocolTypeRouter will analze the connection type and redirect it to the web socket if it's starting with ws// or wss//
+
+```python
+        "websocket": AuthMiddlewareStack(
+            URLRouter(pong.routing.websocket_urlpatterns))
+```
+
+* develop the consumer `PongConsumer`. More info on commented out on the code.
 
 
 
