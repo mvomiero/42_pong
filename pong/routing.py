@@ -1,9 +1,10 @@
-from django.conf.urls import url
+from django.urls import re_path
 from pong.consumers import PongConsumer
 
 websocket_urlpatterns = [
-    url(r'^ws/play/(?P<room_code>\w+)/$', PongConsumer.as_asgi()),
+    re_path(r'^ws/play/(?P<room_code>\w+)/$', PongConsumer.as_asgi()),
 ]
+
 
 # URL parsing --> r'^ws/play/(?P<room_code>\w+)/$':
 #   ^ws/play/ --> matches the path starting with ws/play/
