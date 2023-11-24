@@ -1,8 +1,12 @@
+
+
+
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 const grid = 15;
 const paddleHeight = grid * 5; // 80
 const maxPaddleY = canvas.height - grid - paddleHeight;
+
 
 var paddleSpeed = 6;
 var ballSpeed = 2;
@@ -50,6 +54,59 @@ function collides(obj1, obj2) {
          obj1.y < obj2.y + obj2.height &&
          obj1.y + obj1.height > obj2.y;
 }
+
+// Websocket code
+var roomCode = document.getElementById("game_board").getAttribute("room_code");
+var char_choice = document.getElementById("game_board").getAttribute("char_choice");
+
+var connectionString = 'ws://' + window.location.host + '/ws/play/' + roomCode + '/';
+var gameSocket = new WebSocket(connectionString);
+
+function sendGameData() {
+	const data = {
+	  leftPaddle: {
+		x: leftPaddle.x,
+		y: leftPaddle.y,
+		// other properties...
+		dy: leftPaddle.dy
+	  },
+	  rightPaddle: {
+		x: rightPaddle.x,
+		y: rightPaddle.y,
+		// other properties...
+		dy: rightPaddle.dy
+	  },
+	  ball: {
+		x: ball.x,
+		y: ball.y,
+		// other properties...
+		dx: ball.dx,
+		dy: ball.dy
+	  }
+	};
+	socket.send(JSON.stringify(data));
+  }
+
+// Function to handle received game data
+function receiveGameData(event) {
+	const data = JSON.parse(event.data);
+  
+	// Update game variables based on received data
+	leftPaddle.x = data.leftPaddle.x;
+	leftPaddle.y = data.leftPaddle.y;
+	leftPaddle.dy = data.leftPaddle.dy;
+  
+	rightPaddle.x = data.rightPaddle.x;
+	rightPaddle.y = data.rightPaddle.y;
+	rightPaddle.dy = data.rightPaddle.dy;
+  
+	ball.x = data.ball.x;
+	ball.y = data.ball.y;
+	ball.dx = data.ball.dx;
+	ball.dy = data.ball.dy;
+  
+	// Additional handling if needed for other game elements...
+  }
 
 // game loop
 function loop() {
@@ -122,6 +179,9 @@ function loop() {
     ball.x = rightPaddle.x - ball.width;
   }
 
+  // Call sendGameData() after updating the game state
+  //sendGameData();
+
   // draw ball
   context.fillRect(ball.x, ball.y, ball.width, ball.height);
 
@@ -171,3 +231,4 @@ document.addEventListener('keyup', function(e) {
 
 // start the game
 requestAnimationFrame(loop);
+

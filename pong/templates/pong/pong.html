@@ -7,8 +7,9 @@
         <h1>TIC TAC TOE</h1>
         <h3>Welcome to room: {{room_code}}</h3>
     </div>
-
-    <canvas width="750" height="585" id="game"></canvas>
+	<div id = "game_board" room_code = {{room_code}} char_choice = {{char_choice}}>
+		<canvas width="750" height="585" id="game"></canvas>
+	</div>
     <div id = "alert_move">Your turn. Place your move <strong>{{char_choice}}</strong></div>
 </div>
 {% endblock content %}

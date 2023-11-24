@@ -10,7 +10,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         self.room_code = self.scope['url_route']['kwargs']['room_code']
 
         # Construct a room group name that the channel will join (basic string formatting)
-        self.room_group_name = 'room_%s' % self.room_name
+        self.room_group_name = 'room_%s' % self.room_code
 
         # Join the room group
             # await is used to pause the execution of an asynchronous function until the awaited coroutine is complete.
