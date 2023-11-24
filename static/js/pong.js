@@ -63,29 +63,29 @@ var connectionString = 'ws://' + window.location.host + '/ws/play/' + roomCode +
 var gameSocket = new WebSocket(connectionString);
 
 function sendGameData() {
-	const data = {
-	  leftPaddle: {
-		x: leftPaddle.x,
-		y: leftPaddle.y,
-		// other properties...
-		dy: leftPaddle.dy
-	  },
-	  rightPaddle: {
-		x: rightPaddle.x,
-		y: rightPaddle.y,
-		// other properties...
-		dy: rightPaddle.dy
-	  },
-	  ball: {
-		x: ball.x,
-		y: ball.y,
-		// other properties...
-		dx: ball.dx,
-		dy: ball.dy
-	  }
-	};
-	socket.send(JSON.stringify(data));
-  }
+    var gameData = {
+        leftPaddle: {
+            x: leftPaddle.x,
+            y: leftPaddle.y,
+            dy: leftPaddle.dy
+        },
+        rightPaddle: {
+            x: rightPaddle.x,
+            y: rightPaddle.y,
+            dy: rightPaddle.dy
+        },
+        ball: {
+            x: ball.x,
+            y: ball.y,
+            dx: ball.dx,
+            dy: ball.dy
+        }
+        // Include other relevant data if needed
+    };
+
+    // Send the game data to the server via WebSocket
+    gameSocket.send(JSON.stringify(gameData));
+}
 
 // Function to handle received game data
 function receiveGameData(event) {
@@ -216,6 +216,7 @@ document.addEventListener('keydown', function(e) {
   else if (e.which === 83) {
     leftPaddle.dy = paddleSpeed;
   }
+  sendGameData();
 });
 
 // listen to keyboard events to stop the paddle if key is released
@@ -227,7 +228,60 @@ document.addEventListener('keyup', function(e) {
   if (e.which === 83 || e.which === 87) {
     leftPaddle.dy = 0;
   }
+  sendGameData();
 });
+
+// Event handler for successful connection
+gameSocket.onopen = function(event) {
+    console.log("WebSocket connection opened!");
+    // Perform actions after successful connection
+};
+
+// Event handler for receiving messages
+gameSocket.onmessage = function(event) {
+	try {
+        var data = JSON.parse(event.data);
+        // Update game variables based on received data
+        // ... (your code to update game state)
+    } catch (error) {
+        console.error('Error parsing received data:', error);
+        console.log('Received data:', event.data);
+		print(event.data);
+        // Additional error handling or logging as needed
+    }
+	leftPaddle.x = data.leftPaddle.x;
+	leftPaddle.y = data.leftPaddle.y;
+	leftPaddle.dy = data.leftPaddle.dy;
+  
+	rightPaddle.x = data.rightPaddle.x;
+	rightPaddle.y = data.rightPaddle.y;
+	rightPaddle.dy = data.rightPaddle.dy;
+  
+	ball.x = data.ball.x;
+	ball.y = data.ball.y;
+	ball.dx = data.ball.dx;
+	ball.dy = data.ball.dy;
+    // Process the received data
+
+    // Example: Update game state based on received data
+    // ...
+};
+
+// Event handler for connection closure
+gameSocket.onclose = function(event) {
+    if (event.wasClean) {
+        console.log("WebSocket connection closed cleanly.");
+    } else {
+        console.error("WebSocket connection closed unexpectedly.");
+    }
+    // Perform cleanup tasks or display a message indicating connection closure
+};
+
+// Error handler for WebSocket errors
+gameSocket.onerror = function(error) {
+    console.error("WebSocket encountered an error: ", error);
+    // Handle WebSocket errors
+};
 
 // start the game
 requestAnimationFrame(loop);
