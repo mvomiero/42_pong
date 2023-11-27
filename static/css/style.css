@@ -9,13 +9,21 @@ body {
     align-items: center;
 }
 #game_board {
-    display: grid;
-    grid-gap: 0.5em;
-    grid-template-columns: repeat(3, 1fr);
-    width: 16em;
-    height: auto;
-    margin: 0.5em 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 750px; /* Adjust the width to accommodate the canvas and some spacing */
+    max-width: 100%; /* Ensure it fits within the available space */
+    margin: auto; /* Center horizontally */
 }
+
+/* Update the canvas size to fill the available space in the game board */
+#game {
+    width: 100%;
+    height: 100%;
+}
+
 .square{
     background: #2f76c7;
     width: 5em;
