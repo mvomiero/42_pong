@@ -20,6 +20,12 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name,
         )
 
+            # Retrieve the group size
+        group_size = len(self.channel_layer.groups.get(self.room_group_name, {}).items())
+
+        # Print the group size
+        print(f"The size of group '{self.room_group_name}' is: {group_size}")
+
         # Accept the connection
         await self.accept()
 
