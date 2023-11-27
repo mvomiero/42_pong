@@ -1,12 +1,8 @@
-
-
-
-const canvas = document.getElementById('game');
-const context = canvas.getContext('2d');
+const canvas = document.getElementById("game");
+const context = canvas.getContext("2d");
 const grid = 15;
 const paddleHeight = grid * 5; // 80
 const maxPaddleY = canvas.height - grid - paddleHeight;
-
 
 var paddleSpeed = 6;
 var ballSpeed = 2;
@@ -19,7 +15,7 @@ const leftPaddle = {
   height: paddleHeight,
 
   // paddle velocity
-  dy: 0
+  dy: 0,
 };
 const rightPaddle = {
   // start in the middle of the game on the right side
@@ -29,7 +25,7 @@ const rightPaddle = {
   height: paddleHeight,
 
   // paddle velocity
-  dy: 0
+  dy: 0,
 };
 const ball = {
   // start in the middle of the game
@@ -43,57 +39,68 @@ const ball = {
 
   // ball velocity (start going to the top-right corner)
   dx: ballSpeed,
-  dy: -ballSpeed
+  dy: -ballSpeed,
 };
 
 // check for collision between two objects using axis-aligned bounding box (AABB)
 // @see https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
 function collides(obj1, obj2) {
-  return obj1.x < obj2.x + obj2.width &&
-         obj1.x + obj1.width > obj2.x &&
-         obj1.y < obj2.y + obj2.height &&
-         obj1.y + obj1.height > obj2.y;
+  return (
+    obj1.x < obj2.x + obj2.width &&
+    obj1.x + obj1.width > obj2.x &&
+    obj1.y < obj2.y + obj2.height &&
+    obj1.y + obj1.height > obj2.y
+  );
 }
 
 // Websocket code
 var roomCode = document.getElementById("game_board").getAttribute("room_code");
-var char_choice = document.getElementById("game_board").getAttribute("char_choice");
+var char_choice = document
+  .getElementById("game_board")
+  .getAttribute("char_choice");
 
-var connectionString = 'ws://' + window.location.host + '/ws/play/' + roomCode + '/';
+// Keep track of connected players
+let playerCount;
+
+var connectionString =
+  "ws://" + window.location.host + "/ws/play/" + roomCode + "/";
 var gameSocket = new WebSocket(connectionString);
 
 function sendGameData() {
-	console.log('SendGameData called');
-    var gameData = {
-        leftPaddle: {
-            x: leftPaddle.x,
-            y: leftPaddle.y,
-            dy: leftPaddle.dy
-        },
-        rightPaddle: {
-            x: rightPaddle.x,
-            y: rightPaddle.y,
-            dy: rightPaddle.dy
-        },
-        ball: {
-            x: ball.x,
-            y: ball.y,
-            dx: ball.dx,
-            dy: ball.dy
-        }
-        // Include other relevant data if needed
-    };
+  console.log("SendGameData called");
+  var gameData = {
+    data: {
+      playerCount: playerCount,
+    },
+    leftPaddle: {
+      x: leftPaddle.x,
+      y: leftPaddle.y,
+      dy: leftPaddle.dy,
+    },
+    rightPaddle: {
+      x: rightPaddle.x,
+      y: rightPaddle.y,
+      dy: rightPaddle.dy,
+    },
+    ball: {
+      x: ball.x,
+      y: ball.y,
+      dx: ball.dx,
+      dy: ball.dy,
+    },
+    // Include other relevant data if needed
+  };
 
-	console.log('Sending data:', gameData);
+  console.log("Sending data:", gameData);
 
-    // Send the game data to the server via WebSocket
-    gameSocket.send(JSON.stringify(gameData));
+  // Send the game data to the server via WebSocket
+  gameSocket.send(JSON.stringify(gameData));
 }
 
 // game loop
 function loop() {
   requestAnimationFrame(loop);
-  context.clearRect(0,0,canvas.width,canvas.height);
+  context.clearRect(0, 0, canvas.width, canvas.height);
 
   // move paddles by their velocity
   leftPaddle.y += leftPaddle.dy;
@@ -102,22 +109,30 @@ function loop() {
   // prevent paddles from going through walls
   if (leftPaddle.y < grid) {
     leftPaddle.y = grid;
-  }
-  else if (leftPaddle.y > maxPaddleY) {
+  } else if (leftPaddle.y > maxPaddleY) {
     leftPaddle.y = maxPaddleY;
   }
 
   if (rightPaddle.y < grid) {
     rightPaddle.y = grid;
-  }
-  else if (rightPaddle.y > maxPaddleY) {
+  } else if (rightPaddle.y > maxPaddleY) {
     rightPaddle.y = maxPaddleY;
   }
 
   // draw paddles
-  context.fillStyle = 'white';
-  context.fillRect(leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height);
-  context.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
+  context.fillStyle = "white";
+  context.fillRect(
+    leftPaddle.x,
+    leftPaddle.y,
+    leftPaddle.width,
+    leftPaddle.height
+  );
+  context.fillRect(
+    rightPaddle.x,
+    rightPaddle.y,
+    rightPaddle.width,
+    rightPaddle.height
+  );
 
   // move ball by its velocity
   ball.x += ball.dx;
@@ -127,14 +142,13 @@ function loop() {
   if (ball.y < grid) {
     ball.y = grid;
     ball.dy *= -1;
-  }
-  else if (ball.y + grid > canvas.height - grid) {
+  } else if (ball.y + grid > canvas.height - grid) {
     ball.y = canvas.height - grid * 2;
     ball.dy *= -1;
   }
 
   // reset ball if it goes past paddle (but only if we haven't already done so)
-  if ( (ball.x < 0 || ball.x > canvas.width) && !ball.resetting) {
+  if ((ball.x < 0 || ball.x > canvas.width) && !ball.resetting) {
     ball.resetting = true;
 
     // give some time for the player to recover before launching the ball again
@@ -152,8 +166,7 @@ function loop() {
     // move ball next to the paddle otherwise the collision will happen again
     // in the next frame
     ball.x = leftPaddle.x + leftPaddle.width;
-  }
-  else if (collides(ball, rightPaddle)) {
+  } else if (collides(ball, rightPaddle)) {
     ball.dx *= -1;
 
     // move ball next to the paddle otherwise the collision will happen again
@@ -168,7 +181,7 @@ function loop() {
   context.fillRect(ball.x, ball.y, ball.width, ball.height);
 
   // draw walls
-  context.fillStyle = 'lightgrey';
+  context.fillStyle = "lightgrey";
   context.fillRect(0, 0, canvas.width, grid);
   context.fillRect(0, canvas.height - grid, canvas.width, canvas.height);
 
@@ -179,8 +192,7 @@ function loop() {
 }
 
 // listen to keyboard events to move the paddles
-document.addEventListener('keydown', function(e) {
-
+document.addEventListener("keydown", function (e) {
   // up arrow key
   if (e.which === 38) {
     rightPaddle.dy = -paddleSpeed;
@@ -202,7 +214,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // listen to keyboard events to stop the paddle if key is released
-document.addEventListener('keyup', function(e) {
+document.addEventListener("keyup", function (e) {
   if (e.which === 38 || e.which === 40) {
     rightPaddle.dy = 0;
   }
@@ -213,62 +225,91 @@ document.addEventListener('keyup', function(e) {
   sendGameData();
 });
 
+// Function to handle player connection and identification
+function handlePlayerConnection() {
+  playerCount++; // Increment player count upon connection
+
+  if (playerCount === 1) {
+    // Assign the first player (Player 1)
+    console.log("Player 1 connected!");
+    // Send a message or handle identifying Player 1
+  } else if (playerCount === 2) {
+    // Assign the second player (Player 2)
+    console.log("Player 2 connected!");
+    // Send a message or handle identifying Player 2
+  }
+
+  if (playerCount > 2) {
+    // Prevent further connections if more than two players attempt to join
+	print("Sorry, the game is full!");
+    console.log("Sorry, the game is full!");
+    gameSocket.close(); // Close the connection for additional players
+    // Redirect the client to a certain page after a short delay (for example, 1 second)
+    setTimeout(function () {
+      window.location.href = "http://127.0.0.1:8000/";
+    }, 1000); // Adjust the delay as needed
+  }
+}
+
 // Event handler for successful connection
-gameSocket.onopen = function(event) {
-    console.log("WebSocket connection opened!");
-	// Call sendGameData() after establishing the WebSocket connection
-	sendGameData();
-    // Perform actions after successful connection
+gameSocket.onopen = function (event) {
+  console.log("WebSocket connection opened!");
+  handlePlayerConnection(); // Handle player connection
+  // Call sendGameData() after establishing the WebSocket connection
+  sendGameData();
+  // Perform actions after successful connection
 };
 
-gameSocket.onmessage = function(event) {
-    try {
-        var parsedData = JSON.parse(event.data);
-        console.log('Received data:', parsedData);
+gameSocket.onmessage = function (event) {
+  try {
+    //var parsedData = JSON.parse(event.data);
+    //console.log("Received data:", parsedData);
 
-        var data = JSON.parse(parsedData.data); // Parse the 'data' string within 'parsedData'
-        console.log('Parsed inner data:', data);
+    var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
+    console.log("Parsed inner data:", data);
 
-        // Now you can access the properties correctly
-        leftPaddle.x = data.leftPaddle.x;
-        leftPaddle.y = data.leftPaddle.y;
-        leftPaddle.dy = data.leftPaddle.dy;
-  
-        rightPaddle.x = data.rightPaddle.x;
-        rightPaddle.y = data.rightPaddle.y;
-        rightPaddle.dy = data.rightPaddle.dy;
-  
-        ball.x = data.ball.x;
-        ball.y = data.ball.y;
-        ball.dx = data.ball.dx;
-        ball.dy = data.ball.dy;
+    playerCount = data.playerCount; // Update player count
 
-        // Process the received data
-        // Example: Update game state based on received data
-        // ...
-    } catch (error) {
-        console.error('Error parsing received data:', error);
-        console.log('Received data:', event.data);
-        // Additional error handling or logging as needed
-    }
+    // Now you can access the properties correctly
+    leftPaddle.x = data.leftPaddle.x;
+    leftPaddle.y = data.leftPaddle.y;
+    leftPaddle.dy = data.leftPaddle.dy;
+
+    rightPaddle.x = data.rightPaddle.x;
+    rightPaddle.y = data.rightPaddle.y;
+    rightPaddle.dy = data.rightPaddle.dy;
+
+    ball.x = data.ball.x;
+    ball.y = data.ball.y;
+    ball.dx = data.ball.dx;
+    ball.dy = data.ball.dy;
+
+    // Process the received data
+    // Example: Update game state based on received data
+    // ...
+  } catch (error) {
+    console.error("Error parsing received data:", error);
+    console.log("Received data:", event.data);
+    // Additional error handling or logging as needed
+  }
 };
 
 // Event handler for connection closure
-gameSocket.onclose = function(event) {
-    if (event.wasClean) {
-        console.log("WebSocket connection closed cleanly.");
-    } else {
-        console.error("WebSocket connection closed unexpectedly.");
-    }
-    // Perform cleanup tasks or display a message indicating connection closure
+gameSocket.onclose = function (event) {
+  playerCount--; // Decrement player count upon disconnection
+  if (event.wasClean) {
+    console.log("WebSocket connection closed cleanly.");
+  } else {
+    console.error("WebSocket connection closed unexpectedly.");
+  }
+  // Perform cleanup tasks or display a message indicating connection closure
 };
 
 // Error handler for WebSocket errors
-gameSocket.onerror = function(error) {
-    console.error("WebSocket encountered an error: ", error);
-    // Handle WebSocket errors
+gameSocket.onerror = function (error) {
+  console.error("WebSocket encountered an error: ", error);
+  // Handle WebSocket errors
 };
 
 // start the game
 requestAnimationFrame(loop);
-
