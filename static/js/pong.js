@@ -216,6 +216,8 @@ document.addEventListener('keyup', function(e) {
 // Event handler for successful connection
 gameSocket.onopen = function(event) {
     console.log("WebSocket connection opened!");
+	// Call sendGameData() after establishing the WebSocket connection
+	sendGameData();
     // Perform actions after successful connection
 };
 
