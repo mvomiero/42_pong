@@ -63,6 +63,7 @@ var connectionString = 'ws://' + window.location.host + '/ws/play/' + roomCode +
 var gameSocket = new WebSocket(connectionString);
 
 function sendGameData() {
+	console.log('SendGameData called');
     var gameData = {
         leftPaddle: {
             x: leftPaddle.x,
@@ -83,30 +84,11 @@ function sendGameData() {
         // Include other relevant data if needed
     };
 
+	console.log('Sending data:', gameData);
+
     // Send the game data to the server via WebSocket
     gameSocket.send(JSON.stringify(gameData));
 }
-
-// Function to handle received game data
-function receiveGameData(event) {
-	const data = JSON.parse(event.data);
-  
-	// Update game variables based on received data
-	leftPaddle.x = data.leftPaddle.x;
-	leftPaddle.y = data.leftPaddle.y;
-	leftPaddle.dy = data.leftPaddle.dy;
-  
-	rightPaddle.x = data.rightPaddle.x;
-	rightPaddle.y = data.rightPaddle.y;
-	rightPaddle.dy = data.rightPaddle.dy;
-  
-	ball.x = data.ball.x;
-	ball.y = data.ball.y;
-	ball.dx = data.ball.dx;
-	ball.dy = data.ball.dy;
-  
-	// Additional handling if needed for other game elements...
-  }
 
 // game loop
 function loop() {
@@ -237,34 +219,36 @@ gameSocket.onopen = function(event) {
     // Perform actions after successful connection
 };
 
-// Event handler for receiving messages
 gameSocket.onmessage = function(event) {
-	try {
-        var data = JSON.parse(event.data);
-        // Update game variables based on received data
-        // ... (your code to update game state)
+    try {
+        var parsedData = JSON.parse(event.data);
+        console.log('Received data:', parsedData);
+
+        var data = JSON.parse(parsedData.data); // Parse the 'data' string within 'parsedData'
+        console.log('Parsed inner data:', data);
+
+        // Now you can access the properties correctly
+        leftPaddle.x = data.leftPaddle.x;
+        leftPaddle.y = data.leftPaddle.y;
+        leftPaddle.dy = data.leftPaddle.dy;
+  
+        rightPaddle.x = data.rightPaddle.x;
+        rightPaddle.y = data.rightPaddle.y;
+        rightPaddle.dy = data.rightPaddle.dy;
+  
+        ball.x = data.ball.x;
+        ball.y = data.ball.y;
+        ball.dx = data.ball.dx;
+        ball.dy = data.ball.dy;
+
+        // Process the received data
+        // Example: Update game state based on received data
+        // ...
     } catch (error) {
         console.error('Error parsing received data:', error);
         console.log('Received data:', event.data);
-		print(event.data);
         // Additional error handling or logging as needed
     }
-	leftPaddle.x = data.leftPaddle.x;
-	leftPaddle.y = data.leftPaddle.y;
-	leftPaddle.dy = data.leftPaddle.dy;
-  
-	rightPaddle.x = data.rightPaddle.x;
-	rightPaddle.y = data.rightPaddle.y;
-	rightPaddle.dy = data.rightPaddle.dy;
-  
-	ball.x = data.ball.x;
-	ball.y = data.ball.y;
-	ball.dx = data.ball.dx;
-	ball.dy = data.ball.dy;
-    // Process the received data
-
-    // Example: Update game state based on received data
-    // ...
 };
 
 // Event handler for connection closure

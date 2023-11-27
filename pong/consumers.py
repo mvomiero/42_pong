@@ -34,21 +34,21 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     async def receive(self, text_data):
         """
         Receive message from WebSocket.
-        Get the event and send the appropriate event
+        Log/print the received JSON data and forward it to other clients.
         """
-        response = json.loads(text_data)
-        event = response.get("event", None)
-        message = response.get("message", None)
-        # Send message to room group based on the event
+        # Log/print the received JSON data
+        #print("Received JSON data:", text_data)
+
+        # Pass the received JSON data as is to other clients
         await self.channel_layer.group_send(self.room_group_name, {
             'type': 'send_message',
-            'message': message,
-            "event": event  # Use the received event directly
+            'data': text_data  # Send the received data directly to other clients
         })
 
     async def send_message(self, res):
         """ Receive message from room group """
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({
-            "payload": res,
-        }))
+        # Serialize the dictionary 'res' to JSON string
+        res_json = json.dumps(res)
+
+        # Send the serialized JSON string directly to WebSocket
+        await self.send(text_data=res_json)
