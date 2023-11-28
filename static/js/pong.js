@@ -223,11 +223,8 @@ gameSocket.onopen = function(event) {
 
 gameSocket.onmessage = function(event) {
     try {
-        var parsedData = JSON.parse(event.data);
-        console.log('Received data:', parsedData);
-
-        var data = JSON.parse(parsedData.data); // Parse the 'data' string within 'parsedData'
-        console.log('Parsed inner data:', data);
+		var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
+		console.log("Parsed inner data:", data);
 
         // Now you can access the properties correctly
         leftPaddle.x = data.leftPaddle.x;

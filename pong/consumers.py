@@ -51,10 +51,9 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             'data': text_data  # Send the received data directly to other clients
         })
 
-    async def send_message(self, res):
-        """ Receive message from room group """
-        # Serialize the dictionary 'res' to JSON string
-        res_json = json.dumps(res)
-
-        # Send the serialized JSON string directly to WebSocket
-        await self.send(text_data=res_json)
+    async def send_message(self, event):
+        """ Send the group message to clients """
+        # Retrieve the message from the event
+        message = event['data']
+        # Send the message to the client WebSocket
+        await self.send(text_data=message)
