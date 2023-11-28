@@ -64,16 +64,32 @@ var gameSocket = new WebSocket(connectionString);
 
 var player1 = '';
 var player2 = '';
+let players_set = false;
+
+function updatePlayers() {
+	console.log('UPDATEPLAYERS called');
+	var Data = {
+		command: 'update_players',
+		players: {
+			player: char_choice,
+			player1: player1,
+			player2: player2,
+			//players_set: players_set,
+		}
+	};
+	console.log('Updaate players Sending data:', Data);
+	gameSocket.send(JSON.stringify(Data));
+}
 
 function sendGameData() {
 	console.log('SendGameData called');
     var gameData = {
 		command: 'update',
-		players: {
-			player: char_choice,
-			player1: player1,
-			player2: player2,
-		},
+		//players: {
+		//	player: char_choice,
+		//	player1: player1,
+		//	player2: player2,
+		//},
         leftPaddle: {
             x: leftPaddle.x,
             y: leftPaddle.y,
@@ -220,6 +236,7 @@ document.addEventListener('keyup', function(e) {
     leftPaddle.dy = 0;
   }
   sendGameData();
+  //updatePlayers();
 });
 
 // Event handler for successful connection
@@ -227,6 +244,7 @@ gameSocket.onopen = function(event) {
     console.log("WebSocket connection opened!");
 	// Call sendGameData() after establishing the WebSocket connection
 	sendGameData();
+	updatePlayers();
     // Perform actions after successful connection
 };
 
@@ -239,31 +257,47 @@ gameSocket.onmessage = function(event) {
 			console.log('the command is to update!');
 		}
 
-		console.log('char_choice:', char_choice);
-		console.log('data.players.player:', data.players.player);
+		//console.log('char_choice:', char_choice);
+		//console.log('data.players.player:', data.players.player);
 
-		if (data.players.player !== char_choice) {
-			console.log('UPDATING PLAYERS!');
-			player1 = char_choice;
-			player2 = data.players.player;
-			//sendGameData();
+		if (data.command === 'update_players') {
+
+			if (player1 !== '' && player2 !== '' && player1 !== player2) {
+				console.log('PLAYERS SET!');
+				console.log('player1:', player1);
+				console.log('player2:', player2);
+				return;
+			}
+			if (data.players.player !== char_choice) {
+				console.log('UPDATING PLAYERS!');
+				player1 = char_choice;
+				player2 = data.players.player;
+				updatePlayers();
+			}
+			if (data.players.player1 !== '' && data.players.player2 !== '') {
+				console.log('UPDATING PLAYERS SAME!');
+				player1 = data.players.player1;
+				player2 = data.players.player2;
+			}
 		}
 
 
 
         // Now you can access the properties correctly
-        leftPaddle.x = data.leftPaddle.x;
-        leftPaddle.y = data.leftPaddle.y;
-        leftPaddle.dy = data.leftPaddle.dy;
-  
-        rightPaddle.x = data.rightPaddle.x;
-        rightPaddle.y = data.rightPaddle.y;
-        rightPaddle.dy = data.rightPaddle.dy;
-  
-        ball.x = data.ball.x;
-        ball.y = data.ball.y;
-        ball.dx = data.ball.dx;
-        ball.dy = data.ball.dy;
+		if (data.command === 'update') {
+			leftPaddle.x = data.leftPaddle.x;
+			leftPaddle.y = data.leftPaddle.y;
+			leftPaddle.dy = data.leftPaddle.dy;
+	
+			rightPaddle.x = data.rightPaddle.x;
+			rightPaddle.y = data.rightPaddle.y;
+			rightPaddle.dy = data.rightPaddle.dy;
+	
+			ball.x = data.ball.x;
+			ball.y = data.ball.y;
+			ball.dx = data.ball.dx;
+			ball.dy = data.ball.dy;
+		}
 
         // Process the received data
         // Example: Update game state based on received data
