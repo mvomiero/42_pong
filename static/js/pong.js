@@ -62,9 +62,18 @@ var char_choice = document.getElementById("game_board").getAttribute("char_choic
 var connectionString = 'ws://' + window.location.host + '/ws/play/' + roomCode + '/';
 var gameSocket = new WebSocket(connectionString);
 
+var player1 = '';
+var player2 = '';
+
 function sendGameData() {
 	console.log('SendGameData called');
     var gameData = {
+		command: 'update',
+		players: {
+			player: char_choice,
+			player1: player1,
+			player2: player2,
+		},
         leftPaddle: {
             x: leftPaddle.x,
             y: leftPaddle.y,
@@ -225,6 +234,22 @@ gameSocket.onmessage = function(event) {
     try {
 		var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
 		console.log("Parsed inner data:", data);
+
+		if (data.command === 'update') {
+			console.log('the command is to update!');
+		}
+
+		console.log('char_choice:', char_choice);
+		console.log('data.players.player:', data.players.player);
+
+		if (data.players.player !== char_choice) {
+			console.log('UPDATING PLAYERS!');
+			player1 = char_choice;
+			player2 = data.players.player;
+			//sendGameData();
+		}
+
+
 
         // Now you can access the properties correctly
         leftPaddle.x = data.leftPaddle.x;

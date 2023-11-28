@@ -45,6 +45,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Log/print the received JSON data
         #print("Received JSON data:", text_data)
 
+        received_data = json.loads(text_data)
+
         # Pass the received JSON data as is to other clients
         await self.channel_layer.group_send(self.room_group_name, {
             'type': 'send_message',
