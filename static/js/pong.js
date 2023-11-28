@@ -62,6 +62,7 @@ var char_choice = document.getElementById("game_board").getAttribute("char_choic
 var connectionString = 'ws://' + window.location.host + '/ws/play/' + roomCode + '/';
 var gameSocket = new WebSocket(connectionString);
 
+var player = 0;
 var player1 = '';
 var player2 = '';
 let players_set = false;
@@ -235,8 +236,11 @@ document.addEventListener('keyup', function(e) {
   if (e.which === 83 || e.which === 87) {
     leftPaddle.dy = 0;
   }
+  console.log('player1:', player1);
+	console.log('player2:', player2);
+	console.log('player:', player);
   sendGameData();
-  //updatePlayers();
+
 });
 
 // Event handler for successful connection
@@ -272,14 +276,19 @@ gameSocket.onmessage = function(event) {
 				console.log('UPDATING PLAYERS!');
 				player1 = char_choice;
 				player2 = data.players.player;
+				player = 1;
 				updatePlayers();
 			}
 			if (data.players.player1 !== '' && data.players.player2 !== '') {
 				console.log('UPDATING PLAYERS SAME!');
 				player1 = data.players.player1;
 				player2 = data.players.player2;
+				player = 2;
 			}
 		}
+		console.log('player1:', player1);
+		console.log('player2:', player2);
+		console.log('player:', player);
 
 
 
