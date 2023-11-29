@@ -1,0 +1,40 @@
+<!--users/templates/users/dashboard.html-->
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+Hello, {{ user.username|default:'Guest' }}!
+
+<div>
+    {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}">Logout</a>
+		<a href="{% url 'password_change' %}">Change password</a>
+		<a href="{% url 'profile_update' %}">Update profile</a>
+    {% else %}
+        <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+</div>
+
+{% if user.is_authenticated %}
+    <div>
+        <h3>Bio:</h3>
+        {% if bio %}
+            <p>{{ bio }}</p>
+        {% else %}
+            <p>No bio information available.</p>
+        {% endif %}
+    </div>
+{% endif %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get the user's chosen dashboard color from the template variable
+        var userDashboardColor = "{{ user.dashboard_color }}";
+
+        // Apply the user's chosen color as the background color of the body
+        document.body.style.backgroundColor = userDashboardColor;
+    });
+</script>
+
+{% endblock %}
