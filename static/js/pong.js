@@ -224,6 +224,7 @@ function loop() {
       ball.resetting = false;
       ball.x = canvas.width / 2;
       ball.y = canvas.height / 2;
+	  sendGameData();
     }, 800);
 
   }
