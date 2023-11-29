@@ -432,8 +432,8 @@ gameSocket.onmessage = function (event) {
 
 		// Redirect to another page after a short delay (e.g., 2 seconds)
         setTimeout(function() {
-            window.location.href = '/'; // Replace '/path/to/another/page' with the desired URL
-        }, 2000); // 2000 milliseconds = 2 seconds
+            window.location.href = '/dashboard/'; // Replace '/path/to/another/page' with the desired URL
+        }, 500); // 2000 milliseconds = 2 seconds
 	}
 
     // Process the received data

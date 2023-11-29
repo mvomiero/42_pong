@@ -19,3 +19,6 @@ def pong(request, room_code):
         "room_code": room_code,
     }
     return render(request, "pong/pong.html", context)
+
+def dashboard(request):
+	return render(request, "pong/dashboard.html")
