@@ -38,8 +38,8 @@ const ball = {
   resetting: false,
 
   // ball velocity (start going to the top-right corner)
-  dx: ballSpeed,
-  dy: -ballSpeed,
+  dx: 0,
+  dy: 0,
 };
 
 // check for collision between two objects using axis-aligned bounding box (AABB)
@@ -321,6 +321,9 @@ gameSocket.onmessage = function (event) {
         player = 2;
 		sendLogMessage("Player " + char_choice + ", id = " + player + " has joined the game!\n"
 		               + "<p> Player 1 is " + data.players.player1 + " and Player 2 is " + data.players.player2 + "</p>");
+		ball.dx = ballSpeed;
+		ball.dy = -ballSpeed;
+		sendGameData();
       }
     }
     //console.log("player1:", player1);
