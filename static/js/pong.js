@@ -54,8 +54,8 @@ function collides(obj1, obj2) {
 }
 
 // Function to add logs to the logs div
-function addLog(message) {
-  const logsDiv = document.getElementById("logs");
+function addLog(message, elementId) {
+  const logsDiv = document.getElementById(elementId);
   logsDiv.innerHTML = `<p>${message}</p>`;
 }
 
@@ -91,10 +91,11 @@ function updatePlayers() {
 }
 
 // Function to send log messages to the server
-function sendLogMessage(message) {
+function sendLogMessage(message, elementId) {
   const logData = {
     command: "broadcast_log",
     message: message,
+	elementId: elementId,
   };
   console.log("Sending log message:", logData);
   gameSocket.send(JSON.stringify(logData));
@@ -114,11 +115,11 @@ function sendScoreData() {
 
   // Send the game data to the server via WebSocket
   gameSocket.send(JSON.stringify(scoreData));
-  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2);
+  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores", "logs");
 }
 
 function sendGameData() {
-  console.log("SendGameData called");
+  //console.log("SendGameData called");
   var gameData = {
     command: "update",
     //players: {
@@ -140,11 +141,12 @@ function sendGameData() {
       y: ball.y,
       dx: ball.dx,
       dy: ball.dy,
+	  resetting: ball.resetting,
     },
     // Include other relevant data if needed
   };
 
-  console.log("Sending data:", gameData);
+  //console.log("Sending data:", gameData);
 
   // Send the game data to the server via WebSocket
   gameSocket.send(JSON.stringify(gameData));
@@ -208,11 +210,14 @@ function loop() {
 	if (ball.x < 0) {
 		// Ball passed the left edge, player 2 scores
 		scorePlayer2++;
-	} else if (ball.x >= canvas.width) {
+	} else if (ball.x > canvas.width ) {
 		// Ball passed the right edge, player 1 scores
 		scorePlayer1++;
+		console.log("SCORE!! Player 1 score: " + scorePlayer1);
 	}
+
 	sendScoreData();
+	sendGameData();
 
     // give some time for the player to recover before launching the ball again
     setTimeout(() => {
@@ -220,6 +225,7 @@ function loop() {
       ball.x = canvas.width / 2;
       ball.y = canvas.height / 2;
     }, 800);
+
   }
 
   // check to see if ball collides with paddle. if they do change x velocity
@@ -315,12 +321,12 @@ gameSocket.onopen = function (event) {
 gameSocket.onmessage = function (event) {
   try {
     var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
-    console.log("Parsed inner data:", data);
+    //console.log("Parsed inner data:", data);
 
 
     if (data.command === "update_players") {
 	  if (player1 === "" && player2 === "") {
-		sendLogMessage("Player " + char_choice + ", id = " + 1 + " has joined the game!");
+		sendLogMessage("Player " + char_choice + ", id = " + 1 + " has joined the game!", "logs");
 	  }
       if (player1 !== "" && player2 !== "" && player1 !== player2) {
         console.log("PLAYERS SET!");
@@ -341,7 +347,7 @@ gameSocket.onmessage = function (event) {
         player2 = data.players.player2;
         player = 2;
 		sendLogMessage("Player " + char_choice + ", id = " + player + " has joined the game!\n"
-		               + "<p> Player 1 is " + data.players.player1 + " and Player 2 is " + data.players.player2 + "</p>");
+		               + "<p> Player 1 is " + data.players.player1 + " and Player 2 is " + data.players.player2 + "</p>", "logs");
 		ball.dx = ballSpeed;
 		ball.dy = -ballSpeed;
 		sendGameData();
@@ -355,7 +361,7 @@ gameSocket.onmessage = function (event) {
     if (data.command === "broadcast_log") {
       if (data.message) {
         // Display the log message in the logs div using the addLog function
-        addLog(data.message);
+        addLog(data.message, data.elementId);
       }
     }
 
@@ -373,6 +379,7 @@ gameSocket.onmessage = function (event) {
       ball.y = data.ball.y;
       ball.dx = data.ball.dx;
       ball.dy = data.ball.dy;
+	  ball.resetting = data.ball.resetting;
     }
 
 	if (data.command === "updateScore") {
