@@ -9,7 +9,7 @@ var ballSpeed = 2;
 
 const leftPaddle = {
   // start in the middle of the game on the left side
-  x: 0 ,
+  x: 0,
   y: canvas.height / 2 - paddleHeight / 2,
   width: grid,
   height: paddleHeight,
@@ -40,6 +40,7 @@ const ball = {
   // ball velocity (start going to the top-right corner)
   dx: 0,
   dy: 0,
+  speed: ballSpeed,
 };
 
 // check for collision between two objects using axis-aligned bounding box (AABB)
@@ -77,6 +78,7 @@ var scorePlayer2 = 0;
 
 var match = 1;
 
+var gamePaused = false; // Variable to track game pause state
 
 function updatePlayers() {
   console.log("UPDATEPLAYERS called");
@@ -97,21 +99,21 @@ function sendLogMessage(message, elementId) {
   const logData = {
     command: "broadcast_log",
     message: message,
-	elementId: elementId,
+    elementId: elementId,
   };
   console.log("Sending log message:", logData);
   gameSocket.send(JSON.stringify(logData));
 }
 
 function sendScoreData() {
-	  console.log("SendScoreData called");
+  console.log("SendScoreData called");
   var scoreData = {
-	command: "updateScore",
-	players: {
-	  scorePlayer1: scorePlayer1,
-	  scorePlayer2: scorePlayer2,
-	  match: match,
-	},
+    command: "updateScore",
+    players: {
+      scorePlayer1: scorePlayer1,
+      scorePlayer2: scorePlayer2,
+      match: match,
+    },
   };
 
   console.log("Sending data:", scoreData);
@@ -122,15 +124,28 @@ function sendScoreData() {
 }
 
 function sendGameEnd() {
-	  console.log("SendGameEnd called");
+  console.log("SendGameEnd called");
   var gameEnd = {
-	command: "gameEnd",
+    command: "gameEnd",
   };
 
   console.log("Sending data:", gameEnd);
 
   // Send the game data to the server via WebSocket
   gameSocket.send(JSON.stringify(gameEnd));
+}
+
+function sendGamePause() {
+	  console.log("SendGamePause called");
+  var gamePause = {
+	command: "gamePause",
+	gamePaused: gamePaused,
+  };
+
+  console.log("Sending data:", gamePause);
+
+  // Send the game data to the server via WebSocket
+  gameSocket.send(JSON.stringify(gamePause));
 }
 
 function sendGameData() {
@@ -156,7 +171,8 @@ function sendGameData() {
       y: ball.y,
       dx: ball.dx,
       dy: ball.dy,
-	  resetting: ball.resetting,
+      resetting: ball.resetting,
+      speed: ballSpeed,
     },
     // Include other relevant data if needed
   };
@@ -167,9 +183,20 @@ function sendGameData() {
   gameSocket.send(JSON.stringify(gameData));
 }
 
+
+
+// Listen to keyboard events to pause/resume the game
+document.addEventListener("keydown", function (e) {
+  if (e.key === " ") { // Check for space bar key press
+	gamePaused = !gamePaused; // Toggle game pause state
+	sendGamePause();
+  }
+});
+
 // game loop
 function loop() {
-  requestAnimationFrame(loop);
+	requestAnimationFrame(loop);
+  //requestAnimationFrame(loop);
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   // move paddles by their velocity
@@ -205,8 +232,10 @@ function loop() {
   );
 
   // move ball by its velocity
+  if (!gamePaused) {
   ball.x += ball.dx;
   ball.y += ball.dy;
+  }
 
   // prevent ball from going through walls by changing its velocity
   if (ball.y < grid) {
@@ -221,47 +250,46 @@ function loop() {
   if ((ball.x < 0 || ball.x > canvas.width) && !ball.resetting) {
     ball.resetting = true;
 
-		// reset ball if it goes past left or right edge
-	if (ball.x < 0) {
-		// Ball passed the left edge, player 2 scores
-		scorePlayer2++;
-	} else if (ball.x > canvas.width ) {
-		// Ball passed the right edge, player 1 scores
-		scorePlayer1++;
-		console.log("SCORE!! Player 1 score: " + scorePlayer1);
-	}
+    // reset ball if it goes past left or right edge
+    if (ball.x < 0) {
+      // Ball passed the left edge, player 2 scores
+      scorePlayer2++;
+    } else if (ball.x > canvas.width) {
+      // Ball passed the right edge, player 1 scores
+      scorePlayer1++;
+      console.log("SCORE!! Player 1 score: " + scorePlayer1);
+    }
 
-	if (scorePlayer1 >= 2 || scorePlayer2 >= 2) {
-		if (scorePlayer1 > scorePlayer2) {
-			sendLogMessage("Player 1 wins the match " + match, "logs");
-			sendLogMessage("Match: " + match, "match");
-		} else if (scorePlayer1 < scorePlayer2) {
-			sendLogMessage("Player 2 wins the match " + match, "logs");
-			sendLogMessage("Match: " + match, "match");
-		} else {
-			sendLogMessage("It's a tie!", "logs");
-		}
-		scorePlayer1 = 0;
-		scorePlayer2 = 0;
-		match++;
+    if (scorePlayer1 >= 2 || scorePlayer2 >= 2) {
+      if (scorePlayer1 > scorePlayer2) {
+        sendLogMessage("Player 1 wins the match " + match, "logs");
+        sendLogMessage("Match: " + match, "match");
+      } else if (scorePlayer1 < scorePlayer2) {
+        sendLogMessage("Player 2 wins the match " + match, "logs");
+        sendLogMessage("Match: " + match, "match");
+      } else {
+        sendLogMessage("It's a tie!", "logs");
+      }
+      scorePlayer1 = 0;
+      scorePlayer2 = 0;
+      match++;
 
-		if (match > 2) {
-			sendLogMessage("Game over!", "logs");
-			sendGameEnd();
-		}
-	}
+      if (match > 2) {
+        sendLogMessage("Game over!", "logs");
+        sendGameEnd();
+      }
+    }
 
-	sendScoreData();
-	sendGameData();
+    sendScoreData();
+    sendGameData();
 
     // give some time for the player to recover before launching the ball again
     setTimeout(() => {
       ball.resetting = false;
       ball.x = canvas.width / 2;
       ball.y = canvas.height / 2;
-	  sendGameData();
+      sendGameData();
     }, 800);
-
   }
 
   // check to see if ball collides with paddle. if they do change x velocity
@@ -296,6 +324,7 @@ function loop() {
   }
 }
 
+
 // listen to keyboard events to move the paddles
 document.addEventListener("keydown", function (e) {
   // Player 1 controls (left paddle) - Arrow keys
@@ -325,6 +354,8 @@ document.addEventListener("keydown", function (e) {
   sendGameData();
 });
 
+
+
 // listen to keyboard events to stop the paddle if key is released
 document.addEventListener("keyup", function (e) {
   // Player 1 controls
@@ -344,6 +375,10 @@ document.addEventListener("keyup", function (e) {
   sendGameData();
 });
 
+
+
+
+
 // Event handler for successful connection
 gameSocket.onopen = function (event) {
   console.log("WebSocket connection opened!");
@@ -361,11 +396,13 @@ gameSocket.onmessage = function (event) {
     var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
     //console.log("Parsed inner data:", data);
 
-
     if (data.command === "update_players") {
-	  if (player1 === "" && player2 === "") {
-		sendLogMessage("Player " + char_choice + ", id = " + 1 + " has joined the game!", "logs");
-	  }
+      if (player1 === "" && player2 === "") {
+        sendLogMessage(
+          "Player " + char_choice + ", id = " + 1 + " has joined the game!",
+          "logs"
+        );
+      }
       if (player1 !== "" && player2 !== "" && player1 !== player2) {
         console.log("PLAYERS SET!");
         console.log("player1:", player1);
@@ -384,12 +421,23 @@ gameSocket.onmessage = function (event) {
         player1 = data.players.player1;
         player2 = data.players.player2;
         player = 2;
-		sendLogMessage("Player " + char_choice + ", id = " + player + " has joined the game!\n"
-		               + "<p> Player 1 is " + data.players.player1 + " and Player 2 is " + data.players.player2 + "</p>", "logs");
-		ball.dx = ballSpeed;
-		ball.dy = -ballSpeed;
-		sendGameData();
-		sendScoreData();
+        sendLogMessage(
+          "Player " +
+            char_choice +
+            ", id = " +
+            player +
+            " has joined the game!\n" +
+            "<p> Player 1 is " +
+            data.players.player1 +
+            " and Player 2 is " +
+            data.players.player2 +
+            "</p>",
+          "logs"
+        );
+        ball.dx = ball.ballSpeed;
+        ball.dy = -ball.ballSpeed;
+        sendGameData();
+        sendScoreData();
       }
     }
     //console.log("player1:", player1);
@@ -418,23 +466,29 @@ gameSocket.onmessage = function (event) {
       ball.y = data.ball.y;
       ball.dx = data.ball.dx;
       ball.dy = data.ball.dy;
-	  ball.resetting = data.ball.resetting;
+      ball.resetting = data.ball.resetting;
+      ball.ballSpeed = data.ball.speed;
     }
 
-	if (data.command === "updateScore") {
-	  scorePlayer1 = data.players.scorePlayer1;
-	  scorePlayer2 = data.players.scorePlayer2;
-	  match = data.players.match;
+    if (data.command === "updateScore") {
+      scorePlayer1 = data.players.scorePlayer1;
+      scorePlayer2 = data.players.scorePlayer2;
+      match = data.players.match;
+    }
+
+    if (data.command === "gameEnd") {
+      gameSocket.close();
+
+      // Redirect to another page after a short delay (e.g., 2 seconds)
+      setTimeout(function () {
+        window.location.href = "/dashboard/"; // Replace '/path/to/another/page' with the desired URL
+      }, 500); // 2000 milliseconds = 2 seconds
+    }
+
+	if (data.command === "gamePause") {
+		gamePaused = data.gamePaused;
 	}
 
-	if (data.command === "gameEnd") {
-		gameSocket.close();
-
-		// Redirect to another page after a short delay (e.g., 2 seconds)
-        setTimeout(function() {
-            window.location.href = '/dashboard/'; // Replace '/path/to/another/page' with the desired URL
-        }, 500); // 2000 milliseconds = 2 seconds
-	}
 
     // Process the received data
     // Example: Update game state based on received data
