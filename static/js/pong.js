@@ -72,8 +72,10 @@ var gameSocket = new WebSocket(connectionString);
 var player = 0;
 var player1 = "";
 var player2 = "";
-let scorePlayer1 = 0;
-let scorePlayer2 = 0;
+var scorePlayer1 = 0;
+var scorePlayer2 = 0;
+
+var match = 1;
 
 
 function updatePlayers() {
@@ -108,6 +110,7 @@ function sendScoreData() {
 	players: {
 	  scorePlayer1: scorePlayer1,
 	  scorePlayer2: scorePlayer2,
+	  match: match,
 	},
   };
 
@@ -115,7 +118,7 @@ function sendScoreData() {
 
   // Send the game data to the server via WebSocket
   gameSocket.send(JSON.stringify(scoreData));
-  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores", "logs");
+  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 }
 
 function sendGameData() {
@@ -214,6 +217,21 @@ function loop() {
 		// Ball passed the right edge, player 1 scores
 		scorePlayer1++;
 		console.log("SCORE!! Player 1 score: " + scorePlayer1);
+	}
+
+	if (scorePlayer1 >= 2 || scorePlayer2 >= 2) {
+		if (scorePlayer1 > scorePlayer2) {
+			sendLogMessage("Player 1 wins the match " + match, "logs");
+			sendLogMessage("Match: " + match, "match");
+		} else if (scorePlayer1 < scorePlayer2) {
+			sendLogMessage("Player 2 wins the match " + match, "logs");
+			sendLogMessage("Match: " + match, "match");
+		} else {
+			sendLogMessage("It's a tie!", "logs");
+		}
+		scorePlayer1 = 0;
+		scorePlayer2 = 0;
+		match++;
 	}
 
 	sendScoreData();
@@ -315,6 +333,8 @@ gameSocket.onopen = function (event) {
   // Call sendGameData() after establishing the WebSocket connection
   sendGameData();
   updatePlayers();
+  sendLogMessage("Match: " + match, "match");
+  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
   //sendLogMessage("Player " + char_choice + ", id = " + player + " has joined the game!");
   // Perform actions after successful connection
 };
@@ -352,6 +372,7 @@ gameSocket.onmessage = function (event) {
 		ball.dx = ballSpeed;
 		ball.dy = -ballSpeed;
 		sendGameData();
+		sendScoreData();
       }
     }
     //console.log("player1:", player1);
@@ -386,6 +407,7 @@ gameSocket.onmessage = function (event) {
 	if (data.command === "updateScore") {
 	  scorePlayer1 = data.players.scorePlayer1;
 	  scorePlayer2 = data.players.scorePlayer2;
+	  match = data.players.match;
 	}
 
     // Process the received data
