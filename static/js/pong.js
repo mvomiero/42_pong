@@ -9,7 +9,7 @@ var ballSpeed = 2;
 
 const leftPaddle = {
   // start in the middle of the game on the left side
-  x: grid * 2,
+  x: 0 ,
   y: canvas.height / 2 - paddleHeight / 2,
   width: grid,
   height: paddleHeight,
@@ -19,7 +19,7 @@ const leftPaddle = {
 };
 const rightPaddle = {
   // start in the middle of the game on the right side
-  x: canvas.width - grid * 3,
+  x: canvas.width - grid,
   y: canvas.height / 2 - paddleHeight / 2,
   width: grid,
   height: paddleHeight,
@@ -72,7 +72,9 @@ var gameSocket = new WebSocket(connectionString);
 var player = 0;
 var player1 = "";
 var player2 = "";
-let players_set = false;
+let scorePlayer1 = 0;
+let scorePlayer2 = 0;
+
 
 function updatePlayers() {
   console.log("UPDATEPLAYERS called");
@@ -82,7 +84,6 @@ function updatePlayers() {
       player: char_choice,
       player1: player1,
       player2: player2,
-      //players_set: players_set,
     },
   };
   console.log("Updaate players Sending data:", Data);
@@ -99,14 +100,30 @@ function sendLogMessage(message) {
   gameSocket.send(JSON.stringify(logData));
 }
 
+function sendScoreData() {
+	  console.log("SendScoreData called");
+  var scoreData = {
+	command: "updateScore",
+	players: {
+	  scorePlayer1: scorePlayer1,
+	  scorePlayer2: scorePlayer2,
+	},
+  };
+
+  console.log("Sending data:", scoreData);
+
+  // Send the game data to the server via WebSocket
+  gameSocket.send(JSON.stringify(scoreData));
+  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2);
+}
+
 function sendGameData() {
   console.log("SendGameData called");
   var gameData = {
     command: "update",
     //players: {
-    //	player: char_choice,
-    //	player1: player1,
-    //	player2: player2,
+    //	scorePlayer1: scorePlayer1,
+    //	scorePlayer2: scorePlayer2,
     //},
     leftPaddle: {
       x: leftPaddle.x,
@@ -187,12 +204,22 @@ function loop() {
   if ((ball.x < 0 || ball.x > canvas.width) && !ball.resetting) {
     ball.resetting = true;
 
+		// reset ball if it goes past left or right edge
+	if (ball.x < 0) {
+		// Ball passed the left edge, player 2 scores
+		scorePlayer2++;
+	} else if (ball.x >= canvas.width) {
+		// Ball passed the right edge, player 1 scores
+		scorePlayer1++;
+	}
+	sendScoreData();
+
     // give some time for the player to recover before launching the ball again
     setTimeout(() => {
       ball.resetting = false;
       ball.x = canvas.width / 2;
       ball.y = canvas.height / 2;
-    }, 400);
+    }, 800);
   }
 
   // check to see if ball collides with paddle. if they do change x velocity
@@ -290,12 +317,6 @@ gameSocket.onmessage = function (event) {
     var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
     console.log("Parsed inner data:", data);
 
-    if (data.command === "update") {
-      console.log("the command is to update!");
-    }
-
-    //console.log('char_choice:', char_choice);
-    //console.log('data.players.player:', data.players.player);
 
     if (data.command === "update_players") {
 	  if (player1 === "" && player2 === "") {
@@ -353,6 +374,11 @@ gameSocket.onmessage = function (event) {
       ball.dx = data.ball.dx;
       ball.dy = data.ball.dy;
     }
+
+	if (data.command === "updateScore") {
+	  scorePlayer1 = data.players.scorePlayer1;
+	  scorePlayer2 = data.players.scorePlayer2;
+	}
 
     // Process the received data
     // Example: Update game state based on received data
