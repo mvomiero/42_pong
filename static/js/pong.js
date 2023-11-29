@@ -121,6 +121,18 @@ function sendScoreData() {
   sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 }
 
+function sendGameEnd() {
+	  console.log("SendGameEnd called");
+  var gameEnd = {
+	command: "gameEnd",
+  };
+
+  console.log("Sending data:", gameEnd);
+
+  // Send the game data to the server via WebSocket
+  gameSocket.send(JSON.stringify(gameEnd));
+}
+
 function sendGameData() {
   //console.log("SendGameData called");
   var gameData = {
@@ -232,6 +244,11 @@ function loop() {
 		scorePlayer1 = 0;
 		scorePlayer2 = 0;
 		match++;
+
+		if (match > 2) {
+			sendLogMessage("Game over!", "logs");
+			sendGameEnd();
+		}
 	}
 
 	sendScoreData();
@@ -408,6 +425,15 @@ gameSocket.onmessage = function (event) {
 	  scorePlayer1 = data.players.scorePlayer1;
 	  scorePlayer2 = data.players.scorePlayer2;
 	  match = data.players.match;
+	}
+
+	if (data.command === "gameEnd") {
+		gameSocket.close();
+
+		// Redirect to another page after a short delay (e.g., 2 seconds)
+        setTimeout(function() {
+            window.location.href = '/'; // Replace '/path/to/another/page' with the desired URL
+        }, 2000); // 2000 milliseconds = 2 seconds
 	}
 
     // Process the received data
