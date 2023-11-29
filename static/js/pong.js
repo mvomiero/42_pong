@@ -53,6 +53,12 @@ function collides(obj1, obj2) {
   );
 }
 
+// Function to add logs to the logs div
+function addLog(message) {
+  const logsDiv = document.getElementById("logs");
+  logsDiv.innerHTML = `<p>${message}</p>`;
+}
+
 // Websocket code
 var roomCode = document.getElementById("game_board").getAttribute("room_code");
 var char_choice = document
@@ -81,6 +87,16 @@ function updatePlayers() {
   };
   console.log("Updaate players Sending data:", Data);
   gameSocket.send(JSON.stringify(Data));
+}
+
+// Function to send log messages to the server
+function sendLogMessage(message) {
+  const logData = {
+    command: "broadcast_log",
+    message: message,
+  };
+  console.log("Sending log message:", logData);
+  gameSocket.send(JSON.stringify(logData));
 }
 
 function sendGameData() {
@@ -265,6 +281,7 @@ gameSocket.onopen = function (event) {
   // Call sendGameData() after establishing the WebSocket connection
   sendGameData();
   updatePlayers();
+  //sendLogMessage("Player " + char_choice + ", id = " + player + " has joined the game!");
   // Perform actions after successful connection
 };
 
@@ -281,6 +298,9 @@ gameSocket.onmessage = function (event) {
     //console.log('data.players.player:', data.players.player);
 
     if (data.command === "update_players") {
+	  if (player1 === "" && player2 === "") {
+		sendLogMessage("Player " + char_choice + ", id = " + 1 + " has joined the game!");
+	  }
       if (player1 !== "" && player2 !== "" && player1 !== player2) {
         console.log("PLAYERS SET!");
         console.log("player1:", player1);
@@ -299,11 +319,21 @@ gameSocket.onmessage = function (event) {
         player1 = data.players.player1;
         player2 = data.players.player2;
         player = 2;
+		sendLogMessage("Player " + char_choice + ", id = " + player + " has joined the game!\n"
+		               + "<p> Player 1 is " + data.players.player1 + " and Player 2 is " + data.players.player2 + "</p>");
       }
     }
-    console.log("player1:", player1);
-    console.log("player2:", player2);
-    console.log("player:", player);
+    //console.log("player1:", player1);
+    //console.log("player2:", player2);
+    //console.log("player:", player);
+
+    // Check if the received command is for broadcasting log messages
+    if (data.command === "broadcast_log") {
+      if (data.message) {
+        // Display the log message in the logs div using the addLog function
+        addLog(data.message);
+      }
+    }
 
     // Now you can access the properties correctly
     if (data.command === "update") {
