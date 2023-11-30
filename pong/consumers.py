@@ -5,37 +5,50 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 class PongConsumer(AsyncJsonWebsocketConsumer):
 
-    async def connect(self):
-        # Extract the room code from the channel's path
-        self.room_code = self.scope['url_route']['kwargs']['room_code']
+    connected_users = {}  # Dictionary to store connected users and their connections
 
-        # Construct a room group name that the channel will join (basic string formatting)
+    async def connect(self):
+        self.room_code = self.scope['url_route']['kwargs']['room_code']
         self.room_group_name = 'room_%s' % self.room_code
 
-        # Join the room group
-            # await is used to pause the execution of an asynchronous function until the awaited coroutine is complete.
-            # self.channel_layer.group_add(group, channel) --> Adds a channel (ws connection) to a group.
         await self.channel_layer.group_add(
-            self.room_group_name, # the attribute that we defined above
+            self.room_group_name,
             self.channel_name,
         )
 
-            # Retrieve the group size
-        group_size = len(self.channel_layer.groups.get(self.room_group_name, {}).items())
+        # Add the connected user and their connection to the dictionary
+        user_id = self.scope["user"].id  # Assuming authentication is implemented and user information is available
+        if user_id:
+            if user_id not in self.connected_users:
+                self.connected_users[user_id] = set()
+            self.connected_users[user_id].add(self.channel_name)
 
-        # Print the group size
+        group_size = len(self.channel_layer.groups.get(self.room_group_name, {}).items())
         print(f"The size of group '{self.room_group_name}' is: {group_size}")
 
-        # Accept the connection
+        # Additional print statement at connection
+        if user_id:
+            print(f"User {user_id} connected with channel name {self.channel_name}")
+
         await self.accept()
 
     async def disconnect(self, close_code):
-        print("Disconnected")
-        # Leave room group
+        # Remove the connection from the dictionary when a user disconnects
+        user_id = self.scope["user"].id
+        if user_id in self.connected_users:
+            self.connected_users[user_id].discard(self.channel_name)
+            if not self.connected_users[user_id]:
+                del self.connected_users[user_id]
+
         await self.channel_layer.group_discard(
             self.room_group_name,
-            self.channel_name
+            self.channel_name,
         )
+
+        # Additional print statement at disconnection
+        if user_id:
+            print(f"User {user_id} disconnected from channel name {self.channel_name}")
+
     
     async def receive(self, text_data):
         """
