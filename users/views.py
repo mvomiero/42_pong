@@ -8,9 +8,14 @@ from django.http import HttpResponseNotAllowed
 from .forms import CustomUserForm
 
 def dashboard(request):
+    if request.method == "POST":
+        room_code = request.POST.get("room_code")
+        char_choice = request.user.id  # Using the authenticated user's ID directly
+        return redirect('/play/%s?&choice=%s' % (room_code, char_choice))
+
     if request.user.is_authenticated:
         bio = request.user.bio
-        return render(request, "users/dashboard.html", {'bio': bio})
+        return render(request, "users/dashboard.html", {'bio': bio, 'user_id': request.user.id})
     else:
         # Handle the case when the user is not authenticated
         return render(request, "users/dashboard.html")

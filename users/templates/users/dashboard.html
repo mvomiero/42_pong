@@ -1,6 +1,6 @@
 <!--users/templates/users/dashboard.html-->
 
-{% extends 'base.html' %}
+{% extends 'base_users.html' %}
 
 {% block content %}
 
@@ -17,6 +17,19 @@ Hello, {{ user.username|default:'Guest' }}!
 </div>
 
 {% if user.is_authenticated %}
+
+<form method="POST">
+    
+    {% csrf_token %}
+    <div class='form-control'>
+      <label for="room">Room id</label>
+      <input id="room" type="text" name="room_code" required />
+    </div>
+    <input type="hidden" name="user_id" value="{{ user_id }}" /> <!-- Add this line -->
+    <input type="submit" class="button" value="Start Game" />
+  </form>
+</div>
+
     <div>
         <h3>Bio:</h3>
         {% if bio %}
