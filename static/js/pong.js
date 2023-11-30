@@ -60,11 +60,41 @@ function addLog(message, elementId) {
   logsDiv.innerHTML = `<p>${message}</p>`;
 }
 
+// Function to fetch user ID via AJAX
+function fetchUserId() {
+    fetch('/get_user_id/') // Replace with your endpoint URL
+        .then(response => response.json())
+        .then(data => {
+            // Check if user_id is fetched properly
+            if (data && data.user_id) {
+                // Use the fetched user ID securely in your JavaScript
+                var userId = data.user_id;
+                var char_choice = userId; // Set char_choice to user_id
+                console.log('User ID fetched:', userId);
+                // Perform actions with the user ID
+            } else {
+                // Fetching user ID failed, use default char_choice from the HTML attribute
+                var char_choice = document
+                    .getElementById("game_board")
+                    .getAttribute("char_choice");
+                console.log('Failed to fetch user ID, using default:', char_choice);
+            }
+            
+            // Further logic using char_choice variable
+            // ...
+        })
+        .catch(error => {
+            console.error('Error fetching user ID:', error);
+        });
+}
+
 // Websocket code
 var roomCode = document.getElementById("game_board").getAttribute("room_code");
-var char_choice = document
+var char_choice;
+fetchUserId(); // Fetch user ID via AJAX
+/*var char_choice = document
   .getElementById("game_board")
-  .getAttribute("char_choice");
+  .getAttribute("char_choice");*/
 
 var connectionString =
   "ws://" + window.location.host + "/ws/play/" + roomCode + "/";

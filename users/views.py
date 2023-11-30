@@ -6,6 +6,7 @@ from django.urls import reverse
 from users.forms import CustomUserCreationForm
 from django.http import HttpResponseNotAllowed
 from .forms import CustomUserForm
+from django.http import JsonResponse
 
 def dashboard(request):
     if request.method == "POST":
@@ -51,3 +52,11 @@ def profile_update(request):
     else:
         form = CustomUserForm(instance=request.user)
     return render(request, 'users/profile_update.html', {'form': form})
+
+
+def get_user_id(request):
+    if request.user.is_authenticated:
+        user_id = request.user.id
+        return JsonResponse({'user_id': user_id})
+    else:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
