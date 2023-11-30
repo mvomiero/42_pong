@@ -60,6 +60,8 @@ function addLog(message, elementId) {
   logsDiv.innerHTML = `<p>${message}</p>`;
 }
 
+
+
 // Function to fetch user ID via AJAX
 function fetchUserId() {
     fetch('/get_user_id/') // Replace with your endpoint URL
@@ -69,16 +71,20 @@ function fetchUserId() {
             if (data && data.user_id) {
                 // Use the fetched user ID securely in your JavaScript
                 var userId = data.user_id;
-                var char_choice = userId; // Set char_choice to user_id
+                char_choice = userId; // Set char_choice to user_id
                 console.log('User ID fetched:', userId);
                 // Perform actions with the user ID
             } else {
                 // Fetching user ID failed, use default char_choice from the HTML attribute
-                var char_choice = document
+                char_choice = document
                     .getElementById("game_board")
                     .getAttribute("char_choice");
                 console.log('Failed to fetch user ID, using default:', char_choice);
             }
+			sendGameData();
+  			updatePlayers();
+			sendLogMessage("Match: " + match, "match");
+			sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
             
             // Further logic using char_choice variable
             // ...
@@ -91,10 +97,6 @@ function fetchUserId() {
 // Websocket code
 var roomCode = document.getElementById("game_board").getAttribute("room_code");
 var char_choice;
-fetchUserId(); // Fetch user ID via AJAX
-/*var char_choice = document
-  .getElementById("game_board")
-  .getAttribute("char_choice");*/
 
 var connectionString =
   "ws://" + window.location.host + "/ws/play/" + roomCode + "/";
@@ -412,13 +414,12 @@ document.addEventListener("keyup", function (e) {
 // Event handler for successful connection
 gameSocket.onopen = function (event) {
   console.log("WebSocket connection opened!");
-  // Call sendGameData() after establishing the WebSocket connection
-  sendGameData();
-  updatePlayers();
-  sendLogMessage("Match: " + match, "match");
-  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
-  //sendLogMessage("Player " + char_choice + ", id = " + player + " has joined the game!");
-  // Perform actions after successful connection
+  fetchUserId(); // Fetch user ID via AJAX
+  //sendGameData();
+  //updatePlayers();
+  //sendLogMessage("Match: " + match, "match");
+  //sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
+
 };
 
 gameSocket.onmessage = function (event) {

@@ -12,7 +12,7 @@ def dashboard(request):
     if request.method == "POST":
         room_code = request.POST.get("room_code")
         char_choice = request.user.id  # Using the authenticated user's ID directly
-        return redirect('/play/%s?&choice=%s' % (room_code, char_choice))
+        return redirect('/play/%s' % (room_code))
 
     if request.user.is_authenticated:
         bio = request.user.bio
