@@ -54,9 +54,16 @@ def profile_update(request):
     return render(request, 'users/profile_update.html', {'form': form})
 
 
-def get_user_id(request):
+def get_user_info(request):
     if request.user.is_authenticated:
         user_id = request.user.id
-        return JsonResponse({'user_id': user_id})
+        user_info = {
+            'user_id': user_id,
+            'username': request.user.username,
+            'bio': request.user.profile.bio if hasattr(request.user, 'profile') else None
+            # Add other user-related data as needed
+        }
+        return JsonResponse(user_info)
     else:
         return JsonResponse({'error': 'User not authenticated'}, status=401)
+

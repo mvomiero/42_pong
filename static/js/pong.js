@@ -60,7 +60,9 @@ function addLog(message, elementId) {
   logsDiv.innerHTML = `<p>${message}</p>`;
 }
 
-
+// Define variables in a broader scope to access them later
+var username = '';
+var bio = '';
 
 // Function to fetch user ID via AJAX
 function fetchUserId() {
@@ -73,6 +75,12 @@ function fetchUserId() {
                 var userId = data.user_id;
                 char_choice = userId; // Set char_choice to user_id
                 console.log('User ID fetched:', userId);
+
+				username = data.username;
+                bio = data.bio;
+
+				console.log('Username:', username);
+				console.log('Bio:', bio);
                 // Perform actions with the user ID
             } else {
                 // Fetching user ID failed, use default char_choice from the HTML attribute
@@ -85,6 +93,7 @@ function fetchUserId() {
   			updatePlayers();
 			sendLogMessage("Match: " + match, "match");
 			sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
+			addLog("Username: " + username, "user");
             
             // Further logic using char_choice variable
             // ...
