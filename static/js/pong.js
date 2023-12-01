@@ -94,6 +94,7 @@ function fetchUserId() {
 			sendLogMessage("Match: " + match, "match");
 			sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 			addLog("Username: " + username, "user");
+			addLog("Bio: " + bio, "bio");
             
             // Further logic using char_choice variable
             // ...

@@ -60,7 +60,7 @@ def get_user_info(request):
         user_info = {
             'user_id': user_id,
             'username': request.user.username,
-            'bio': request.user.profile.bio if hasattr(request.user, 'profile') else None
+            'bio': request.user.bio if hasattr(request.user, 'bio') else None
             # Add other user-related data as needed
         }
         return JsonResponse(user_info)
