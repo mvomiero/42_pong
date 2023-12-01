@@ -6,15 +6,20 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 class PongConsumer(AsyncJsonWebsocketConsumer):
 
     connected_users = {}  # Dictionary to store connected users and their connections
+    room_size = 2  # Define the size of each room
+    room_counter = 0  # Counter to generate room codes
 
     async def connect(self):
-        self.room_code = self.scope['url_route']['kwargs']['room_code']
+        self.room_code = (self.room_counter // self.room_size) + 1
         self.room_group_name = 'room_%s' % self.room_code
 
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name,
         )
+
+        # Increment room_counter for the next connection
+        self.room_counter += 1
 
         # Add the connected user and their connection to the dictionary
         user_id = self.scope["user"].id  # Assuming authentication is implemented and user information is available
@@ -28,7 +33,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
 
         # Additional print statement at connection
         if user_id:
-            print(f"User {user_id} connected with channel name {self.channel_name}")
+            print(f"User {user_id} connected with channel name {self.channel_name} to room {self.room_group_name}")
 
         await self.accept()
 
