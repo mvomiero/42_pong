@@ -8,8 +8,12 @@
   <h1>Welcome to Pooong</h1>
 
 
-	<a href="{% url 'room' %}">Play uregistered</a>
+	<a href="{% url 'room' %}">Play unregistered</a>
+
+	<a href="{% url 'play_local' %}" class="btn">Play on local machine</a>
+  
+	<a href="{% url 'play_remote' %}" class="btn">Play remotely</a>
 
 
 </div>
-{% endblock content %}
+{% endblock content %}                   
