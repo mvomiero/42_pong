@@ -47,4 +47,11 @@ def play_local(request):
     return render(request, "pong/play_local.html")
 
 def play_remote(request):
+    if request.method == "POST":
+        game_type = request.POST.get("game_type")
+        char_choice = request.POST.get("character_choice")
+        return redirect(
+            '/play/%s?&choice=%s' 
+            %(game_type, char_choice) # replacing the strings just like printf
+        )
     return render(request, "pong/play_remote.html")

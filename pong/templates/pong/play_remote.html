@@ -11,16 +11,16 @@
 	
     {% csrf_token %}
     <div class='form-control'>
-      <label for="room">Room id</label>
-      <input id="room" type="text" name="room_code" required />
+      <!-- <label for="game_type">Match or Tournament?</label> -->
+      <!-- <input id="game_type" type="text" name="game_type" required /> -->
+      <select for="game_type" name="game_type">
+        <option value="match">Match</option>
+        <option value="tournament">Tournament</option>
+      </select>
     </div>
     <div class='form-control'>
 		<label for="character_choice">Your alias</label>
 		<input id="character_choice" type="text" name="character_choice" required />
-      <!--<select for="character_choice" name="character_choice">
-        <option value="X">X</option>
-        <option value="O">O</option>
-      </select>-->
     </div>
     <input type="submit" class="button" value="Start Game" />
   </form>
