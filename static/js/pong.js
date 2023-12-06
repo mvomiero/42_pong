@@ -62,40 +62,12 @@ function addLog(message, elementId) {
 
 
 
-// Function to fetch user ID via AJAX
-function fetchUserId() {
-    fetch('/get_user_id/') // Replace with your endpoint URL
-        .then(response => response.json())
-        .then(data => {
-            // Check if user_id is fetched properly
-            if (data && data.user_id) {
-                // Use the fetched user ID securely in your JavaScript
-                var userId = data.user_id;
-                char_choice = userId; // Set char_choice to user_id
-                console.log('User ID fetched:', userId);
-                // Perform actions with the user ID
-            } else {
-                // Fetching user ID failed, use default char_choice from the HTML attribute
-                char_choice = document
-                    .getElementById("game_board")
-                    .getAttribute("char_choice");
-                console.log('Failed to fetch user ID, using default:', char_choice);
-            }
-			sendGameData();
-  			updatePlayers();
-			sendLogMessage("Match: " + match, "match");
-			sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
-            
-            // Further logic using char_choice variable
-            // ...
-        })
-        .catch(error => {
-            console.error('Error fetching user ID:', error);
-        });
-}
 
 // Websocket code
 var roomCode = document.getElementById("game_board").getAttribute("room_code");
+char_choice = document
+                    .getElementById("game_board")
+                    .getAttribute("char_choice");
 var char_choice;
 
 var connectionString =
@@ -414,11 +386,11 @@ document.addEventListener("keyup", function (e) {
 // Event handler for successful connection
 gameSocket.onopen = function (event) {
   console.log("WebSocket connection opened!");
-  fetchUserId(); // Fetch user ID via AJAX
-  //sendGameData();
-  //updatePlayers();
-  //sendLogMessage("Match: " + match, "match");
-  //sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
+  //fetchUserId(); // Fetch user ID via AJAX
+  sendGameData();
+  updatePlayers();
+  sendLogMessage("Match: " + match, "match");
+  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 
 };
 

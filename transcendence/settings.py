@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'channels',
 	'pong',
-	"users",
+	#"users",
 ]
 
 MIDDLEWARE = [
@@ -155,8 +155,8 @@ STATICFILES_DIRS = [
 os.path.join(BASE_DIR, "static"),
 ]
 
-LOGIN_REDIRECT_URL = "dashboard"
-LOGOUT_REDIRECT_URL = "dashboard"
+# LOGIN_REDIRECT_URL = "dashboard"
+# LOGOUT_REDIRECT_URL = "dashboard"
 
 
-AUTH_USER_MODEL = 'users.CustomUser'
+# AUTH_USER_MODEL = 'users.CustomUser'

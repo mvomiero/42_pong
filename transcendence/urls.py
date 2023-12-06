@@ -17,11 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from pong.views import index
-from users.views import get_user_id
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("pong.urls")),
-	path("users/", include("users.urls")),
-	path('get_user_id/', get_user_id, name='get_user_id'),
+	#path("users/", include("users.urls")),
 ]
