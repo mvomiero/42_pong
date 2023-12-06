@@ -1,47 +1,50 @@
-const canvas = document.getElementById("game");
-const context = canvas.getContext("2d");
-const grid = 15;
-const paddleHeight = grid * 5; // 80
-const maxPaddleY = canvas.height - grid - paddleHeight;
+// const canvas = document.getElementById("game");
+// const context = canvas.getContext("2d");
+// const grid = 15;
+// const paddleHeight = grid * 5; // 80
+// const maxPaddleY = canvas.height - grid - paddleHeight;
 
-var paddleSpeed = 6;
-var ballSpeed = 2;
+// var paddleSpeed = 6;
+// var ballSpeed = 2;
 
-const leftPaddle = {
-  // start in the middle of the game on the left side
-  x: 0,
-  y: canvas.height / 2 - paddleHeight / 2,
-  width: grid,
-  height: paddleHeight,
+import { canvas, context, grid, paddleHeight, maxPaddleY, paddleSpeed, ballSpeed } from './constants.js';
+import { leftPaddle, rightPaddle, ball } from './objects.js';
 
-  // paddle velocity
-  dy: 0,
-};
-const rightPaddle = {
-  // start in the middle of the game on the right side
-  x: canvas.width - grid,
-  y: canvas.height / 2 - paddleHeight / 2,
-  width: grid,
-  height: paddleHeight,
+// const leftPaddle = {
+//   // start in the middle of the game on the left side
+//   x: 0,
+//   y: canvas.height / 2 - paddleHeight / 2,
+//   width: grid,
+//   height: paddleHeight,
 
-  // paddle velocity
-  dy: 0,
-};
-const ball = {
-  // start in the middle of the game
-  x: canvas.width / 2,
-  y: canvas.height / 2,
-  width: grid,
-  height: grid,
+//   // paddle velocity
+//   dy: 0,
+// };
+// const rightPaddle = {
+//   // start in the middle of the game on the right side
+//   x: canvas.width - grid,
+//   y: canvas.height / 2 - paddleHeight / 2,
+//   width: grid,
+//   height: paddleHeight,
 
-  // keep track of when need to reset the ball position
-  resetting: false,
+//   // paddle velocity
+//   dy: 0,
+// };
+// const ball = {
+//   // start in the middle of the game
+//   x: canvas.width / 2,
+//   y: canvas.height / 2,
+//   width: grid,
+//   height: grid,
 
-  // ball velocity (start going to the top-right corner)
-  dx: 0,
-  dy: 0,
-  speed: ballSpeed,
-};
+//   // keep track of when need to reset the ball position
+//   resetting: false,
+
+//   // ball velocity (start going to the top-right corner)
+//   dx: 0,
+//   dy: 0,
+//   speed: ballSpeed,
+// };
 
 // check for collision between two objects using axis-aligned bounding box (AABB)
 // @see https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection

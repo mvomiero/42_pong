@@ -155,6 +155,9 @@ STATICFILES_DIRS = [
 os.path.join(BASE_DIR, "static"),
 ]
 
+# Define the root directory where collectstatic will collect static files to
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # LOGIN_REDIRECT_URL = "dashboard"
 # LOGOUT_REDIRECT_URL = "dashboard"
 
