@@ -386,7 +386,6 @@ document.addEventListener("keyup", function (e) {
 // Event handler for successful connection
 gameSocket.onopen = function (event) {
   console.log("WebSocket connection opened!");
-  //fetchUserId(); // Fetch user ID via AJAX
   sendGameData();
   updatePlayers();
   sendLogMessage("Match: " + match, "match");
