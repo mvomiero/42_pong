@@ -71,7 +71,8 @@ char_choice = document
 var char_choice;
 
 var connectionString =
-  "ws://" + window.location.host + "/ws/play/" + roomCode + "/";
+  "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
+console.log("connectionString: ", connectionString);
 var gameSocket = new WebSocket(connectionString);
 
 var player = 0;
@@ -386,6 +387,7 @@ document.addEventListener("keyup", function (e) {
 // Event handler for successful connection
 gameSocket.onopen = function (event) {
   console.log("WebSocket connection opened!");
+  console.log("ConnectionString: ", connectionString);
   sendGameData();
   updatePlayers();
   sendLogMessage("Match: " + match, "match");

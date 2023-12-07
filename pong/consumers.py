@@ -8,7 +8,10 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     connected_users = {}  # Dictionary to store connected users and their connections
 
     async def connect(self):
-        self.room_code = self.scope['url_route']['kwargs']['room_code']
+        self.room_code = self.scope['url_route']['kwargs']['game_mode']
+        self.player = self.scope['url_route']['kwargs']['player']
+        print(f"room_code: {self.room_code}")
+        print(f"player: {self.player}")
         self.room_group_name = 'room_%s' % self.room_code
 
         await self.channel_layer.group_add(

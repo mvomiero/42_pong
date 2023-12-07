@@ -16,7 +16,7 @@ def room(request):
     return render(request, "pong/room.html")
 
 def pong(request, room_code):
-    choice = request.GET.get("choice") # get the choice from the url
+    choice = request.GET.get("player") # get the choice from the url
     context = {
         "char_choice": choice,
         "room_code": room_code,
@@ -48,10 +48,9 @@ def play_local(request):
 
 def play_remote(request):
     if request.method == "POST":
-        game_type = request.POST.get("game_type")
-        char_choice = request.POST.get("character_choice")
+        game_mode = request.POST.get("game_type")
+        char_player = request.POST.get("character_choice")
         return redirect(
-            '/play/%s?&choice=%s' 
-            %(game_type, char_choice) # replacing the strings just like printf
+            '/play/%s?&player=%s'%(game_mode, char_player) # replacing the strings just like printf
         )
     return render(request, "pong/play_remote.html")
