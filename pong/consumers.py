@@ -3,8 +3,27 @@
 import json 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
+# 1) 1. player joins -> create group_tournament && send message to player1 with player ID
+# 2) 2. & 3. player join -> add to group_tournament
+# 3) 4. player join -> add to group_tournament && broadcast message to all players in group_tournament
+# 4) make match-plan (create group_match1 with p1 & p2 & group_match2 with p3 & p4) -> broadcast message with tournament plan
+# 5) [Frontend] start playing matches -> broadcast message with match current status 
+# 6) [Frontend] match finished -> broadcast message with match result
+# 7) delete group_match -> [Frontend] broadcast message with tournament result (semi-final results)
+# 8) create group_matchFinal -> broadcast message with final match
+# 9) [Frontend] start playing matches -> broadcast message with match current status 
+# 10) [Frontend] match finished -> broadcast message with match result
+# 11) delete group_match -> [Frontend] broadcast message with tournament result (semi-final results)
+# 12) delete group_tournament -> [Frontend] broadcast message with tournament result (semi-final results)
+# 13) [Frontend] disconnect player
+# check at all times, that no players left (still 4 players in the group_tournament) -> if left: close tournament
+# check at connect that we don't have duplicates in alias (player name)
 class PongConsumer(AsyncJsonWebsocketConsumer):
 
+    # player:flo    | match:semi1
+    # player:marco  | match:semi1
+    # player:pierre | match:semi2
+    # player:john   | match:semi2
     connected_users = {}  # Dictionary to store connected users and their connections
 
     async def connect(self):
