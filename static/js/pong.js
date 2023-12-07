@@ -483,10 +483,19 @@ gameSocket.onmessage = function (event) {
     if (data.command === "gameEnd") {
       gameSocket.close();
 
+            // Create a new paragraph element
+      const newParagraph = document.createElement('p');
+
+      // Set the content of the paragraph
+      newParagraph.textContent = 'Game over!';
+
+      // Replace the canvas with the new paragraph
+      canvas.parentNode.replaceChild(newParagraph, canvas);
+
       // Redirect to another page after a short delay (e.g., 2 seconds)
-      setTimeout(function () {
-        window.location.href = "/dashboard/"; // Replace '/path/to/another/page' with the desired URL
-      }, 500); // 2000 milliseconds = 2 seconds
+      // setTimeout(function () {
+      //   window.location.href = "/dashboard/"; // Replace '/path/to/another/page' with the desired URL
+      // }, 500); // 2000 milliseconds = 2 seconds
     }
 
 	if (data.command === "gamePause") {
