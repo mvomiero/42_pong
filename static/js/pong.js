@@ -1,3 +1,8 @@
+// Fold all --> Ctrl + K + 0
+// Unfold all --> Ctrl + K + J
+// Fold current --> Ctrl + ]
+// Unfold current --> Ctrl + [
+
 const canvas = document.getElementById("game");
 const context = canvas.getContext("2d");
 const grid = 15;
@@ -190,6 +195,16 @@ function sendGameData() {
 
 
 
+function startGame() {
+  console.log("startGamefunction called!");
+  sendGameData();
+  updatePlayers();
+  sendLogMessage("Match: " + match, "match");
+  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
+}
+
+
+
 // Listen to keyboard events to pause/resume the game
 document.addEventListener("keydown", function (e) {
   if (e.key === " ") { // Check for space bar key press
@@ -360,7 +375,6 @@ document.addEventListener("keydown", function (e) {
 });
 
 
-
 // listen to keyboard events to stop the paddle if key is released
 document.addEventListener("keyup", function (e) {
   // Player 1 controls
@@ -380,6 +394,11 @@ document.addEventListener("keyup", function (e) {
   sendGameData();
 });
 
+// HTML Button click event to trigger the WebSocket actions
+document.getElementById("startGameButton").addEventListener("click", function() {
+  // Call the function when the button is clicked
+  startGame();
+});
 
 
 
@@ -388,10 +407,10 @@ document.addEventListener("keyup", function (e) {
 gameSocket.onopen = function (event) {
   console.log("WebSocket connection opened!");
   console.log("ConnectionString: ", connectionString);
-  sendGameData();
-  updatePlayers();
-  sendLogMessage("Match: " + match, "match");
-  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
+  // sendGameData();
+  // updatePlayers();
+  // sendLogMessage("Match: " + match, "match");
+  // sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 
 };
 
