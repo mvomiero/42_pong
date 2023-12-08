@@ -1,3 +1,8 @@
+// Fold all --> Ctrl + K + 0
+// Unfold all --> Ctrl + K + J
+// Fold current --> Ctrl + ]
+// Unfold current --> Ctrl + [
+
 const canvas = document.getElementById("game");
 const context = canvas.getContext("2d");
 const grid = 15;
@@ -188,6 +193,39 @@ function sendGameData() {
   gameSocket.send(JSON.stringify(gameData));
 }
 
+// Function to start the countdown
+function startCountdown() {
+  let countdown = 3; // Initial countdown number
+
+  // Initial display of countdown number
+  sendLogMessage(countdown > 0 ? countdown : '', "countdownText");
+
+  // Display the countdown at intervals of 1 second
+  const countdownInterval = setInterval(() => {
+    countdown--; // Decrement the countdown
+
+    if (countdown > 0) {
+      sendLogMessage(countdown, "countdownText");
+    } else if (countdown === 0) {
+      sendLogMessage('GO!', "countdownText");
+    } else {
+      sendLogMessage(' ', "countdownText");
+      clearInterval(countdownInterval); // Stop the countdown when it reaches 1
+    }
+  }, 1000); // 1 second interval
+}
+
+function startGame() {
+  console.log("startGamefunction called!");
+  sendGameData();
+  updatePlayers();
+  startCountdown();
+  sendLogMessage("Match: " + match, "match");
+  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
+}
+
+
+
 
 
 // Listen to keyboard events to pause/resume the game
@@ -360,7 +398,6 @@ document.addEventListener("keydown", function (e) {
 });
 
 
-
 // listen to keyboard events to stop the paddle if key is released
 document.addEventListener("keyup", function (e) {
   // Player 1 controls
@@ -380,6 +417,11 @@ document.addEventListener("keyup", function (e) {
   sendGameData();
 });
 
+// HTML Button click event to trigger the WebSocket actions
+document.getElementById("startGameButton").addEventListener("click", function() {
+  // Call the function when the button is clicked
+  startGame();
+});
 
 
 
@@ -388,10 +430,10 @@ document.addEventListener("keyup", function (e) {
 gameSocket.onopen = function (event) {
   console.log("WebSocket connection opened!");
   console.log("ConnectionString: ", connectionString);
-  sendGameData();
-  updatePlayers();
-  sendLogMessage("Match: " + match, "match");
-  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
+  // sendGameData();
+  // updatePlayers();
+  // sendLogMessage("Match: " + match, "match");
+  // sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 
 };
 
@@ -438,10 +480,13 @@ gameSocket.onmessage = function (event) {
             "</p>",
           "logs"
         );
-        ball.dx = ball.ballSpeed;
-        ball.dy = -ball.ballSpeed;
-        sendGameData();
-        sendScoreData();
+                // Wait for 4 seconds before changing ball speed and sending data
+        setTimeout(() => {
+          ball.dx = ball.ballSpeed;
+          ball.dy = -ball.ballSpeed;
+          sendGameData();
+          sendScoreData();
+        }, 4000); // 4000 milliseconds = 4 seconds
       }
     }
     //console.log("player1:", player1);
