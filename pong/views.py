@@ -54,3 +54,6 @@ def play_remote(request):
             '/play/%s?&player=%s'%(game_mode, char_player) # replacing the strings just like printf
         )
     return render(request, "pong/play_remote.html")
+
+def error_full(request):
+    return render(request, "pong/error_full.html")
