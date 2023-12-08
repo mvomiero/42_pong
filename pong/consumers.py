@@ -36,15 +36,12 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         print(f"player: {self.player}")
         self.match_id = None  # NEW
         self.tournament_id = None  # NEW
+        self.room_group_name = None  # NEW
         
         # To Do: Handle douplicates in alias (player name) for matches
 
         # Add the player to a match
         if self.room_code == "match":
-            # Refuse if set_match is full
-            if len(self.set_match) >= 1000:
-                await self.close(code=507)
-                return
             
             # Find the first match ID with only one player
             open_match = None
@@ -53,7 +50,15 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 if len(players) == 1:
                     open_match = match_id
                     break
-
+            
+            # Refuse if set_match is full
+            nbr_matches = len(self.set_match)
+            print(f"len(matches): {nbr_matches}")
+            if open_match is None and len(self.set_match) >= 1:
+                print("Match is full.")
+                await self.close(code=507)
+                return
+            
             print(f"open_match: {open_match}")
             if open_match is None:  # create a new match
                 # Find the smallest available ID for the new match
@@ -102,6 +107,9 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
 
     async def disconnect(self, close_code):
         # Remove the connection from the dictionaries when a user disconnects
+        if self.room_group_name is None:
+            print("No room_group_name found.")
+            return
         user_id = self.player
         print(f"Disconnecting user {user_id} from channel name {self.channel_name}")
         if user_id in self.connected_users:
