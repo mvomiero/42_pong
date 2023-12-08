@@ -45,11 +45,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'players': ['player3', 'player4'],
                     #     'matches': ['match2', 'match3']
                     # },
-        # add a player:     set_tournaments['id1']['players'].append('player5')
-        # remove player:    if player_to_remove in my_dict[id_to_modify]['players']:
-        #                       set_tournaments['id1']['players'].remove('player5')
-        # retrieving all players: players = set_tournaments['id1']['players']
-        # clearing all players: set_tournaments['id1']['players'].clear()
 
 
     # ************************************************************ #
@@ -101,36 +96,52 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     # ***************** LOGIC PLAYER MATCHMAKING ***************** #
     # ************************************************************ #
     async def add_player_to_match(self):
+        # OLD: set_matches = {match_id: [player, player], match_id: [player, player], ...}
+            # NEW (has to be implemented):
+                # set_matches = {
+                    # 'id1': {
+                    #     'players':    ['player1', 'player2'],
+                    #     'tournament': ['tournament_id']
+                    # },
+                    # 'id2': {
+                    #     'players':    ['player3', 'player4'],
+                    #     'tournament': ['None']        # "None" if not part of a tournament
+                    # },
+        # add a player:     set_matches['id1']['players'].append('player5')
+        # remove player:    if player_to_remove in set_matches['id1']['players']:
+        #                       set_matches['id1']['players'].remove('player5')
+        # retrieving all players: players = set_matches['id1']['players']
+        # clearing all players: set_matches['id1']['players'].clear()
+        # removing element from dictionary: del set_matches['id1']
+
         self.match_id = None
 
         max_nbr_games = 1000   # important to avoid overflow and undefined behavior with set_matcheses
 
         # Find the first match ID with only one player
         open_match = None
-        for id, players in self.set_matches.items():
-            print(f"match_id: {id} | players: {players} | len(players): {len(players)}")
-            if len(players) == 1:
+        for id, data in self.set_matches.items():
+            print(f"match_id: {id} | players: {data['players']} | len(players): {len(data['players'])}")
+            if len(data['players']) == 1:
                 open_match = id
                 break
-        
+
         # Reject if set_matches is full
         if open_match is None and len(self.set_matches) >= max_nbr_games:
-            print("set_match is full.")
+            print("set_matches is full.")
             self.reject_connection(507)
             return False
-            
-        print(f"open_match: {open_match}")
-        if open_match is None:  # create a new match
+
+        id = open_match
+        if id is None:  # create a new match
             # Find the smallest available ID for the new match
-            new_match_id = 0
-            while new_match_id in self.set_matches:
-                new_match_id += 1
-            self.set_matches[new_match_id] = set()
-            self.set_matches[new_match_id].add(self.player)
-            self.match_id = new_match_id
-        else:                   # add player to existing match
-            self.set_matches[open_match].add(self.player)
-            self.match_id = open_match
+            id = 0
+            while id in self.set_matches:
+                id += 1
+            self.set_matches[id] = {'players': [], 'tournament': []}
+            self.set_matches[id]['tournament'].append(None)
+        self.set_matches[id]['players'].append(self.player)
+        self.match_id = id
 
         print(f"self.set_matches: {self.set_matches}")
 
@@ -159,10 +170,11 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'matches': ['match2', 'match3']
                     # },
         # add a player:     set_tournaments['id1']['players'].append('player5')
-        # remove player:    if player_to_remove in my_dict[id_to_modify]['players']:
+        # remove player:    if player_to_remove in set_tournaments['id1']['players']:
         #                       set_tournaments['id1']['players'].remove('player5')
         # retrieving all players: players = set_tournaments['id1']['players']
         # clearing all players: set_tournaments['id1']['players'].clear()
+        # removing element from dictionary: del set_tournaments['id1']
 
         self.tournament_id = None
         max_nbr_tournaments = 0   # important to avoid overflow and undefined behavior with set_tournamentses
@@ -189,8 +201,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             id = 0
             while id in self.set_tournaments:
                 id += 1
-            self.set_tournaments[id] = set()
-        self.set_tournaments[id].add(self.player)
+            self.set_tournaments[id] = {'players': [], 'matches': []}
+        self.set_tournaments[id].append(self.player)
         self.tournament_id = id
         
 
@@ -222,9 +234,11 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             for user_info_tuple in self.connected_users[user_id]:
                 match_id = user_info_tuple[2]  # Assuming match_id is the third element
             print(f"Retrieved match_id {match_id} for user_id {user_id}.")
-            if match_id and match_id in self.set_matches and user_id in self.set_matches[match_id]:
-                self.set_matches[match_id].discard(user_id)
-                if not self.set_matches[match_id]:
+            if match_id is not None and match_id in self.set_matches and user_id in self.set_matches[match_id]['players']:
+                self.set_matches[match_id]['players'].remove(user_id)
+                if not self.set_matches[match_id]['players']:
+                    self.set_matches[match_id]['tournament'].clear()
+                    self.set_matches[match_id].clear()
                     del self.set_matches[match_id]
             
             # Clear and delete user from connected_users
