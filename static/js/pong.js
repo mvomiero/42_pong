@@ -193,15 +193,38 @@ function sendGameData() {
   gameSocket.send(JSON.stringify(gameData));
 }
 
+// Function to start the countdown
+function startCountdown() {
+  let countdown = 3; // Initial countdown number
 
+  // Initial display of countdown number
+  sendLogMessage(countdown > 0 ? countdown : '', "countdownText");
+
+  // Display the countdown at intervals of 1 second
+  const countdownInterval = setInterval(() => {
+    countdown--; // Decrement the countdown
+
+    if (countdown > 0) {
+      sendLogMessage(countdown, "countdownText");
+    } else if (countdown === 0) {
+      sendLogMessage('GO!', "countdownText");
+    } else {
+      sendLogMessage(' ', "countdownText");
+      clearInterval(countdownInterval); // Stop the countdown when it reaches 1
+    }
+  }, 1000); // 1 second interval
+}
 
 function startGame() {
   console.log("startGamefunction called!");
   sendGameData();
   updatePlayers();
+  startCountdown();
   sendLogMessage("Match: " + match, "match");
   sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 }
+
+
 
 
 
@@ -457,10 +480,13 @@ gameSocket.onmessage = function (event) {
             "</p>",
           "logs"
         );
-        ball.dx = ball.ballSpeed;
-        ball.dy = -ball.ballSpeed;
-        sendGameData();
-        sendScoreData();
+                // Wait for 4 seconds before changing ball speed and sending data
+        setTimeout(() => {
+          ball.dx = ball.ballSpeed;
+          ball.dy = -ball.ballSpeed;
+          sendGameData();
+          sendScoreData();
+        }, 4000); // 4000 milliseconds = 4 seconds
       }
     }
     //console.log("player1:", player1);
