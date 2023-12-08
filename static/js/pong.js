@@ -195,6 +195,7 @@ function sendGameData() {
 
 // Function to start the countdown
 function startCountdown() {
+  console.log("startCountdown called!");
   let countdown = 3; // Initial countdown number
 
   // Initial display of countdown number
@@ -220,6 +221,15 @@ function startGame() {
   sendGameData();
   updatePlayers();
   startCountdown();
+  
+  // Wait for 4 seconds before changing ball speed and sending data
+  setTimeout(() => {
+    ball.dx = ball.ballSpeed;
+    ball.dy = -ball.ballSpeed;
+    sendGameData();
+    sendScoreData();
+  }, 4000); // 4000 milliseconds = 4 seconds
+  
   sendLogMessage("Match: " + match, "match");
   sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 }
@@ -228,13 +238,7 @@ function startGame() {
 
 
 
-// Listen to keyboard events to pause/resume the game
-document.addEventListener("keydown", function (e) {
-  if (e.key === " ") { // Check for space bar key press
-	gamePaused = !gamePaused; // Toggle game pause state
-	sendGamePause();
-  }
-});
+
 
 // game loop
 function loop() {
@@ -423,6 +427,15 @@ document.getElementById("startGameButton").addEventListener("click", function() 
   startGame();
 });
 
+// Listen to keyboard events to pause/resume the game
+document.addEventListener("keydown", function (e) {
+  if (e.key === " ") {
+  e.preventDefault(); // Check for space bar key press
+	gamePaused = !gamePaused; // Toggle game pause state
+	sendGamePause();
+  }
+});
+
 
 
 
@@ -481,12 +494,7 @@ gameSocket.onmessage = function (event) {
           "logs"
         );
                 // Wait for 4 seconds before changing ball speed and sending data
-        setTimeout(() => {
-          ball.dx = ball.ballSpeed;
-          ball.dy = -ball.ballSpeed;
-          sendGameData();
-          sendScoreData();
-        }, 4000); // 4000 milliseconds = 4 seconds
+
       }
     }
     //console.log("player1:", player1);
