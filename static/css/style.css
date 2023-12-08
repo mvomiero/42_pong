@@ -19,6 +19,12 @@ body {
     margin: auto; /* Center horizontally */
 }
 
+#countdownText {
+    /* Set explicit height or width */
+    height: 50px; /* Example height */
+    /* Other styles */
+}
+
 /* Update the canvas size to fill the available space in the game board */
 #game {
     width: 100%;
