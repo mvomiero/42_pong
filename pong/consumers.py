@@ -21,10 +21,19 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 class PongConsumer(AsyncJsonWebsocketConsumer):
 
     connected_users = {}  # Dictionary to store connected users and their connections
-            # connected_users = {user_id: (channel_name, group_name, match_id), user_id: (...), ...}
+                # connected_users = {
+                    # 'player1': {
+                    #     'channel_name':       ['specific..inmemory!lwBXeBBUxaub'],
+                    #     'room_group_name':    ['match_0'],
+                    #     'match_id':           [0]
+                    # },
+                    # 'player2': {
+                    #     'channel_name':       ['specific..inmemory!qGPfepkBTNdx'],
+                    #     'room_group_name':    ['match_0'],
+                    #     'match_id':           [0]
+                    # },
+                # }
     set_matches = {}  # Dictionary to store matches and their players
-            # OLD: set_matches = {match_id: [player, player], match_id: [player, player], ...}
-            # NEW (has to be implemented):
                 # set_matches = {
                     # 'id1': {
                     #     'players':    ['player1', 'player2'],
@@ -79,13 +88,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name,
         )
 
-        # Add the connected user and their connection to the dictionary
-        # user_id = self.scope["user"].id  # Assuming authentication is implemented and user information is available
-        # if user_id:
-        #     if user_id not in self.connected_users:
-        #         self.connected_users[user_id] = set()
-        #     self.connected_users[user_id].add(self.channel_name)
-
         group_size = len(self.channel_layer.groups.get(self.room_group_name, {}).items())
         print(f"The size of group '{self.room_group_name}' is: {group_size}")
 
@@ -96,24 +98,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     # ***************** LOGIC PLAYER MATCHMAKING ***************** #
     # ************************************************************ #
     async def add_player_to_match(self):
-        # OLD: set_matches = {match_id: [player, player], match_id: [player, player], ...}
-            # NEW (has to be implemented):
-                # set_matches = {
-                    # 'id1': {
-                    #     'players':    ['player1', 'player2'],
-                    #     'tournament': ['tournament_id']
-                    # },
-                    # 'id2': {
-                    #     'players':    ['player3', 'player4'],
-                    #     'tournament': ['None']        # "None" if not part of a tournament
-                    # },
-        # add a player:     set_matches['id1']['players'].append('player5')
-        # remove player:    if player_to_remove in set_matches['id1']['players']:
-        #                       set_matches['id1']['players'].remove('player5')
-        # retrieving all players: players = set_matches['id1']['players']
-        # clearing all players: set_matches['id1']['players'].clear()
-        # removing element from dictionary: del set_matches['id1']
-
         self.match_id = None
 
         max_nbr_games = 1000   # important to avoid overflow and undefined behavior with set_matcheses
@@ -149,9 +133,13 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         print(f"room_group_name: {self.room_group_name}")
 
         # Add player to the dictionary
-        self.connected_users[self.player] = set()
-        user_info_tuple = (self.channel_name, self.room_group_name, self.match_id)
-        self.connected_users[self.player].add(user_info_tuple)
+        if self.player not in self.connected_users:
+            self.connected_users[self.player] = {'channel_name': [], 'room_group_name': [], 'match_id': []}
+        self.connected_users[self.player]['channel_name'].append(self.channel_name)
+        self.connected_users[self.player]['room_group_name'].append(self.room_group_name)
+        self.connected_users[self.player]['match_id'].append(self.match_id)
+        
+        print(f"self.connected_users: {self.connected_users}")
 
         return True
 
@@ -160,22 +148,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     # *************** LOGIC TOURNAMENT MATCHMAKING *************** #
     # ************************************************************ #
     async def add_player_to_tournament(self):
-        # set_tournaments = {
-                    # 'id1': {
-                    #     'players': ['player1', 'player2'],
-                    #     'matches': ['match1', 'match2']
-                    # },
-                    # 'id2': {
-                    #     'players': ['player3', 'player4'],
-                    #     'matches': ['match2', 'match3']
-                    # },
-        # add a player:     set_tournaments['id1']['players'].append('player5')
-        # remove player:    if player_to_remove in set_tournaments['id1']['players']:
-        #                       set_tournaments['id1']['players'].remove('player5')
-        # retrieving all players: players = set_tournaments['id1']['players']
-        # clearing all players: set_tournaments['id1']['players'].clear()
-        # removing element from dictionary: del set_tournaments['id1']
-
         self.tournament_id = None
         max_nbr_tournaments = 0   # important to avoid overflow and undefined behavior with set_tournamentses
         players_per_tournament = 4
@@ -230,9 +202,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         if user_id in self.connected_users:
             
             # Remove user from match and delete match if empty
-            match_id = None
-            for user_info_tuple in self.connected_users[user_id]:
-                match_id = user_info_tuple[2]  # Assuming match_id is the third element
+            match_id = self.connected_users[user_id]['match_id'][0]
             print(f"Retrieved match_id {match_id} for user_id {user_id}.")
             if match_id is not None and match_id in self.set_matches and user_id in self.set_matches[match_id]['players']:
                 self.set_matches[match_id]['players'].remove(user_id)
@@ -242,9 +212,11 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     del self.set_matches[match_id]
             
             # Clear and delete user from connected_users
+            self.connected_users[user_id]['channel_name'].clear()
+            self.connected_users[user_id]['room_group_name'].clear()
+            self.connected_users[user_id]['match_id'].clear()
             self.connected_users[user_id].clear()
-            if not self.connected_users[user_id]:
-                del self.connected_users[user_id]
+            del self.connected_users[user_id]
 
             print(f"self.set_matches: {self.set_matches}")
             print(f"self.connected_users: {self.connected_users}")
