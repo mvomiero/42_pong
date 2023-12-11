@@ -37,18 +37,20 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 # set_matches = {
                     # 'id1': {
                     #     'players':    ['player1', 'player2'],
-                    #     'tournament': ['tournament_id']
+                    #     'tournament': ['tournament_id'],
+                    #     'score':      [0, 0]
                     # },
                     # 'id2': {
                     #     'players':    ['player3', 'player4'],
                     #     'tournament': ['None']        # "None" if not part of a tournament
+                    #     'score':      [0, 0]
                     # },
 
     set_tournaments = {}  # Dictionary to store tournaments and their matches
                 # set_tournaments = {
                     # 'id1': {
-                    #     'players': ['player1', 'player2'],
-                    #     'matches': ['match1', 'match2']
+                    #     'players': ['player1', 'player2', 'player3', 'player4'],
+                    #     'matches': ['match1', 'match2', 'match3']
                     # },
                     # 'id2': {
                     #     'players': ['player3', 'player4'],
@@ -100,7 +102,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     async def add_player_to_match(self):
         self.match_id = None
 
-        max_nbr_games = 1000   # important to avoid overflow and undefined behavior with set_matcheses
+        max_nbr_games = 1000   # important to avoid overflow and undefined behavior with set_matches
 
         # Find the first match ID with only one player
         open_match = None
@@ -124,6 +126,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 id += 1
             self.set_matches[id] = {'players': [], 'tournament': []}
             self.set_matches[id]['tournament'].append(None)
+            self.set_matches[id]['score'] = [-1, -1]
         self.set_matches[id]['players'].append(self.player)
         self.match_id = id
 
@@ -149,10 +152,10 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     # ************************************************************ #
     async def add_player_to_tournament(self):
         self.tournament_id = None
-        max_nbr_tournaments = 0   # important to avoid overflow and undefined behavior with set_tournamentses
+        max_nbr_tournaments = 0   # important to avoid overflow and undefined behavior with set_tournaments
         players_per_tournament = 4
 
-        # Find the first tournament ID with less than (players_per_tournament) players
+        # Find the first tournament ID with less than <players_per_tournament> players
         open_tournament = None
         for id, data in self.set_tournaments.items():
             print(f"tournament_id: {id} | players: {data['players']} | len(players): {len(data['players'])}")
@@ -176,7 +179,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             self.set_tournaments[id] = {'players': [], 'matches': []}
         self.set_tournaments[id].append(self.player)
         self.tournament_id = id
-        
 
         return True
 
@@ -208,6 +210,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 self.set_matches[match_id]['players'].remove(user_id)
                 if not self.set_matches[match_id]['players']:
                     self.set_matches[match_id]['tournament'].clear()
+                    self.set_matches[match_id]['score'].clear()
                     self.set_matches[match_id].clear()
                     del self.set_matches[match_id]
             
@@ -221,14 +224,11 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             print(f"self.set_matches: {self.set_matches}")
             print(f"self.connected_users: {self.connected_users}")
 
-            # self.connected_users[user_id].discard(self.channel_name)
-            # if not self.connected_users[user_id]:
-            #     del self.connected_users[user_id]
-
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name,
         )
+        
 
         # Additional print statement at disconnection
         if user_id:
@@ -241,10 +241,18 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         Receive message from WebSocket.
         Log/print the received JSON data and forward it to other clients.
         """
-        # Log/print the received JSON data
-        #print("Received JSON data:", text_data)
-
+        
         received_data = json.loads(text_data)
+        
+        # Log/print the received JSON data
+        # print("Received JSON data:", received_data)
+
+        # store game store in dictionary set_matches
+        if received_data['command'] == "updateScore":
+            print(f"Received JSON data ({self.player}):, {received_data}")
+            self.set_matches[self.match_id]['score'][0] = received_data['players']['scorePlayer1']
+            self.set_matches[self.match_id]['score'][1] = received_data['players']['scorePlayer2']
+            
 
         # Pass the received JSON data as is to other clients
         await self.channel_layer.group_send(self.room_group_name, {
@@ -257,4 +265,5 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Retrieve the message from the event
         message = event['data']
         # Send the message to the client WebSocket
-        await self.send(text_data=message)
+        if self.channel_layer.groups:
+            await self.send(text_data=message)
