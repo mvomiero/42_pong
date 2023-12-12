@@ -63,6 +63,23 @@ function updatePlayers() {
     // Send the game data to the server via WebSocket
     gameSocket.send(JSON.stringify(gameEnd));
   }
+
+
+
+  function sendMatchInfo(mode) {
+    console.log("SendMatchInfo called");
+    var matchInfo = {
+      command: "match_info",
+      mode: mode,
+      score: {
+        player1: scorePlayer1,
+        player2: scorePlayer2,
+      },
+      winner: winner,
+    };
+
+    gameSocket.send(JSON.stringify(matchInfo));
+  }
   
   function sendGamePause() {
         console.log("SendGamePause called");

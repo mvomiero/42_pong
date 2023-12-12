@@ -80,9 +80,13 @@ var player2 = "";
 var scorePlayer1 = 0;
 var scorePlayer2 = 0;
 
+var winner = "";
+const winningScore = 2;
+
 var match = 1;
 
 var gamePaused = false; // Variable to track game pause state
+
 
 
 // Function to start the countdown
@@ -194,11 +198,13 @@ function loop() {
       console.log("SCORE!! Player 1 score: " + scorePlayer1);
     }
 
-    if (scorePlayer1 >= 2 || scorePlayer2 >= 2) {
+    if (scorePlayer1 >= winningScore || scorePlayer2 >= winningScore) {
       if (scorePlayer1 > scorePlayer2) {
+        winner = player1;
         sendLogMessage("Player 1 wins the match " + match, "logs");
         sendLogMessage("Match: " + match, "match");
       } else if (scorePlayer1 < scorePlayer2) {
+        winner = player2;
         sendLogMessage("Player 2 wins the match " + match, "logs");
         sendLogMessage("Match: " + match, "match");
       } else {
@@ -208,13 +214,17 @@ function loop() {
       scorePlayer2 = 0;
       match++;
 
-      if (match > 2) {
+      if (match > 1) {
         sendLogMessage("Game over!", "logs");
-        sendGameEnd();
+        sendMatchInfo("update");
+        sendMatchEnd("end");
+        //sendGameEnd();
       }
     }
 
-    sendScoreData();
+    sendMatchInfo("update");
+
+    //sendScoreData();
     sendGameData();
 
     // give some time for the player to recover before launching the ball again
