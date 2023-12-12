@@ -32,29 +32,29 @@ def match_start(players):       # send in match-making method (if two players ar
 #     }
 #     return JsonResponse(list)
 
-def tournament_info(self, mode, matchSemi1, matchSemi2, matchFinal, playerRanking):
+def tournament_info(mode, matchSemi1=None, matchSemi2=None, matchFinal=None, playerRanking=None):
     list = {
         'command': 'tournament_info',
         'mode': mode, # 'start' || 'update' || 'end',
-        'matchSemi1': {
-            'player1': self.set_matches[self.match_id]['players'][0],
-            'player2': self.set_matches[self.match_id]['players'][1],
-        },
-        'matchSemi2': {
-            'player1': self.set_matches[self.match_id]['players'][2],
-            'player2': self.set_matches[self.match_id]['players'][3],
-        },
-        'matchFinal': {
-            'player1': None,    # at beginning of tournament, no players have won any matches
-            'player2': None,
-        },
-        'playerRanking': {
-            'firstPosition': None,
-            'secondPosition': None,
-            'thirdPosition': None,
-            'fourthPosition': None,
-        },
+        'matchSemi1': {},
+        'matchSemi2': {},
+        'matchFinal': {},
+        'playerRanking': {},
     }
+    if matchSemi1 is not None:
+        list['matchSemi1']['player1'] = matchSemi1[0]
+        list['matchSemi1']['player2'] = matchSemi1[1]
+    if matchSemi2 is not None:
+        list['matchSemi2']['player1'] = matchSemi2[0]
+        list['matchSemi2']['player2'] = matchSemi2[1]
+    if matchFinal is not None:
+        list['matchFinal']['player1'] = matchFinal[0]
+        list['matchFinal']['player2'] = matchFinal[1]
+    if playerRanking is not None:
+        list['playerRanking']['firstPosition'] = playerRanking[0]
+        list['playerRanking']['secondPosition'] = playerRanking[1]
+        list['playerRanking']['thirdPosition'] = playerRanking[2]
+        list['playerRanking']['fourthPosition'] = playerRanking[3]
     return json.dumps(list)
 
 

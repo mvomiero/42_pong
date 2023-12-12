@@ -92,17 +92,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 self.reject_connection(501)
                 return
 
-        if self.room_group_name_match is not None:
-            await self.channel_layer.group_add(
-                self.room_group_name_match,
-                self.channel_name,
-            )
-        if self.room_group_name_tournament is not None:
-            await self.channel_layer.group_add(
-                self.room_group_name_tournament,
-                self.channel_name,
-            )
-
         group_size = len(self.channel_layer.groups.get(self.room_group_name_match, {}).items())
         print(f"The size of group '{self.room_group_name_match}' is: {group_size}")
 
@@ -152,10 +141,54 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         
         print(f"self.connected_users: {self.connected_users}")
 
+        # Add player to the group
+        if self.room_group_name_match is not None:
+            await self.channel_layer.group_add(
+                self.room_group_name_match,
+                self.channel_name,
+            )
+
         if len(self.set_matches[id]['players']) == 2:
             await self.send_to_group(match_start(self.set_matches[id]['players']), self.room_group_name_match)
 
         return True
+
+
+    async def create_match_tournament(self, tournament_id, player1, player2):
+        max_nbr_games = 1000
+
+        # Reject if set_matches is full
+        if len(self.set_matches) >= max_nbr_games:
+            print("set_matches is full.")
+            # self.reject_connection(507)
+            return -1
+        
+        # Find the smallest available ID for the new match
+        match_id = 0
+        while match_id in self.set_matches:
+            match_id += 1
+        
+        # Create new match
+        self.set_matches[match_id] = {'players': [], 'tournament': [], 'score': []}
+        self.set_matches[match_id]['tournament'] = tournament_id
+        self.set_matches[match_id]['score'] = [-1, -1]
+        self.set_matches[match_id]['players'] = [player1, player2]
+        
+        room_group_name_match = f'{"match"}_{match_id}'  # generate room name
+
+        # Add player to the dictionary
+        # TODO: change so that method uses a player_name instead of self.player
+        await self.add_connected_users(self.match_id, -1)
+
+        # Add player to the group
+        # TODO: add both players to the group (not self.channel_name!!)
+        if self.room_group_name_match is not None:
+            await self.channel_layer.group_add(
+                self.room_group_name_match,
+                self.channel_name,
+            )
+
+        return match_id
 
 
     # ************************************************************ #
@@ -187,7 +220,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             id = 0
             while id in self.set_tournaments:
                 id += 1
-            self.set_tournaments[id] = {'players': [], 'matches': []}
+            self.set_tournaments[id] = {'players': [], 'matchesSemi': [], 'matchFinal': []}
         self.set_tournaments[id].append(self.player)
         self.tournament_id = id
 
@@ -197,9 +230,21 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Add player to the dictionary connected_users
         await self.add_connected_users(None, self.tournament_id)
 
+        # Add player to the group
+        if self.room_group_name_tournament is not None:
+            await self.channel_layer.group_add(
+                self.room_group_name_tournament,
+                self.channel_name,
+            )
+
         # Broadcast tournament info to all players if tournament is full
         if len(self.set_tournaments[id]['players']) == players_per_tournament:
-            await self.send_to_group(tournament_info(self.set_tournaments[id]['players']), self.room_group_name_tournament)
+            await self.send_to_group(tournament_info('start'), self.room_group_name_tournament)
+            self.set_tournaments[id]['matchesSemi'].append(self.create_match_tournament(self.tournament_id, self.set_tournaments[id]['players'][0], self.set_tournaments[id]['players'][1]))
+            self.set_tournaments[id]['matchesSemi'].append(self.create_match_tournament(self.tournament_id, self.set_tournaments[id]['players'][2], self.set_tournaments[id]['players'][3]))
+
+
+
 
         return True
 
