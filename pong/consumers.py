@@ -1,7 +1,8 @@
 #pong/consumers.py
 
-import json 
+import json, asyncio
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from transcendence.views import add_game_data
 
 # 1) 1. player joins -> create group_tournament && send message to player1 with player ID
 # 2) 2. & 3. player join -> add to group_tournament
@@ -234,7 +235,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         if user_id:
             print(f"User {user_id} disconnected from channel name {self.channel_name}")
         self.close()
-
     
     async def receive(self, text_data):
         """
@@ -252,8 +252,10 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             print(f"Received JSON data ({self.player}):, {received_data}")
             self.set_matches[self.match_id]['score'][0] = received_data['players']['scorePlayer1']
             self.set_matches[self.match_id]['score'][1] = received_data['players']['scorePlayer2']
+            # calling synchronous function add_game_data in transcendence app
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, lambda: add_game_data('me', 'you', 1, 3)) # fake data for now!
             
-
         # Pass the received JSON data as is to other clients
         await self.channel_layer.group_send(self.room_group_name, {
             'type': 'send_message',
