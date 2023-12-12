@@ -1,7 +1,7 @@
 #pong/consumers.py
 
 import json 
-# from webSocket_messages import tournament_start
+from .webSocket_messages import *
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 # 1) 1. player joins -> create group_tournament && send message to player1 with player ID
@@ -25,13 +25,13 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 # connected_users = {
                     # 'player1': {
                     #     'channel_name':       ['specific..inmemory!lwBXeBBUxaub'],
-                    #     'room_group_name':    ['match_0'],
                     #     'match_id':           [0]
+                    #     'tournament_id':      [None]
                     # },
                     # 'player2': {
                     #     'channel_name':       ['specific..inmemory!qGPfepkBTNdx'],
-                    #     'room_group_name':    ['match_0'],
-                    #     'match_id':           [0]
+                    #     'match_id':           [2]
+                    #     'tournament_id':      [0]
                     # },
                 # }
     set_matches = {}  # Dictionary to store matches and their players
@@ -50,12 +50,14 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     set_tournaments = {}  # Dictionary to store tournaments and their matches
                 # set_tournaments = {
                     # 'id1': {
-                    #     'players': ['player1', 'player2', 'player3', 'player4'],
-                    #     'matchesSemi': ['match1', 'match2', 'match3']
+                    #     'players':     ['player1', 'player2', 'player3', 'player4'],
+                    #     'matchesSemi': ['match1', 'match2'],
+                    #     'matchFinal':  ['match3'],
                     # },
                     # 'id2': {
-                    #     'players': ['player3', 'player4'],
-                    #     'matches': ['match2', 'match3']
+                    #     'players':     ['player5', 'player6'],
+                    #     'matchesSemi': [None, None],
+                    #     'matchFinal':  [None],
                     # },
 
 
@@ -65,11 +67,15 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.room_code = self.scope['url_route']['kwargs']['game_mode']
         self.player = self.scope['url_route']['kwargs']['player']
-        self.room_group_name = None
+        self.room_group_name_match = None
+        self.room_group_name_tournament = None
 
         print(f"room_code: {self.room_code}")
         print(f"player: {self.player}")
         
+        await self.accept()
+        await self.send_to_self(set_player(self.player))
+
         # Reject connection if player already exists
         if self.player in self.connected_users:
             print(f"Player {self.player} already exists.")
@@ -78,29 +84,34 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
 
         # Add the player to a match
         if self.room_code == "match":
-            if not await self.add_player_to_match():
+            if not await self.add_player_to_match(self.room_code):
                 return
         elif self.room_code == "tournament":
             print("Tournament mode is not implemented yet.")
-            if not await self.add_player_to_tournament():
+            if not await self.add_player_to_tournament(self.room_code):
                 self.reject_connection(501)
                 return
 
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name,
-        )
+        if self.room_group_name_match is not None:
+            await self.channel_layer.group_add(
+                self.room_group_name_match,
+                self.channel_name,
+            )
+        if self.room_group_name_tournament is not None:
+            await self.channel_layer.group_add(
+                self.room_group_name_tournament,
+                self.channel_name,
+            )
 
-        group_size = len(self.channel_layer.groups.get(self.room_group_name, {}).items())
-        print(f"The size of group '{self.room_group_name}' is: {group_size}")
+        group_size = len(self.channel_layer.groups.get(self.room_group_name_match, {}).items())
+        print(f"The size of group '{self.room_group_name_match}' is: {group_size}")
 
-        await self.accept()
 
 
     # ************************************************************ #
     # ***************** LOGIC PLAYER MATCHMAKING ***************** #
     # ************************************************************ #
-    async def add_player_to_match(self):
+    async def add_player_to_match(self, room_code):
         self.match_id = None
 
         max_nbr_games = 1000   # important to avoid overflow and undefined behavior with set_matches
@@ -133,17 +144,16 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
 
         print(f"self.set_matches: {self.set_matches}")
 
-        self.room_group_name = f'{self.room_code}_{self.match_id}'  # generate room name
-        print(f"room_group_name: {self.room_group_name}")
+        self.room_group_name_match = f'{room_code}_{self.match_id}'  # generate room name
+        print(f"room_group_name_match: {self.room_group_name_match}")
 
         # Add player to the dictionary
-        if self.player not in self.connected_users:
-            self.connected_users[self.player] = {'channel_name': [], 'room_group_name': [], 'match_id': []}
-        self.connected_users[self.player]['channel_name'].append(self.channel_name)
-        self.connected_users[self.player]['room_group_name'].append(self.room_group_name)
-        self.connected_users[self.player]['match_id'].append(self.match_id)
+        await self.add_connected_users(self.match_id, -1)
         
         print(f"self.connected_users: {self.connected_users}")
+
+        if len(self.set_matches[id]['players']) == 2:
+            await self.send_to_group(match_start(self.set_matches[id]['players']), self.room_group_name_match)
 
         return True
 
@@ -151,7 +161,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     # ************************************************************ #
     # *************** LOGIC TOURNAMENT MATCHMAKING *************** #
     # ************************************************************ #
-    async def add_player_to_tournament(self):
+    async def add_player_to_tournament(self, room_code):
         self.tournament_id = None
         max_nbr_tournaments = 0   # important to avoid overflow and undefined behavior with set_tournaments
         players_per_tournament = 4
@@ -181,7 +191,27 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         self.set_tournaments[id].append(self.player)
         self.tournament_id = id
 
+        self.room_group_name_tournament = f'{room_code}_{self.tournament_id}'  # generate room name
+        print(f"room_group_name_match: {self.room_group_name_tournament}")
+
+        # Add player to the dictionary connected_users
+        await self.add_connected_users(None, self.tournament_id)
+
+        # Broadcast tournament info to all players if tournament is full
+        if len(self.set_tournaments[id]['players']) == players_per_tournament:
+            await self.send_to_group(tournament_info(self.set_tournaments[id]['players']), self.room_group_name_tournament)
+
         return True
+
+
+    async def add_connected_users(self, match_id, tournament_id):
+        if self.player not in self.connected_users:
+            self.connected_users[self.player] = {'channel_name': [], 'room_group_name_match': [], 'match_id': []}
+        self.connected_users[self.player]['channel_name'] = self.channel_name
+        if match_id != -1:
+            self.connected_users[self.player]['match_id'] = match_id
+        if tournament_id != -1:
+            self.connected_users[self.player]['tournament_id'] = tournament_id
 
 
     # ************************************************************ #
@@ -189,7 +219,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     # ************************************************************ #
     async def reject_connection(self, code):
         # print(f"Rejecting connection with code {code}.")
-        await self.accept()
+        # await self.accept()
         await self.close(code=code)
 
 
@@ -198,8 +228,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     # ************************************************************ #
     async def disconnect(self, close_code):
         # Remove the connection from the dictionaries when a user disconnects
-        if self.room_group_name is None:
-            print("No room_group_name found.")
+        if self.room_group_name_match is None:
+            print("No room_group_name_match found.")
             return
         user_id = self.player
         print(f"Disconnecting user {user_id} from channel name {self.channel_name}")
@@ -218,7 +248,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             
             # Clear and delete user from connected_users
             self.connected_users[user_id]['channel_name'].clear()
-            self.connected_users[user_id]['room_group_name'].clear()
+            self.connected_users[user_id]['room_group_name_match'].clear()
             self.connected_users[user_id]['match_id'].clear()
             self.connected_users[user_id].clear()
             del self.connected_users[user_id]
@@ -227,7 +257,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             print(f"self.connected_users: {self.connected_users}")
 
         await self.channel_layer.group_discard(
-            self.room_group_name,
+            self.room_group_name_match,
             self.channel_name,
         )
         
@@ -254,27 +284,23 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             print(f"Received JSON data ({self.player}):, {received_data}")
             self.set_matches[self.match_id]['score'][0] = received_data['players']['scorePlayer1']
             self.set_matches[self.match_id]['score'][1] = received_data['players']['scorePlayer2']
-            
-
-        # await self.channel_layer.send(self.channel_name, {
-        #     'type': 'send_message',
-        #     'data': text_data  # Send the received data directly to other clients
-        # })
-
-        
-        # await self.channel_layer.group_send(self.room_group_name, {
-        #     'type': 'send_message',
-        #     'data': tournament_start()  # Send the received data directly to other clients
-        # })
-        
 
         # Pass the received JSON data as is to other clients
-        await self.channel_layer.group_send(self.room_group_name, {
+        self.send_to_group(text_data, self.room_group_name_match)
+
+
+    async def send_to_self(self, data):
+        """ Send message to self """
+        await self.channel_layer.send(self.channel_name, {
             'type': 'send_message',
-            'data': text_data  # Send the received data directly to other clients
+            'data': data
         })
 
-    
+    async def send_to_group(self, data, group_name):
+        await self.channel_layer.group_send(group_name, {
+            'type': 'send_message',
+            'data': data
+        })
 
     async def send_message(self, event):
         """ Send the group message to clients """
