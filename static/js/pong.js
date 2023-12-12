@@ -111,7 +111,8 @@ function startCountdown() {
 function startGame() {
   console.log("startGamefunction called!");
   sendGameData();
-  updatePlayers();
+  // player don't need to be updated since it is handled from the backend
+  //updatePlayers(); 
   startCountdown();
   
   // Wait for 4 seconds before changing ball speed and sending data
