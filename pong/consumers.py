@@ -2,7 +2,7 @@
 
 import json, asyncio
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from transcendence.views import add_game_data
+from pong.views import add_game_data
 
 # 1) 1. player joins -> create group_tournament && send message to player1 with player ID
 # 2) 2. & 3. player join -> add to group_tournament
