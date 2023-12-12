@@ -1,6 +1,7 @@
 #pong/consumers.py
 
 import json 
+# from webSocket_messages import tournament_start
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 # 1) 1. player joins -> create group_tournament && send message to player1 with player ID
@@ -50,7 +51,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 # set_tournaments = {
                     # 'id1': {
                     #     'players': ['player1', 'player2', 'player3', 'player4'],
-                    #     'matches': ['match1', 'match2', 'match3']
+                    #     'matchesSemi': ['match1', 'match2', 'match3']
                     # },
                     # 'id2': {
                     #     'players': ['player3', 'player4'],
@@ -72,7 +73,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Reject connection if player already exists
         if self.player in self.connected_users:
             print(f"Player {self.player} already exists.")
-            self.reject_connection(500)
+            self.reject_connection(507)
             return
 
         # Add the player to a match
@@ -124,7 +125,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             id = 0
             while id in self.set_matches:
                 id += 1
-            self.set_matches[id] = {'players': [], 'tournament': []}
+            self.set_matches[id] = {'players': [], 'tournament': [], 'score': []}
             self.set_matches[id]['tournament'].append(None)
             self.set_matches[id]['score'] = [-1, -1]
         self.set_matches[id]['players'].append(self.player)
@@ -187,6 +188,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     # ********************* REJECT WEBSOCKET ********************* #
     # ************************************************************ #
     async def reject_connection(self, code):
+        # print(f"Rejecting connection with code {code}.")
         await self.accept()
         await self.close(code=code)
 
@@ -245,7 +247,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         received_data = json.loads(text_data)
         
         # Log/print the received JSON data
-        # print("Received JSON data:", received_data)
+        print("Received JSON data:", received_data)
 
         # store game store in dictionary set_matches
         if received_data['command'] == "updateScore":
@@ -254,11 +256,25 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             self.set_matches[self.match_id]['score'][1] = received_data['players']['scorePlayer2']
             
 
+        # await self.channel_layer.send(self.channel_name, {
+        #     'type': 'send_message',
+        #     'data': text_data  # Send the received data directly to other clients
+        # })
+
+        
+        # await self.channel_layer.group_send(self.room_group_name, {
+        #     'type': 'send_message',
+        #     'data': tournament_start()  # Send the received data directly to other clients
+        # })
+        
+
         # Pass the received JSON data as is to other clients
         await self.channel_layer.group_send(self.room_group_name, {
             'type': 'send_message',
             'data': text_data  # Send the received data directly to other clients
         })
+
+    
 
     async def send_message(self, event):
         """ Send the group message to clients """
