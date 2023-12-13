@@ -81,7 +81,7 @@ var scorePlayer1 = 0;
 var scorePlayer2 = 0;
 
 var winner = "";
-const winningScore = 2;
+const winningScore = 3;
 
 var match = 1;
 
@@ -126,8 +126,7 @@ function startGame() {
     sendGameData();
     sendScoreData();
   }, 4000); // 4000 milliseconds = 4 seconds
-  
-  sendLogMessage("Match: " + match, "match");
+
   sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 }
 
@@ -195,8 +194,9 @@ function loop() {
     } else if (ball.x > canvas.width) {
       // Ball passed the right edge, player 1 scores
       scorePlayer1++;
-      console.log("SCORE!! Player 1 score: " + scorePlayer1);
+      //console.log("SCORE!! Player 1 score: " + scorePlayer1);
     }
+    sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 
     if (scorePlayer1 >= winningScore || scorePlayer2 >= winningScore) {
       if (scorePlayer1 > scorePlayer2) {
@@ -210,14 +210,12 @@ function loop() {
       } else {
         sendLogMessage("It's a tie!", "logs");
       }
-      scorePlayer1 = 0;
-      scorePlayer2 = 0;
       match++;
 
       if (match > 1) {
         sendLogMessage("Game over!", "logs");
         sendMatchInfo("update");
-        sendMatchEnd("end");
+        sendMatchInfo("end");
         //sendGameEnd();
       }
     }
