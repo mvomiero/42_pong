@@ -12,25 +12,27 @@ def set_player(player_name):        # send after accepting the WebSocket connect
 # tournament:
     # -semi-finals: broadcast to the players in the match
     # -final: broadcast to all players in the tournament
-def match_start(players):       # send in match-making method (if two players are assigned to a match)
+# Remote Match:
+    # -broadcast to the players in the match
+def match_info(mode, players, score=None, winner=None):
     list = {
-        'command': 'match_start',
+        'command': 'match_info',
+        'mode': mode, # 'start' || 'update' || 'end',
         'player1': players[0],
         'player2': players[1],
+        'score': {
+            'player1': 0,
+            'player2': 0,
+        },
+        'winner': None,
     }
-    return json.dumps(list)
+    if score is not None:
+        list['score']['player1'] = score[0]
+        list['score']['player2'] = score[1]
+    if winner is not None:
+        list['winner'] = winner
 
-# def match_end(self, mode, event):         # Frontend->Backend: send when a match ends (Backend still broadcasts this message)
-#     list = {
-#         'command': 'match_info',
-#         'mode': mode, # 'update' || 'end',
-#         'score': {
-#             'player1': 3,
-#             'player2': 0,
-#         },
-#         'winner': player_alias,
-#     }
-#     return JsonResponse(list)
+    return json.dumps(list)
 
 def tournament_info(mode, matchSemi1=None, matchSemi2=None, matchFinal=None, playerRanking=None):
     list = {
@@ -43,13 +45,22 @@ def tournament_info(mode, matchSemi1=None, matchSemi2=None, matchFinal=None, pla
     }
     if matchSemi1 is not None:
         list['matchSemi1']['player1'] = matchSemi1[0]
-        list['matchSemi1']['player2'] = matchSemi1[1]
+        if len(matchSemi1) > 1:
+            list['matchSemi1']['player2'] = matchSemi1[1]
+        else:
+            list['matchSemi1']['player2'] = None
     if matchSemi2 is not None:
         list['matchSemi2']['player1'] = matchSemi2[0]
-        list['matchSemi2']['player2'] = matchSemi2[1]
+        if len(matchSemi2) > 1:
+            list['matchSemi2']['player2'] = matchSemi2[1]
+        else:
+            list['matchSemi2']['player2'] = None
     if matchFinal is not None:
         list['matchFinal']['player1'] = matchFinal[0]
-        list['matchFinal']['player2'] = matchFinal[1]
+        if len(matchFinal) > 1:
+            list['matchFinal']['player2'] = matchFinal[1]
+        else:
+            list['matchFinal']['player2'] = None
     if playerRanking is not None:
         list['playerRanking']['firstPosition'] = playerRanking[0]
         list['playerRanking']['secondPosition'] = playerRanking[1]
