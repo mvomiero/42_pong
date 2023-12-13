@@ -316,15 +316,25 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                         # self.set_matches[match_id]['group_name'].clear()
                         self.set_matches[match_id].clear()
                         del self.set_matches[match_id]
-            else:
+            elif len(self.set_tournaments[self.connected_users[user_id]['tournament_id']]['players']) <= 1:
                 # Remove user from tournament and delete tournament if empty
                 tournament_id = self.connected_users[user_id]['tournament_id']
                 if tournament_id is not None and tournament_id in self.set_tournaments and user_id in self.set_tournaments[tournament_id]['players']:
                     self.set_tournaments[tournament_id]['players'].remove(user_id)
                     # TODO: Remove the match from the tournament if it exists
+                    if self.set_tournaments[tournament_id]['matchFinal']:
+                        if self.set_tournaments[tournament_id]['matchFinal'] in self.set_matches:
+                            self.set_matches[self.set_tournaments[tournament_id]['matchFinal']].clear()
+                            del self.set_matches[self.set_tournaments[tournament_id]['matchFinal']]
+                    nbr_matches = len(self.set_tournaments[tournament_id]['matchesSemi']) - 1
+                    while nbr_matches >= 0:
+                        if self.set_tournaments[tournament_id]['matchesSemi'][nbr_matches] in self.set_matches:
+                            self.set_matches[self.set_tournaments[tournament_id]['matchesSemi'][nbr_matches]].clear()
+                            del self.set_matches[self.set_tournaments[tournament_id]['matchesSemi'][nbr_matches]]
+                        nbr_matches -= 1
                     if not self.set_tournaments[tournament_id]['players']:
-                        self.set_tournaments[tournament_id]['matchesSemi'].clear()
-                        self.set_tournaments[tournament_id]['matchFinal'].clear()
+                        # self.set_tournaments[tournament_id]['matchesSemi'].clear()
+                        # self.set_tournaments[tournament_id]['matchFinal'].clear()
                         # self.set_tournaments[tournament_id]['group_name'].clear()
                         self.set_tournaments[tournament_id].clear()
                         del self.set_tournaments[tournament_id]
@@ -375,7 +385,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             self.set_matches[self.match_id]['score'][1] = received_data['players']['scorePlayer2']
 
         # Pass the received JSON data as is to other clients
-        self.send_to_group(text_data, self.group_name_match)
+        print(f"Sending message to group {self.group_name_match}")
+        await self.send_to_group(text_data, self.group_name_match)
 
     async def send_to_self(self, data):
         """ Send message to self """
