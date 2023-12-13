@@ -62,7 +62,7 @@ def error_full(request):
     return render(request, "pong/error_full.html")
 
 # database...
-def add_game_data(p1n, p2n, p1s, p2s):
+def add_game_data(p1n, p2n, p1s, p2s, itg):
     print(f"Incoming arguments: p1n={p1n}, p2n={p2n}, p1s={p1s}, p2s={p2s}")
     start_time = time.time() - 20 # where to place this in code?
     end_time = time.time()
@@ -74,9 +74,11 @@ def add_game_data(p1n, p2n, p1s, p2s):
             player2_points=p2s,
             game_end_timestamp=datetime.fromtimestamp(time.time()),
             game_duration_secs=end_time - start_time,
-            is_tournament_game=True
+            is_tournament_game=itg,
+            #blockchain_hash="test"
         )
         game_data.save()
+        print(f"Record ID: {game_data.id}")
         # saved_data = GameData.objects.get(id=1)
         # print("Saved data from the database:")
         # print(f"Player 1 Name: {saved_data.player1_name}")
