@@ -165,20 +165,21 @@ gameSocket.onopen = function (event) {
         console.log("char_choice:", char_choice);
       }
 
-      if (data.command === "match_start") {
-        player1 = data.player1;
-        player2 = data.player2;
-        if (char_choice === player1) {
-          player = 1;
-        }
-        else if (char_choice === player2) {
-          player = 2;
-        }
-        startGame();        
-      }
+
 
       if (data.command === "match_info") {
-        if (data.mode === "end") {
+        if (data.mode === "start") {
+          player1 = data.player1;
+          player2 = data.player2;
+          if (char_choice === player1) {
+            player = 1;
+          }
+          else if (char_choice === player2) {
+            player = 2;
+          }
+          startGame();        
+        }
+        else if (data.mode === "end") {
           ball.dx = 0;
           ball.dy = 0;
           ball.x = canvas.width - grid;
