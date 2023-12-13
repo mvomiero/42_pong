@@ -230,7 +230,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name,
         )
         
-
         # Additional print statement at disconnection
         if user_id:
             print(f"User {user_id} disconnected from channel name {self.channel_name}")
@@ -254,7 +253,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             self.set_matches[self.match_id]['score'][1] = received_data['players']['scorePlayer2']
             # calling synchronous function add_game_data in transcendence app
             loop = asyncio.get_event_loop()
-            await loop.run_in_executor(None, lambda: add_game_data('me', 'you', 1, 3)) # fake data for now!
+            await loop.run_in_executor(None, lambda: add_game_data('me', 'you', 1, 3, True)) # fake data for now!
             
         # Pass the received JSON data as is to other clients
         await self.channel_layer.group_send(self.room_group_name, {
