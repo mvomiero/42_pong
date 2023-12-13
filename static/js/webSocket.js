@@ -95,7 +95,7 @@ function updatePlayers() {
   }
   
   function sendGameData() {
-    //console.log("SendGameData called");
+    console.log("SendGameData called");
     var gameData = {
       command: "update",
       //players: {
@@ -155,37 +155,47 @@ gameSocket.onopen = function (event) {
   
   gameSocket.onmessage = function (event) {
     try {
+      //console.log("RECEIVED DATA:", event.data);
       var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
       //console.log("Parsed inner data:", data);
 
       if (data.command === "set_player") {
         char_choice = data.player;
+        console.log("set_player called");
+        console.log("char_choice:", char_choice);
       }
 
-      if (data.command === "match_start") {
-        player1 = data.player1;
-        player2 = data.player2;
-        if (char_choice === player1) {
-          player = 1;
-        }
-        else if (char_choice === player2) {
-          player = 2;
-        }
-        startGame();        
-      }
+
 
       if (data.command === "match_info") {
-        if (data.mode === "end") {
+        if (data.mode === "start") {
+          player1 = data.player1;
+          player2 = data.player2;
+          if (char_choice === player1) {
+            player = 1;
+          }
+          else if (char_choice === player2) {
+            player = 2;
+          }
+          startGame();        
+        }
+        else if (data.mode === "end") {
           ball.dx = 0;
           ball.dy = 0;
           ball.x = canvas.width - grid;
           ball.y = canvas.height / 2 - paddleHeight / 2;
+          sendGameData();
           sendLogMessage("match END!, winner is " + data.winner, "match");
         }
         else if (data.mode === "update") {
           scorePlayer1 = data.score.player1;
           scorePlayer2 = data.score.player2;
         }
+      }
+
+      if (data.command === "tournament_info") {
+        console.log("TOURNAMENT_info called");
+        sendLogMessage("TOURNAMENT INFO: " + event.data, "tournament");
       }
 
   
