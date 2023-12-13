@@ -1,6 +1,6 @@
 // initialisation functions:
 function makeTable() {
-  const tableGeometry = new THREE.BoxGeometry(tableWidth, tableHeight, 0.001);
+  const tableGeometry = new THREE.BoxGeometry(tableWidth, tableHeight, tableThickness);
   const tableMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
   const table = new THREE.Mesh(tableGeometry, tableMaterial);
   return table;
@@ -27,6 +27,13 @@ function makeBall() {
   return ball;
 }
 
+function spaceTogglesGameProgress(event) {
+    if (event.keyCode === 32) { // space
+        gamePaused = !gamePaused;
+        console.log('Game paused:', gamePaused);
+    }
+}
+
 function initBatKeys() {
   document.addEventListener("keydown", (event) => {
     const key = event.key.toUpperCase();
@@ -40,12 +47,14 @@ function initBatKeys() {
       movement[key] = false;
     }
   });
+  document.addEventListener('keydown', spaceTogglesGameProgress);
 }
 
 // animation functions:
 function moveBall()
 {
-  ball.position.x += ballDir * ballSpeed;
+  if (gamePaused === false)
+    ball.position.x += ballDir * ballSpeed;
 }
 
 // ball bounce off bats
@@ -158,9 +167,10 @@ document.body.appendChild(renderer.domElement);
 let ballDir = 1;
 let ballSpeed = 0.1;
 const batSpeed = 0.1;
+const batBallThickness = 0.4;
 const tableWidth = 10;
 const tableHeight = 6;
-const batBallThickness = 1;
+const tableThickness = batBallThickness / 2;
 const batWidth = 0.25;
 const batHeight = 2;
 const ballWidth = 0.5;
@@ -169,6 +179,7 @@ const ballHeight = 0.5;
 let player1Points = 0;
 let player2Points = 0;
 const maxPoints = 1;
+let gamePaused = true;
 let gameInProgress = true;
 
 const table = makeTable();
@@ -176,6 +187,7 @@ const bat1 = makeBat1();
 const bat2 = makeBat2();
 const ball = makeBall();
 
+table.position.z -= batBallThickness; // sink the table below the ball and bats, so they rest upon it
 scene.add(table);
 scene.add(bat1);
 scene.add(bat2);
@@ -185,12 +197,12 @@ bat1.position.x -= 4.5;
 bat2.position.x += 4.5;
 
 // from the top (default)
-// camera.position.x = 0;
-// camera.position.y = 0;
-// camera.position.z = 5;
-// camera.rotation.x = 0;
-// camera.rotation.y = 0;
-// camera.rotation.z = 0;
+camera.position.x = 0;
+camera.position.y = 0;
+camera.position.z = 5;
+camera.rotation.x = 0;
+camera.rotation.y = 0;
+camera.rotation.z = 0;
 
 // // from the side
 // camera.position.x = 0;
@@ -217,17 +229,9 @@ bat2.position.x += 4.5;
 // camera.rotation.z = 0;
 
 // // behind p1 bat
-// camera.position.x = 6;
-// camera.position.y = 0;
-// camera.position.z = 1.2;
-// camera.rotation.x = 1.585;
-// camera.rotation.y = 1.5;
-// camera.rotation.z = 0;
-
-// // behind p1 bat
 // camera.position.x = 5.5;
 // camera.position.y = 0;
-// camera.position.z = 1.2;
+// camera.position.z = 0.6;
 // camera.rotation.x = 1.577;
 // camera.rotation.y = 1.561;
 // camera.rotation.z = 0;
@@ -235,11 +239,10 @@ bat2.position.x += 4.5;
 // // behind p2 bat
 // camera.position.x = -5.5;
 // camera.position.y = 0;
-// camera.position.z = 1.2;
+// camera.position.z = 0.6;
 // camera.rotation.x = 1.577;
 // camera.rotation.y = 4.722;
 // camera.rotation.z = 0;
-
 
 const movement = { W: false, S: false, O: false, L: false };
 
@@ -252,7 +255,7 @@ function animate() {
   changeBallDirectionIfBallHitsBats();
   checkBallOffTableLeft();
   checkBallOffTableRight();
-  stopBallIfGameNotInProgress();
+  // stopBallIfGameNotInProgress();
 
   // // animation: from the side -> from the top
   // if (camera.rotation.x > 0)
