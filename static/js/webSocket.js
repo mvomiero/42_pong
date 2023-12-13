@@ -193,6 +193,11 @@ gameSocket.onopen = function (event) {
         }
       }
 
+      if (data.command === "tournament_info") {
+        console.log("TOURNAMENT_info called");
+        sendLogMessage("TOURNAMENT INFO: " + event.data, "tournament");
+      }
+
   
       if (data.command === "update_players") {
         if (player1 === "" && player2 === "") {
