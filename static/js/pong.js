@@ -215,6 +215,7 @@ function loop() {
       if (match > 1) {
         sendLogMessage("Game over!", "logs");
         sendMatchInfo("update");
+        console.log("calling END function");
         sendMatchInfo("end");
         //sendGameEnd();
       }

@@ -30,7 +30,7 @@ function updatePlayers() {
       message: message,
       elementId: elementId,
     };
-    console.log("Sending log message:", logData);
+    //console.log("Sending log message:", logData);
     gameSocket.send(JSON.stringify(logData));
   }
   
@@ -184,6 +184,7 @@ gameSocket.onopen = function (event) {
           ball.dy = 0;
           ball.x = canvas.width - grid;
           ball.y = canvas.height / 2 - paddleHeight / 2;
+          console.log("reciving game END message");
           sendGameData();
           sendLogMessage("match END!, winner is " + data.winner, "match");
         }
@@ -199,52 +200,7 @@ gameSocket.onopen = function (event) {
       }
 
   
-      if (data.command === "update_players") {
-        if (player1 === "" && player2 === "") {
-          sendLogMessage(
-            "Player " + char_choice + ", id = " + 1 + " has joined the game!",
-            "logs"
-          );
-        }
-        if (player1 !== "" && player2 !== "" && player1 !== player2) {
-          console.log("PLAYERS SET!");
-          console.log("player1:", player1);
-          console.log("player2:", player2);
-          return;
-        }
-        if (data.players.player !== char_choice) {
-          console.log("UPDATING PLAYERS!");
-          player1 = char_choice;
-          player2 = data.players.player;
-          player = 1;
-          updatePlayers();
-        }
-        if (data.players.player1 !== "" && data.players.player2 !== "") {
-          console.log("UPDATING PLAYERS SAME!");
-          player1 = data.players.player1;
-          player2 = data.players.player2;
-          player = 2;
-          sendLogMessage(
-            "Player " +
-              char_choice +
-              ", id = " +
-              player +
-              " has joined the game!\n" +
-              "<p> Player 1 is " +
-              data.players.player1 +
-              " and Player 2 is " +
-              data.players.player2 +
-              "</p>",
-            "logs"
-          );
-                  // Wait for 4 seconds before changing ball speed and sending data
-  
-        }
-      }
-      //console.log("player1:", player1);
-      //console.log("player2:", player2);
-      //console.log("player:", player);
-  
+      
       // Check if the received command is for broadcasting log messages
       if (data.command === "broadcast_log") {
         if (data.message) {
