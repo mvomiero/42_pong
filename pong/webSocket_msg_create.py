@@ -44,24 +44,15 @@ def tournament_info(mode, matchSemi1=None, matchSemi2=None, matchFinal=None, pla
         'playerRanking': {},
     }
     if matchSemi1 is not None:
-        list['matchSemi1']['player1'] = matchSemi1[0]
-        if len(matchSemi1) > 1:
-            list['matchSemi1']['player2'] = matchSemi1[1]
-        else:
-            list['matchSemi1']['player2'] = None
+        list['matchSemi1']['player1'] = matchSemi1[0] if len(matchSemi1) > 0 else None
+        list['matchSemi1']['player2'] = matchSemi1[1] if len(matchSemi1) > 0 else None
     if matchSemi2 is not None:
-        list['matchSemi2']['player1'] = matchSemi2[0]
-        if len(matchSemi2) > 1:
-            list['matchSemi2']['player2'] = matchSemi2[1]
-        else:
-            list['matchSemi2']['player2'] = None
+        list['matchSemi2']['player1'] = matchSemi2[0] if len(matchSemi2) > 0 else None
+        list['matchSemi2']['player2'] = matchSemi2[1] if len(matchSemi2) > 0 else None
     if matchFinal is not None:
-        list['matchFinal']['player1'] = matchFinal[0]
-        if len(matchFinal) > 1:
-            list['matchFinal']['player2'] = matchFinal[1]
-        else:
-            list['matchFinal']['player2'] = None
-    if playerRanking is not None:
+        list['matchFinal']['player1'] = matchFinal[0] if len(matchFinal) > 0 else None
+        list['matchFinal']['player2'] = matchFinal[1] if len(matchFinal) > 1 else None
+    if playerRanking is not None and len(playerRanking) >= 4:
         list['playerRanking']['firstPosition'] = playerRanking[0]
         list['playerRanking']['secondPosition'] = playerRanking[1]
         list['playerRanking']['thirdPosition'] = playerRanking[2]
