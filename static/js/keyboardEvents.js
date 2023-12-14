@@ -61,9 +61,12 @@ document.getElementById("startGameButton").addEventListener("click", function() 
 // Listen to keyboard events to pause/resume the game
 document.addEventListener("keydown", function (e) {
     if (e.key === " ") {
-        e.preventDefault(); // Check for space bar key press
-        gamePaused = !gamePaused; // Toggle game pause state
-        sendGamePause();
+        if (player !== 0)
+        {
+            e.preventDefault(); // Check for space bar key press
+            gamePaused = !gamePaused; // Toggle game pause state
+            sendGamePause();
+        }
     }
 });
   
