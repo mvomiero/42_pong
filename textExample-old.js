@@ -1,6 +1,10 @@
 // import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 // import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 // https://stackoverflow.com/questions/71557495/fontloader-and-textgeometry-not-working-in-threejs
+
+import * as THREE from 'three';
+import { FontLoader } from 'https://unpkg.com/three@0.138.3/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'https://unpkg.com/three@0.138.3/examples/jsm/geometries/TextGeometry.js';
 THREE.Cache.enabled = true;
 
 let container;
