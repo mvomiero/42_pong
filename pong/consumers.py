@@ -100,6 +100,10 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 self.reject_connection(501)
                 return
 
+        print("Closing connection.")
+        # await self.disconnect(500)
+        await self.close(code=2)
+
         # group_size = len(self.channel_layer.groups.get(self.group_name_match, {}).items())
         # print(f"The size of group '{self.group_name_match}' is: {group_size}")
 
@@ -355,7 +359,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Additional print statement at disconnection
         if user_id:
             print(f"User {user_id} disconnected from channel name {self.channel_name}")
-        self.close()
+        self.close(close_code)
 
     
     async def receive(self, text_data):
