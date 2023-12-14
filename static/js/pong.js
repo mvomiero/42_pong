@@ -65,8 +65,8 @@ function collides(obj1, obj2) {
 // Websocket code
 var roomCode = document.getElementById("game_board").getAttribute("room_code");
 char_choice = document
-                    .getElementById("game_board")
-                    .getAttribute("char_choice");
+  .getElementById("game_board")
+  .getAttribute("char_choice");
 var char_choice;
 
 var connectionString =
@@ -87,6 +87,8 @@ var match = 1;
 
 var gamePaused = false; // Variable to track game pause state
 
+tournament_stage = "";
+
 
 
 // Function to start the countdown
@@ -95,18 +97,18 @@ function startCountdown() {
   let countdown = 3; // Initial countdown number
 
   // Initial display of countdown number
-  sendLogMessage(countdown > 0 ? countdown : '', "countdownText");
+  addLog(countdown > 0 ? countdown : '', "countdownText");
 
   // Display the countdown at intervals of 1 second
   const countdownInterval = setInterval(() => {
     countdown--; // Decrement the countdown
 
     if (countdown > 0) {
-      sendLogMessage(countdown, "countdownText");
+      addLog(countdown, "countdownText");
     } else if (countdown === 0) {
-      sendLogMessage('GO!', "countdownText");
+      addLog('GO!', "countdownText");
     } else {
-      sendLogMessage(' ', "countdownText");
+      addLog(' ', "countdownText");
       clearInterval(countdownInterval); // Stop the countdown when it reaches 1
     }
   }, 1000); // 1 second interval
@@ -118,7 +120,7 @@ function startGame() {
   // player don't need to be updated since it is handled from the backend
   //updatePlayers(); 
   startCountdown();
-  
+
   // Wait for 4 seconds before changing ball speed and sending data
   setTimeout(() => {
     ball.dx = ball.ballSpeed;
@@ -127,12 +129,12 @@ function startGame() {
     sendMatchInfo("update");
   }, 4000); // 4000 milliseconds = 4 seconds
 
-  sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
+  addLog("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 }
 
 // game loop
 function loop() {
-	requestAnimationFrame(loop);
+  requestAnimationFrame(loop);
   //requestAnimationFrame(loop);
   context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -170,8 +172,8 @@ function loop() {
 
   // move ball by its velocity
   if (!gamePaused) {
-  ball.x += ball.dx;
-  ball.y += ball.dy;
+    ball.x += ball.dx;
+    ball.y += ball.dy;
   }
 
   // prevent ball from going through walls by changing its velocity
@@ -196,46 +198,44 @@ function loop() {
       scorePlayer1++;
       //console.log("SCORE!! Player 1 score: " + scorePlayer1);
     }
-    sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
+    addLog("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 
     if (scorePlayer1 >= winningScore || scorePlayer2 >= winningScore) {
       if (scorePlayer1 > scorePlayer2) {
         winner = player1;
-        sendLogMessage("Player 1 wins the match " + match, "logs");
-        sendLogMessage("Match: " + match, "match");
+        addLog("Player 1 wins the match " + match, "logs");
+        addLog("Match: " + match, "match");
       } else if (scorePlayer1 < scorePlayer2) {
         winner = player2;
-        sendLogMessage("Player 2 wins the match " + match, "logs");
-        sendLogMessage("Match: " + match, "match");
+        addLog("Player 2 wins the match " + match, "logs");
+        addLog("Match: " + match, "match");
       } else {
-        sendLogMessage("It's a tie!", "logs");
+        addLog("It's a tie!", "logs");
       }
       match++;
 
       if (match > 1) {
-        sendLogMessage("Game over!", "logs");
+        addLog("Game over!", "logs");
         sendMatchInfo("update");
         console.log("calling END function");
         sendMatchInfo("end");
         scorePlayer1 = 0;
         scorePlayer2 = 0;
+        winner = "";
         //sendGameEnd();
       }
     }
 
     sendMatchInfo("update");
 
-    //sendScoreData();
-    if (player !== 0) 
-      sendGameData();
+    sendGameData();
 
     // give some time for the player to recover before launching the ball again
     setTimeout(() => {
       ball.resetting = false;
       ball.x = canvas.width / 2;
       ball.y = canvas.height / 2;
-      if (player !== 0) 
-        sendGameData();
+      sendGameData();
     }, 800);
   }
 

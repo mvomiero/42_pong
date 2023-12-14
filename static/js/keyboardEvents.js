@@ -1,5 +1,5 @@
 
-{/* <script src="pong.js"></script> */}
+{/* <script src="pong.js"></script> */ }
 
 // listen to keyboard events to move the paddles
 document.addEventListener("keydown", function (e) {
@@ -31,8 +31,8 @@ document.addEventListener("keydown", function (e) {
 
     sendGameData();
 });
-  
-  
+
+
 // listen to keyboard events to stop the paddle if key is released
 document.addEventListener("keyup", function (e) {
     // Player 1 controls
@@ -41,32 +41,30 @@ document.addEventListener("keyup", function (e) {
             leftPaddle.dy = 0;
         }
     }
-  
+
     // Player 2 controls
     if (player === 2) {
         if (e.key === "ArrowUp" || e.key === "ArrowDown") {
             rightPaddle.dy = 0;
         }
     }
-  
+
     sendGameData();
 });
 
 // HTML Button click event to trigger the WebSocket actions
-document.getElementById("startGameButton").addEventListener("click", function() {
+document.getElementById("startGameButton").addEventListener("click", function () {
     // Call the function when the button is clicked
     startGame();
 });
-  
+
 // Listen to keyboard events to pause/resume the game
 document.addEventListener("keydown", function (e) {
     if (e.key === " ") {
-        if (player !== 0)
-        {
+        if (player !== 0) {
             e.preventDefault(); // Check for space bar key press
             gamePaused = !gamePaused; // Toggle game pause state
             sendGamePause();
         }
     }
 });
-  
