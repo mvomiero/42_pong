@@ -124,7 +124,7 @@ function startGame() {
     ball.dx = ball.ballSpeed;
     ball.dy = -ball.ballSpeed;
     sendGameData();
-    sendScoreData();
+    sendMatchInfo("update");
   }, 4000); // 4000 milliseconds = 4 seconds
 
   sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
@@ -217,6 +217,8 @@ function loop() {
         sendMatchInfo("update");
         console.log("calling END function");
         sendMatchInfo("end");
+        scorePlayer1 = 0;
+        scorePlayer2 = 0;
         //sendGameEnd();
       }
     }
@@ -224,14 +226,16 @@ function loop() {
     sendMatchInfo("update");
 
     //sendScoreData();
-    sendGameData();
+    if (player !== 0) 
+      sendGameData();
 
     // give some time for the player to recover before launching the ball again
     setTimeout(() => {
       ball.resetting = false;
       ball.x = canvas.width / 2;
       ball.y = canvas.height / 2;
-      sendGameData();
+      if (player !== 0) 
+        sendGameData();
     }, 800);
   }
 
@@ -250,8 +254,6 @@ function loop() {
     ball.x = rightPaddle.x - ball.width;
   }
 
-  // Call sendGameData() after updating the game state
-  //sendGameData();
 
   // draw ball
   context.fillRect(ball.x, ball.y, ball.width, ball.height);
