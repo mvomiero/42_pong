@@ -100,9 +100,9 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 self.reject_connection(501)
                 return
 
-        print("Closing connection.")
+        # print("Closing connection.")
         # await self.disconnect(500)
-        await self.close(code=2)
+        # await self.close(code=2)
 
         # group_size = len(self.channel_layer.groups.get(self.group_name_match, {}).items())
         # print(f"The size of group '{self.group_name_match}' is: {group_size}")
@@ -371,56 +371,54 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         received_data = json.loads(text_data)
         
         # Log/print the received JSON data
-        # print("Received JSON data:", received_data)
+        print("Received JSON data:", received_data)
 
-        # store game store in dictionary set_matches
-        if received_data['command'] == "updateScore":
-            # print(f"Received JSON data ({self.player}):, {received_data}")
-            self.set_matches[self.match_id]['score'][0] = received_data['players']['scorePlayer1']
-            self.set_matches[self.match_id]['score'][1] = received_data['players']['scorePlayer2']
-        elif received_data['command'] == "match_info":
-            print(f"Received JSON data ({self.player}):, {received_data}")
-
-        # broadcast match_end to all players (if match_end is received)
-        if received_data['command'] == "match_info" and received_data['mode'] == "end":
-            if not self.set_matches[self.match_id]['finished']:
-                await self.send_to_group(text_data, self.set_matches[self.match_id]['group_name'])
-                self.set_matches[self.match_id]['finished'] = True
-        elif received_data['command'] == "match_info" and received_data['mode'] == "update":
+        # [Match (Remote & Tournament)] broadcast match_info (update & end) to all players in the match_group
+        if self.match_id is not None and received_data['command'] == "match_info" and (received_data['mode'] == "update" or received_data['mode'] == "end") and not self.set_matches[self.match_id]['finished']:
             await self.send_to_group(text_data, self.set_matches[self.match_id]['group_name'])
-        
-        # broadcast tournament_info if match_end is received (semifinal) and move winner to next match
-        if received_data['command'] == "match_info" and received_data['mode'] == "end" and self.tournament_id is not None:
+            if received_data['mode'] == "end":
+                self.set_matches[self.match_id]['finished'] = True
+                # [TODO] set the final score of the match (set_matches)
+                # [TODO] disconnect players from match???
+                
+        # [Tournament] broadcast tournament_info if match_end is received and match-making players for the final
+        if self.tournament_id is not None and received_data['command'] == "match_info" and received_data['mode'] == "end":
             tournament_mode = 'update'
             finalRank = None
             tournament = self.set_tournaments[self.tournament_id]
-            if not self.set_matches[self.match_id]['finished']:
-                await self.send_to_group(text_data, self.set_matches[self.match_id]['group_name'])
-                self.set_matches[self.match_id]['finished'] = True
+            # [match_info for Semi-Final]
             if self.match_id in tournament['matchesSemi']:
                 self.match_id = tournament['matchFinal']
-                self.discard_playerFromGroup(self.group_name_match)
+                await self.discard_playerFromGroup(self.group_name_match)
                 self.group_name_match = self.set_matches[self.match_id]['group_name']
+                # [self is winner of match] add self to players of final
                 if received_data['winner'] is not None and self.player == received_data['winner']:
                     await self.add_playerToMatch(tournament['matchFinal'])
                 await self.add_playerToGroup(self.set_matches[self.match_id]['group_name'])
-                # Send game_start for the final if both players are in the final
+                # [all 4 players in final group] broadcast match_info 'start'
                 if len(self.channel_layer.groups.get(self.group_name_match, {}).items()) == 4:
-                    print(f"Final start message: {match_info('start', self.set_matches[tournament['matchFinal']]['players'])}")
                     await self.send_to_group(match_info('start', self.set_matches[tournament['matchFinal']]['players']), self.group_name_match)
+            # [match_info for Final]
             elif self.match_id == tournament['matchFinal']:
                 finalRank = await self.get_finalRankTournament(self.tournament_id)
                 self.match_id = None
                 self.discard_playerFromGroup(self.group_name_match)
                 self.group_name_match = None
                 tournament_mode = 'end'
-            print(f"tournament_mode: {tournament_mode} | semiFinal1: {self.set_matches[tournament['matchesSemi'][0]]['players']} | semiFinal2: {self.set_matches[tournament['matchesSemi'][1]]['players']} | final: {self.set_matches[tournament['matchFinal']]['players']} | finalRank: {finalRank}")
+            # [match_info for wrong match]
+            else:
+                print(f"Warning: Received match_info for wrong match ({self.player}, {self.match_id})")
+            # [broadcast tournament_info]
             await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
 
-        # Pass the received JSON data as is to other clients
-        if received_data['command'] != "match_info" and ('mode' not in received_data or received_data['mode'] != "end"):
-            # print(f"Sending message to group {self.group_name_match}")
+        if self.match_id is not None and (received_data['command'] == "update" or received_data['command'] == "gamePause") and self.set_matches[self.match_id]['finished'] == False:
             await self.send_to_group(text_data, self.group_name_match)
+
+
+        # # Pass the received JSON data as is to other clients
+        # if received_data['command'] != "match_info" and ('mode' not in received_data or received_data['mode'] != "end"):
+        #     # print(f"Sending message to group {self.group_name_match}: {json.loads(text_data)}")
+        #     await self.send_to_group(text_data, self.group_name_match)
 
 
     async def get_finalRankTournament(self, tournament_id):
@@ -454,7 +452,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         })
 
     async def send_to_group(self, data, group_name):
-        # print(f"Sending message to group {group_name}: {data}")
         if group_name is not None:
             await self.channel_layer.group_send(group_name, {
                 'type': 'send_message',
