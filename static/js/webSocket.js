@@ -8,20 +8,6 @@ function addLog(message, elementId) {
     const logsDiv = document.getElementById(elementId);
     logsDiv.innerHTML = `<p>${message}</p>`;
   }
-
-// function updatePlayers() {
-//     console.log("UPDATEPLAYERS called");
-//     var Data = {
-//       command: "update_players",
-//       players: {
-//         player: char_choice,
-//         player1: player1,
-//         player2: player2,
-//       },
-//     };
-//     console.log("Updaate players Sending data:", Data);
-//     gameSocket.send(JSON.stringify(Data));
-//   }
   
   // Function to send log messages to the server
   function sendLogMessage(message, elementId) {
@@ -34,38 +20,6 @@ function addLog(message, elementId) {
     gameSocket.send(JSON.stringify(logData));
   }
   
-  // function sendScoreData() {
-  //   console.log("SendScoreData called");
-  //   var scoreData = {
-  //     command: "updateScore",
-  //     players: {
-  //       scorePlayer1: scorePlayer1,
-  //       scorePlayer2: scorePlayer2,
-  //       match: match,
-  //     },
-  //   };
-  
-  //   console.log("Sending data:", scoreData);
-  
-  //   // Send the game data to the server via WebSocket
-  //   gameSocket.send(JSON.stringify(scoreData));
-  //   sendLogMessage("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
-  // }
-  
-  // function sendGameEnd() {
-  //   console.log("SendGameEnd called");
-  //   var gameEnd = {
-  //     command: "gameEnd",
-  //   };
-  
-  //   console.log("Sending data:", gameEnd);
-  
-  //   // Send the game data to the server via WebSocket
-  //   gameSocket.send(JSON.stringify(gameEnd));
-  // }
-
-
-
   function sendMatchInfo(mode) {
     if (player === 0)
       return;
