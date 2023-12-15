@@ -1,10 +1,13 @@
 #pong/consumers.py
 
-import json
+import json, asyncio
+from datetime import datetime
 import time
 from .webSocket_msg_create import *
 # from .webSocket_msg_transmit import *
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from pong.views import add_game_data
+from pong.views import add_tournament_data
 
 # 1) 1. player joins -> create group_tournament && send message to player1 with player ID
 # 2) 2. & 3. player join -> add to group_tournament
@@ -67,6 +70,10 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'startTime':   <timestamp>,
                     #     'endTime':     None,          # None if not started yet
                     # },
+    
+            # players:     ['player1', 'player2', 'player3', 'player4'],
+            # matchesSemi: {'match1', 'match2'],
+
                     # 'id2': {
                     #     'players':     ['player5', 'player6'],
                     #     'matchesSemi': [None, None],
@@ -318,7 +325,22 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         self.set_matches[match_id]['score'][0] = score['player1']
         self.set_matches[match_id]['score'][1] = score['player2']
 
-
+    """ Send match data to database """
+    async def send_matchToDatabase(self, match):
+        p1n = match['players'][0]
+        p2n = match['players'][1]
+        p1s = match['score'][0]
+        p2s = match['score'][1]
+        gend = datetime.fromtimestamp(match['endTime'])
+        gdur = match['endTime'] - match['startTime']
+        if match['tournament'] is not None:
+            itg = True
+        else:
+            itg = False
+        loop = asyncio.get_event_loop()
+        # await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
+        await loop.run_in_executor(None, lambda: add_tournament_data())
+        
     # ************************************************************ #
     # ********************* REJECT WEBSOCKET ********************* #
     # ************************************************************ #
@@ -404,6 +426,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 self.set_matches[self.match_id]['endTime'] = self.get_currentTimestamp()
                 self.storeMatchScore(self.match_id, received_data['score'])
                 print(f"FINISHED MATCH: {self.set_matches[self.match_id]}")
+                # [store in database]
+                await self.send_matchToDatabase(self.set_matches[self.match_id])
                 # [TODO] disconnect players from match???
         
         # [Tournament] broadcast tournament_info if match_end is received and match-making players for the final
