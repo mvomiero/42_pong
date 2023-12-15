@@ -32,11 +32,13 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'channel_name':       ['specific..inmemory!lwBXeBBUxaub'],
                     #     'match_id':           [0]
                     #     'tournament_id':      [None]
+                    #     'self':               self
                     # },
                     # 'player2': {
                     #     'channel_name':       ['specific..inmemory!qGPfepkBTNdx'],
                     #     'match_id':           [2]
                     #     'tournament_id':      [0]
+                    #     'self':               self
                     # },
                 # }
     set_matches = {}  # Dictionary to store matches and their players
@@ -95,7 +97,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         print(f"player: {self.player}")
         
         await self.accept()
-        # await self.send_to_self(set_player(self.player))
+        await self.send_to_self(set_player(self.player))
 
         # Reject connection if player already exists
         if self.player in self.connected_users:
@@ -109,7 +111,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 return
         elif self.room_code == "tournament":
             if not await self.add_player_to_tournament(self.room_code):
-                self.reject_connection(3001)
                 return
 
         # group_size = len(self.channel_layer.groups.get(self.group_name_match, {}).items())
@@ -181,7 +182,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Reject if set_tournaments is full
         if open_tournament is None and len(self.set_tournaments) >= max_nbr_tournaments:
             print("set_tournament is full.")
-            self.reject_connection(4002, "server_full")
+            self.reject_connection(4002)
             return False
 
         id = open_tournament
@@ -208,34 +209,49 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Add player to the group
         await self.add_playerToGroup(self.group_name_tournament)
         
-        # Create new match for tournament or add user to existing match
-        if len(self.set_tournaments[id]['players']) % 2 == 1:
+        # Create all three matches for the tournament
+        if len(self.set_tournaments[id]['players']) == 1:
+            while len(self.set_tournaments[id]['matchesSemi']) < 2:
+                # Create empty match for the final
+                if await self.is_setMatchFull():
+                    for player in self.set_tournaments[id]['players']:
+                        if self.connected_users[player]['self'] != self:
+                            await PongConsumer.delete_connectedUsers(self.connected_users[player]['self'], 4002)
+                    await self.delete_tournament(self.tournament_id)
+                    await PongConsumer.delete_connectedUsers(self, 4002)
+                    return False
+                match_id = await self.get_newMatchID()
+                await self.create_newMatch(match_id, self.tournament_id)
+                self.set_tournaments[id]['matchesSemi'].append(match_id)
+                print(f"Created new match semifinal ({match_id}): {self.set_matches[match_id]}")
             if await self.is_setMatchFull():
-                return False    # TODO: behaviour if match is full
-            match_id = await self.get_newMatchID()
-            group_name_match = await self.create_newMatch(match_id, self.tournament_id)
-            self.set_tournaments[id]['matchesSemi'].append(match_id)
-            print(f"Created new match semifinal ({match_id}): {self.set_matches[match_id]}")
-        else:
-            match_id = self.set_tournaments[id]['matchesSemi'][-1]
-            group_name_match = self.set_matches[match_id]['group_name']
-        await self.add_playerToMatch(self.set_tournaments[id]['matchesSemi'][-1])
-        print(f"Added player to match ({match_id}): {self.set_matches[match_id]}")
-        await self.add_playerToConnectedUsers(match_id, None)
-        print(f"Added player to connected_users: {self.connected_users}")
-        await self.add_playerToGroup(group_name_match)
-        self.group_name_match = group_name_match
-        self.match_id = match_id
-
-        # Broadcast tournament info to all players if tournament is full and start matches
-        if len(self.set_tournaments[id]['players']) == players_per_tournament:
-            # Create empty match for the final
-            if await self.is_setMatchFull():
-                return False    # TODO: behaviour if match is full
+                for player in self.set_tournaments[id]['players']:
+                    if self.connected_users[player]['self'] != self:
+                        await PongConsumer.delete_connectedUsers(self.connected_users[player]['self'], 4002)
+                await self.delete_tournament(self.tournament_id)
+                await PongConsumer.delete_connectedUsers(self, 4002)
+                return False
             match_id = await self.get_newMatchID()
             await self.create_newMatch(match_id, self.tournament_id)
             self.set_tournaments[id]['matchFinal'] = match_id
             print(f"Created new match final ({match_id}): {self.set_matches[match_id]}")
+
+
+        # Add player to semi-final match
+        if len(self.set_matches[self.set_tournaments[id]['matchesSemi'][0]]['players']) < 2:
+            match_id = self.set_tournaments[id]['matchesSemi'][0]
+        else:
+            match_id = self.set_tournaments[id]['matchesSemi'][1]
+        await self.add_playerToMatch(match_id)
+        print(f"Added player to match ({match_id}): {self.set_matches[match_id]}")
+        await self.add_playerToConnectedUsers(match_id, None)
+        print(f"Added player to connected_users: {self.connected_users}")
+        self.group_name_match = self.set_matches[match_id]['group_name']
+        await self.add_playerToGroup(self.group_name_match)
+        self.match_id = match_id
+
+        # Broadcast tournament info to all players if tournament is full and start matches
+        if len(self.set_tournaments[id]['players']) == players_per_tournament:
             print("Broadcasting messages to tournament and matches.")
             # Broadcast tournament info to all players
             id_semi1 = self.set_tournaments[id]['matchesSemi'][0]
@@ -286,12 +302,14 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         and update match_id and tournament_id """
     async def add_playerToConnectedUsers(self, match_id, tournament_id):
         if self.player not in self.connected_users:
-            self.connected_users[self.player] = {'channel_name': [], 'match_id': [], 'tournament_id': []}
+            self.connected_users[self.player] = {'channel_name': [], 'match_id': [], 'tournament_id': [], 'self': []}
         self.connected_users[self.player]['channel_name'] = self.channel_name
         if match_id is not None:
             self.connected_users[self.player]['match_id'] = match_id
         if tournament_id is not None:
             self.connected_users[self.player]['tournament_id'] = tournament_id
+        self.connected_users[self.player]['self'] = self
+        print(f"Added player to connected_users: {self.connected_users[self.player]}")
 
     """ Add a player to a group / room """
     async def add_playerToGroup(self, group_name):
@@ -308,6 +326,16 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 group_name,
                 self.channel_name,
             )
+
+    """ Static method to discard a player from a group / room """
+    @staticmethod
+    async def discard_playerFromGroup_static(user, group_name):
+        if group_name is not None:
+            await user.channel_layer.group_discard(
+                group_name,
+                user.channel_name,
+            )
+
 
     """ Get the current timestamp """
     def get_currentTimestamp(self):
@@ -333,10 +361,60 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         loop = asyncio.get_event_loop()
         # await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
         await loop.run_in_executor(None, lambda: add_tournament_data())
+
+
+    """ Delete a player from connected_users and close connection """
+    @staticmethod
+    async def delete_connectedUsers(user, code=None):
+        if user is None:
+            return
         
-    # ************************************************************ #
-    # ********************* REJECT WEBSOCKET ********************* #
-    # ************************************************************ #
+        user_id = user.player
+        
+        # Remove user from connected_users
+        print(f"Deleting user {user_id} from connected_users.")
+        if user_id in user.connected_users:
+            user.connected_users[user_id].clear()
+            del user.connected_users[user_id]
+        
+        # Discard user from group
+        PongConsumer.discard_playerFromGroup_static(user, user.group_name_match)
+        PongConsumer.discard_playerFromGroup_static(user, user.group_name_tournament)
+
+        # Close connection
+        if code is not None:
+            await user.reject_connection(code)
+
+        # Set user parameters to None
+        user.room_code = None
+        user.player = None
+        user.group_name_match = None
+        user.group_name_tournament = None
+        user.tournament_id = None
+        user.match_id = None
+
+
+    """ Delete a match from set_matches """
+    async def delete_match(self, match_id):
+        # Clear and delete match
+        if match_id is not None and match_id in self.set_matches:
+            self.set_matches[match_id].clear()
+            del self.set_matches[match_id]
+    
+
+    """ Delete a tournament from set_tournaments """
+    async def delete_tournament(self, tournament_id):
+        # Clear and delete tournament
+        if tournament_id is not None and tournament_id in self.set_tournaments:
+            for match_id in self.set_tournaments[tournament_id]['matchesSemi']:
+                await self.delete_match(match_id)
+            if self.set_tournaments[tournament_id]['matchFinal']:
+                await self.delete_match(self.set_tournaments[tournament_id]['matchFinal'])
+            self.set_tournaments[tournament_id].clear()
+            del self.set_tournaments[tournament_id]
+            
+        
+    """ Close the connection with a specific code """
     async def reject_connection(self, code):
         print(f"Rejecting connection with code {code}.")
         await self.close(code=code)
@@ -345,58 +423,38 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     # ************************************************************ #
     # ******************* DISCONNECT WEBSOCKET ******************* #
     # ************************************************************ #
-    async def disconnect(self, close_code, ):
-        # Remove the connection from the dictionaries when a user disconnects
-        if self.group_name_match is None:
-            print("No group_name_match found.")
-            return
-        user_id = self.player
-        print(f"Disconnecting user {user_id} from channel name {self.channel_name} with CLOSE_CODE {close_code}")
-        if user_id in self.connected_users:
-            print(f"USER: {self.connected_users[user_id]}")
-            # Remove for Remote Game
-            if self.connected_users[user_id]['tournament_id'] is None or self.connected_users[user_id]['tournament_id'] == []:
-                # Remove user from match and delete match if empty
-                match_id = self.connected_users[user_id]['match_id']
-                if match_id is not None and match_id in self.set_matches and user_id in self.set_matches[match_id]['players']:
-                    self.set_matches[match_id]['players'].remove(user_id)
-                    if not self.set_matches[match_id]['players']:
-                        self.set_matches[match_id].clear()
-                        del self.set_matches[match_id]
-            elif len(self.set_tournaments[self.connected_users[user_id]['tournament_id']]['players']) <= 1:
-                # Remove user from tournament and delete tournament if empty
-                tournament_id = self.connected_users[user_id]['tournament_id']
-                if tournament_id is not None and tournament_id in self.set_tournaments and user_id in self.set_tournaments[tournament_id]['players']:
-                    self.set_tournaments[tournament_id]['players'].remove(user_id)
-                    if self.set_tournaments[tournament_id]['matchFinal']:
-                        if self.set_tournaments[tournament_id]['matchFinal'] in self.set_matches:
-                            self.set_matches[self.set_tournaments[tournament_id]['matchFinal']].clear()
-                            del self.set_matches[self.set_tournaments[tournament_id]['matchFinal']]
-                    nbr_matches = len(self.set_tournaments[tournament_id]['matchesSemi']) - 1
-                    while nbr_matches >= 0:
-                        if self.set_tournaments[tournament_id]['matchesSemi'][nbr_matches] in self.set_matches:
-                            self.set_matches[self.set_tournaments[tournament_id]['matchesSemi'][nbr_matches]].clear()
-                            del self.set_matches[self.set_tournaments[tournament_id]['matchesSemi'][nbr_matches]]
-                        nbr_matches -= 1
-                    if not self.set_tournaments[tournament_id]['players']:
-                        self.set_tournaments[tournament_id].clear()
-                        del self.set_tournaments[tournament_id]
-
-            # Remove user from connected_users
-            self.connected_users[user_id].clear()
-            del self.connected_users[user_id]
-
-            print(f"self.set_matches: {self.set_tournaments}")
-            print(f"self.set_matches: {self.set_matches}")
-            print(f"self.connected_users: {self.connected_users}")
-
-        self.discard_playerFromGroup(self.group_name_match)
-        self.discard_playerFromGroup(self.group_name_tournament)
+    async def disconnect(self, close_code):
+        if close_code != 1001:
+            print(f"Connection closed by Client with close_code {close_code}")
         
+        if self.player is None:
+            print("No player found.")
+            return
+
+        # Clear and delete remote-match (including closing all players' connections)
+        if self.tournament_id is None:
+            if self.set_matches[self.match_id]['players'][0] != self.player:
+                otherPlayer = self.set_matches[self.match_id]['players'][0]
+            else:
+                otherPlayer = self.set_matches[self.match_id]['players'][1]
+            await PongConsumer.delete_connectedUsers(self.connected_users[otherPlayer]['self'], 4005)
+            await self.delete_match(self.match_id)
+            await PongConsumer.delete_connectedUsers(self, 4005)
+            # return
+        
+        # Clear and delete tournament (including closing all players' connections and matches)
+        if self.tournament_id is not None:
+            for player in self.set_tournaments[self.tournament_id]['players']:
+                if self.connected_users[player]['self'] != self:
+                    await PongConsumer.delete_connectedUsers(self.connected_users[player]['self'], 4006)
+            await self.delete_tournament(self.tournament_id)
+            await PongConsumer.delete_connectedUsers(self, 4006)
+            # return
+
         # Additional print statement at disconnection
-        if user_id:
-            print(f"User {user_id} disconnected from channel name {self.channel_name}")
-        self.close(close_code)
+        print(f"self.set_tournaments: {self.set_tournaments}")
+        print(f"self.set_matches: {self.set_matches}")
+        print(f"self.connected_users: {self.connected_users}")
 
     
     async def receive(self, text_data):
@@ -418,9 +476,13 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 self.set_matches[self.match_id]['endTime'] = self.get_currentTimestamp()
                 self.storeMatchScore(self.match_id, received_data['score'])
                 print(f"FINISHED MATCH: {self.set_matches[self.match_id]}")
-                # [store in database]
-                # await self.send_matchToDatabase(self.set_matches[self.match_id])
-                # [TODO] disconnect players from match???
+                if self.tournament_id is None:
+                    # [store in database]
+                    # await self.send_matchToDatabase(self.set_matches[self.match_id])
+                    otherPlayer = self.set_matches[self.match_id]['players'][0] if self.set_matches[self.match_id]['players'][0] != self.player else self.set_matches[self.match_id]['players'][1]
+                    await PongConsumer.delete_connectedUsers(self.connected_users[otherPlayer]['self'], 3001)
+                    await self.delete_match(self.match_id)
+                    await PongConsumer.delete_connectedUsers(self, 3001)
         
         # [Tournament] broadcast tournament_info if match_end is received and match-making players for the final
         if self.tournament_id is not None and received_data['command'] == "match_info" and received_data['mode'] == "end":
@@ -439,6 +501,9 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 # [all 4 players in final group] broadcast match_info 'start'
                 if len(self.channel_layer.groups.get(self.group_name_match, {}).items()) == 4:
                     await self.send_to_group(match_info('start', self.set_matches[tournament['matchFinal']]['players']), self.group_name_match)
+                # [broadcast tournament_info]
+                print(f"Broadcasting: {tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank)}")
+                await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
             # [match_info for Final]
             elif self.match_id == tournament['matchFinal']:
                 finalRank = await self.get_finalRankTournament(self.tournament_id)
@@ -447,11 +512,20 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 self.group_name_match = None
                 tournament_mode = 'end'
                 self.set_tournaments[self.tournament_id]['endTime'] = self.get_currentTimestamp()
+                # [broadcast tournament_info]
+                print(f"Broadcasting: {tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank)}")
+                await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
+                # [store in database]
+                # await self.send_tournamentToDatabase(self.set_tournaments[self.tournament_id])
+                for player in tournament['players']:
+                    if self.connected_users[player]['self'] != self:
+                        await PongConsumer.delete_connectedUsers(self.connected_users[player]['self'], 3002)
+                await self.delete_tournament(self.tournament_id)
+                await PongConsumer.delete_connectedUsers(self, 3002)
+                return
             # [match_info for wrong match]
             else:
                 print(f"Warning: Received match_info for wrong match ({self.player}, {self.match_id})")
-            # [broadcast tournament_info]
-            await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
 
         # [Broadcast match game-data]
         if (self.match_id is not None 
@@ -502,6 +576,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Retrieve the message from the event
         message = event['data']
         # Send the message to the client WebSocket
-        print(f"Sending message: {message}")
-        if self.channel_layer.groups:
+        # print(f"Sending message: {message}")
+        try:
             await self.send(text_data=message)
+        except Exception as e:
+            print(f"Error sending message: {e}")
