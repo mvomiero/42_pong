@@ -1,7 +1,7 @@
 # pong/urls.py
 
 from django.urls import path, include
-from pong.views import index, pong, dashboard, room, play_local, play_remote, pong_local, error_full
+from pong.views import index, pong, dashboard, room, play_local, play_remote, pong_local, error_full, error_duplicate
 
 urlpatterns = [
 	path('', index, name='index'),
@@ -13,5 +13,6 @@ urlpatterns = [
     # and corresponds to all between play/ and ? in the url
     path('play/<room_code>', pong),
 	path('dashboard/', dashboard, name='dashboard'),
-    path('error/full/', error_full, name='error_full'),
+    path('play/error/full/', error_full, name='error_full'),
+    path('play/error/duplicate/', error_duplicate, name='error_duplicate'),
 ]

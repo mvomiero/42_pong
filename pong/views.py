@@ -57,3 +57,6 @@ def play_remote(request):
 
 def error_full(request):
     return render(request, "pong/error_full.html")
+
+def error_duplicate(request):
+    return render(request, "pong/error_duplicate.html")
