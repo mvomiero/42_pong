@@ -200,12 +200,20 @@ gameSocket.onmessage = function (event) {
 // Event handler for connection closure
 gameSocket.onclose = function (event) {
   console.log("WebSocket connection closed! (code: " + event.code + ")");
-  if (event.code === 507) {
-    // Redirect to another page when the server closes the connection with code 507 (Insufficient Storage)
-    window.location.href = 'error/full'; // Replace with your desired URL
-  }
-
-  // Perform cleanup tasks or display a message indicating connection closure
+  setTimeout(function () {
+    if (event.code === 3001 || event.code === 3002) {
+      window.location.href = '/dashboard';
+    }
+    else if (event.code === 4001) {
+      window.location.href = '/error/duplicate';
+    }
+    else if (event.code === 4002) {
+      window.location.href = '/error/full';
+    }
+    else if (event.code === 4005 || event.code === 4006) {
+      window.location.href = '/error/disconnection';
+    }
+  }, 1000); // 1000 milliseconds = 1 seconds
 };
 
 // Error handler for WebSocket errors
