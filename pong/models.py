@@ -16,3 +16,16 @@ class GameData(models.Model):
         
     class Meta:
         app_label = 'pong'
+
+class TournamentData(models.Model):
+    match_id_semi_1=models.PositiveIntegerField()
+    match_id_semi_2=models.PositiveIntegerField()
+    match_id_final=models.PositiveIntegerField()
+    tournament_end_timestamp = models.DateTimeField()
+    tournament_duration_secs = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"Tournament"
+        
+    class Meta:
+        app_label = 'pong'        

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from .models import GameData
-
-# Create your views here.
+from .models import GameData, TournamentData
+import time
+from datetime import datetime
 
 def index(request):
 	return render(request, "pong/index.html")
@@ -62,7 +62,6 @@ def error_full(request):
 # database functions:
 
 def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
-    print(f"Incoming arguments: p1n={p1n}, p2n={p2n}, p1s={p1s}, p2s={p2s}")
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
         game_data = GameData(
             player1_name=p1n,
@@ -75,4 +74,24 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
             blockchain_hash=None
         )
         game_data.save()
-        print(f"Game data saved {game_data}")
+        return game_data.id
+
+def add_tournament_data(p1=None, p2=None, p3=None, p4=None, matchSemi1=None, matchSemi2=None, matchFinal=None, tend=None, tdur=None):
+    # matchIdSemi1 = add_game_data(matchSemi1['p1n'], matchSemi1['p1s'], matchSemi1['p2n'], matchSemi1['p2s'], matchSemi1['gend'], matchSemi1['gdur'], matchSemi1['itg'])
+    # matchIdSemi2 = add_game_data(matchSemi2['p1n'], matchSemi2['p1s'], matchSemi2['p2n'], matchSemi2['p2s'], matchSemi2['gend'], matchSemi2['gdur'], matchSemi2['itg'])
+    # matchIdFinal = add_game_data(matchFinal['p1n'], matchFinal['p1s'], matchFinal['p2n'], matchFinal['p2s'], matchFinal['gend'], matchFinal['gdur'], matchFinal['itg'])
+    # tournament_data = TournamentData(
+    #     match_id_semi_1=matchIdSemi1,
+    #     match_id_semi_2=matchIdSemi2,
+    #     match_id_final=matchIdFinal,
+    #     tournament_end_timestamp=tend,
+    #     tournament_duration_secs=tdur,
+    #)
+    tournament_data = TournamentData(
+        match_id_semi_1=1,
+        match_id_semi_2=2,
+        match_id_final=3,
+        tournament_end_timestamp=datetime.fromtimestamp(time.time()),
+        tournament_duration_secs=30,
+    )
+    tournament_data.save()

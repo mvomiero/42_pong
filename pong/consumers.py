@@ -7,6 +7,7 @@ from .webSocket_msg_create import *
 # from .webSocket_msg_transmit import *
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from pong.views import add_game_data
+from pong.views import add_tournament_data
 
 # 1) 1. player joins -> create group_tournament && send message to player1 with player ID
 # 2) 2. & 3. player join -> add to group_tournament
@@ -337,9 +338,9 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         else:
             itg = False
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
-
-
+        # await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
+        await loop.run_in_executor(None, lambda: add_tournament_data())
+        
     # ************************************************************ #
     # ********************* REJECT WEBSOCKET ********************* #
     # ************************************************************ #
