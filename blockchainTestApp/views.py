@@ -17,7 +17,7 @@ def add_game_data(request, p1n, p1s, p2n, p2s):
             game_end_timestamp=datetime.fromtimestamp(time.time()),
             game_duration_secs=end_time - start_time,
             is_tournament_game=False,
-            blockchain_hash="test"
+            blockchain_hash=None
         )
         game_data.save()
         return HttpResponse(f"Record ID: {game_data.id}")

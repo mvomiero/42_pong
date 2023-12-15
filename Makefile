@@ -10,6 +10,7 @@ migrate:
 clean:
 	rm -f db.sqlite3
 	make migrate
+	make su
 	
 su:
 	python3 manage.py createsuperuser
