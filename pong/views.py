@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from .models import GameData
 
 # Create your views here.
 
@@ -57,3 +58,21 @@ def play_remote(request):
 
 def error_full(request):
     return render(request, "pong/error_full.html")
+
+# database functions:
+
+def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
+    print(f"Incoming arguments: p1n={p1n}, p2n={p2n}, p1s={p1s}, p2s={p2s}")
+    if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
+        game_data = GameData(
+            player1_name=p1n,
+            player1_points=p1s,
+            player2_name=p2n,
+            player2_points=p2s,
+            game_end_timestamp=gend,
+            game_duration_secs=gdur,
+            is_tournament_game=itg,
+            blockchain_hash=None
+        )
+        game_data.save()
+        print(f"Game data saved {game_data}")
