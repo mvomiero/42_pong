@@ -62,9 +62,6 @@ def error_full(request):
 def error_duplicate(request):
     return render(request, "pong/error_duplicate.html")
 
-def error_duplicate(request):
-    return render(request, "pong/error_duplicate.html")
-
 # database functions:
 
 def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
