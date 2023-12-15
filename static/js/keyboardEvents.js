@@ -3,6 +3,15 @@
 
 // listen to keyboard events to move the paddles
 document.addEventListener("keydown", function (e) {
+    if (e.key === " ") {
+        if (player !== 0) {
+            e.preventDefault(); // Check for space bar key press
+            gamePaused = !gamePaused; // Toggle game pause state
+            sendGamePause();
+        }
+        return;
+    }
+
     // Player 1 controls (left paddle) - Arrow keys
     if (player === 1) {
         console.log("Player 1 moving paddle");
@@ -60,6 +69,7 @@ document.getElementById("startGameButton").addEventListener("click", function ()
 
 // Listen to keyboard events to pause/resume the game
 document.addEventListener("keydown", function (e) {
+    console.log("gamePaused: ", gamePaused);
     if (e.key === " ") {
         if (player !== 0) {
             e.preventDefault(); // Check for space bar key press

@@ -199,6 +199,7 @@ gameSocket.onmessage = function (event) {
 
 // Event handler for connection closure
 gameSocket.onclose = function (event) {
+  console.log("WebSocket connection closed! (code: " + event.code + ")");
   if (event.code === 507) {
     // Redirect to another page when the server closes the connection with code 507 (Insufficient Storage)
     window.location.href = 'error/full'; // Replace with your desired URL

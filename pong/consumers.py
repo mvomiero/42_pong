@@ -1,6 +1,7 @@
 #pong/consumers.py
 
-import json 
+import json
+import time
 from .webSocket_msg_create import *
 # from .webSocket_msg_transmit import *
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
@@ -40,15 +41,19 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     # 'id1': {
                     #     'players':    ['player1', 'player2'],
                     #     'tournament': ['tournament_id'],
-                    #     'score':      [0, 0]
+                    #     'score':      [0, 0],
                     #     'group_name': ['match_1'],
+                    #     'startTime':  None,           # None if not started yet
+                    #     'endTime':    None,
                     #     'finished':   [False]
                     # },
                     # 'id2': {
                     #     'players':    ['player3', 'player4'],
-                    #     'tournament': ['None']        # "None" if not part of a tournament
-                    #     'score':      [0, 3]
+                    #     'tournament': ['None'],       # "None" if not part of a tournament
+                    #     'score':      [0, 3],
                     #     'group_name': ['match_2'],
+                    #     'startTime':  <timestamp>,
+                    #     'endTime':    <timestamp>,
                     #     'finished':   [True]
                     # },
 
@@ -59,12 +64,16 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'matchesSemi': ['match1', 'match2'],
                     #     'matchFinal':  ['match3'],
                     #     'group_name':  ['tournament_1'],
+                    #     'startTime':   <timestamp>,
+                    #     'endTime':     None,          # None if not started yet
                     # },
                     # 'id2': {
                     #     'players':     ['player5', 'player6'],
                     #     'matchesSemi': [None, None],
                     #     'matchFinal':  [None],
                     #     'group_name':  ['tournament_2'],
+                    #     'startTime':   <timestamp>,
+                    #     'endTime':     <timestamp>,
                     # },
 
 
@@ -88,7 +97,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Reject connection if player already exists
         if self.player in self.connected_users:
             print(f"Player {self.player} already exists.")
-            self.reject_connection(507)
+            await self.reject_connection(3000)
             return
 
         # Add the player to a match or tournament
@@ -97,7 +106,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 return
         elif self.room_code == "tournament":
             if not await self.add_player_to_tournament(self.room_code):
-                self.reject_connection(501)
+                self.reject_connection(3001)
                 return
 
         # print("Closing connection.")
@@ -147,6 +156,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Broadcast 'match start' info to all players if match is full
         if len(self.set_matches[match_id]['players']) == 2:
             print(f"Broadcast message match start to group {self.set_matches[match_id]['group_name']}")
+            self.set_matches[match_id]['startTime'] = self.get_currentTimestamp()
+            print(f"self.set_matches: {self.set_matches}")
             await self.send_to_group(match_info('start', self.set_matches[match_id]['players']), self.set_matches[match_id]['group_name'])
 
         return True
@@ -262,6 +273,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         self.set_matches[match_id]['score'] = [-1, -1]
         group_name_match = f'match_{match_id}'  # generate new group name
         self.set_matches[match_id]['group_name'] = group_name_match
+        self.set_matches[match_id]['startTime'] = None
+        self.set_matches[match_id]['endTime'] = None
         return group_name_match
     
     """ Append a player to a match """
@@ -295,6 +308,16 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 group_name,
                 self.channel_name,
             )
+
+    """ Get the current timestamp """
+    def get_currentTimestamp(self):
+        return time.time()
+
+    """ Store the result of a match """
+    def storeMatchScore(self, match_id, score):
+        self.set_matches[match_id]['score'][0] = score['player1']
+        self.set_matches[match_id]['score'][1] = score['player2']
+
 
     # ************************************************************ #
     # ********************* REJECT WEBSOCKET ********************* #
@@ -371,16 +394,18 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         received_data = json.loads(text_data)
         
         # Log/print the received JSON data
-        print("Received JSON data:", received_data)
+        # print("Received JSON data:", received_data)
 
         # [Match (Remote & Tournament)] broadcast match_info (update & end) to all players in the match_group
         if self.match_id is not None and received_data['command'] == "match_info" and (received_data['mode'] == "update" or received_data['mode'] == "end") and not self.set_matches[self.match_id]['finished']:
             await self.send_to_group(text_data, self.set_matches[self.match_id]['group_name'])
             if received_data['mode'] == "end":
                 self.set_matches[self.match_id]['finished'] = True
-                # [TODO] set the final score of the match (set_matches)
+                self.set_matches[self.match_id]['endTime'] = self.get_currentTimestamp()
+                self.storeMatchScore(self.match_id, received_data['score'])
+                print(f"FINISHED MATCH: {self.set_matches[self.match_id]}")
                 # [TODO] disconnect players from match???
-                
+        
         # [Tournament] broadcast tournament_info if match_end is received and match-making players for the final
         if self.tournament_id is not None and received_data['command'] == "match_info" and received_data['mode'] == "end":
             tournament_mode = 'update'
@@ -411,6 +436,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             # [broadcast tournament_info]
             await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
 
+        # [...]
         if self.match_id is not None and (received_data['command'] == "update" or received_data['command'] == "gamePause") and self.set_matches[self.match_id]['finished'] == False:
             await self.send_to_group(text_data, self.group_name_match)
 
