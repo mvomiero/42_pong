@@ -18,5 +18,8 @@ text-scene2-example:
 text-scene3-example:
 	google-chrome "textScene3.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData
 	
+text-scenes-combined:
+	google-chrome "textScenesCombined.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData
+	
 scores:
 	google-chrome "batVelocity3Scores.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData
