@@ -14,98 +14,103 @@ const textHeight = 0.3;
 
 const fontLoader = new FontLoader();
 fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_serif_regular.typeface.json', function (font) {
-  const count1Geom = new TextGeometry('Player 1', {
+  const count3Geom = new TextGeometry('3', {
     font: font,
     size: textSize,
     height: textHeight,
   });
-  const vsGeom = new TextGeometry('vs', {
+  const count2Geom = new TextGeometry('2', {
     font: font,
     size: textSize,
     height: textHeight,
   });
-  const p2Geom = new TextGeometry('Player 2', {
+  const count1Geom = new TextGeometry('1', {
     font: font,
     size: textSize,
     height: textHeight,
-  });    
+  });
+  const beginGeom = new TextGeometry('GO!', {
+    font: font,
+    size: textSize,
+    height: textHeight,
+  });        
 
-  const count1Material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-  const vsMaterial = new THREE.MeshBasicMaterial({ color: 0xffffaa });
-  const p2Material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+  const count3Material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const count2Material = new THREE.MeshBasicMaterial({ color: 0xffffaa });
+  const count1Material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+  const beginMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+  const count3Mesh = new THREE.Mesh(count3Geom, count3Material);
+  const count2Mesh = new THREE.Mesh(count2Geom, count2Material);
   const count1Mesh = new THREE.Mesh(count1Geom, count1Material);
-  const vsMesh = new THREE.Mesh(vsGeom, vsMaterial);
-  const p2Mesh = new THREE.Mesh(p2Geom, p2Material);
-  
+  const beginMesh = new THREE.Mesh(beginGeom, beginMaterial);
+ 
+ 	camera.position.x += 0.15;
+ 	camera.position.y += 0.25;
   camera.position.z = 5;
 
   // initial state:
-  count1Mesh.position.x -= 11; // start x
-  count1Mesh.position.y += 1;
-  scene.add(count1Mesh);  
+  count3Mesh.position.z = -20; // start z
+  scene.add(count3Mesh);
 
-  var count1Done = false, vsDone = false, p2Done = false;
+  var sceneNum = 0;
   var frameCounter = 0;
   function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
-    if(count1Done === false)
-    {
-	    if(count1Mesh.position.x < -3) // end x
-	    {
-	    	count1Mesh.position.x += 0.3; // speed
-	    }
-	    else
-	    {
-	    	count1Done = true;
-	    	vsMesh.position.z -= 10; // start z
-	    	scene.add(vsMesh);
-	    }
-	}
 
-	if(count1Done === true)
-	{
-	    if(vsMesh.position.z < 0) // end z
-	    {
-	    	vsMesh.position.z += 0.4; // speed
-	    }
-	    else if (vsDone === false)
-	    {
-	    	vsDone = true;
-	    	p2Mesh.position.x += 9; // start x
-	    	p2Mesh.position.y -= 1;
-	    	scene.add(p2Mesh);
-	    }
-	}
-
-	if(vsDone === true)
-	{
-	    if(p2Mesh.position.x > 1) // end x
-	    {
-	    	p2Mesh.position.x -= 0.3; // spped
-	    }
-	    else if (p2Done === false)
-	    {
-	    	p2Done = true;
-	    }
-	}
-
-	if (p2Done === true)
-	{
-		if (frameCounter < 70)
-		{
-		  frameCounter++;
+		switch(sceneNum) {
+			case 0:
+				if(count3Mesh.position.z < 10) // end z
+		    {
+		    	count3Mesh.position.z += 0.3; // speed
+		    }
+		    else
+		    {
+		    	count2Mesh.position.z = -20; // start z
+		    	scene.remove(count3Mesh);
+		    	scene.add(count2Mesh);
+		    	sceneNum++;
+		    }
+		    break;
+			case 1:
+				if(count2Mesh.position.z < 10) // end z
+		    {
+		    	count2Mesh.position.z += 0.3; // speed
+		    }
+		    else
+		    {
+		    	count1Mesh.position.z = -20; // start z
+		    	scene.remove(count2Mesh);
+		    	scene.add(count1Mesh);
+		    	sceneNum++;
+		    }
+				break;
+			case 2:
+				if(count1Mesh.position.z < 10) // end z
+		    {
+		    	count1Mesh.position.z += 0.3; // speed
+		    }
+		    else
+		    {
+		    	beginMesh.position.z = -20; // start z
+		    	scene.remove(count1Mesh);
+		    	scene.add(beginMesh);
+		    	sceneNum++;
+		    }
+				break;
+			case 3:
+				if(beginMesh.position.z < 5) // end z
+		    {
+		    	beginMesh.position.z += 0.3; // speed
+		    }
+		    else
+		    {
+		    	beginMesh.position.z = -20; // start z
+		    	scene.remove(beginMesh);
+		    	sceneNum++;
+		    }
+				break;				
 		}
-		else
-		{
-		  scene.remove(count1Mesh);
-		  scene.remove(vsMesh);
-		  scene.remove(p2Mesh); 
-		  //frameCounter = 0;
-		  // call to next scene
-		}
-	}
   }
-
   animate();
 });

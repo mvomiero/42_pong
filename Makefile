@@ -9,5 +9,14 @@ chrome-modules:
 disable-web:
 	google-chrome "importMapExample_fontLoader.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData
 	
-text-example:
+text-scene1-example:
 	google-chrome "textScene1.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData
+	
+text-scene2-example:
+	google-chrome "textScene2.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData
+	
+text-scene3-example:
+	google-chrome "textScene3.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData
+	
+scores:
+	google-chrome "batVelocity3Scores.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData
