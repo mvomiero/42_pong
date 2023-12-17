@@ -82,22 +82,22 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
         game_data.save()
         return game_data.id
 
-def add_tournament_data(p1=None, p2=None, p3=None, p4=None, matchSemi1=None, matchSemi2=None, matchFinal=None, tend=None, tdur=None):
-    # matchIdSemi1 = add_game_data(matchSemi1['p1n'], matchSemi1['p1s'], matchSemi1['p2n'], matchSemi1['p2s'], matchSemi1['gend'], matchSemi1['gdur'], matchSemi1['itg'])
-    # matchIdSemi2 = add_game_data(matchSemi2['p1n'], matchSemi2['p1s'], matchSemi2['p2n'], matchSemi2['p2s'], matchSemi2['gend'], matchSemi2['gdur'], matchSemi2['itg'])
-    # matchIdFinal = add_game_data(matchFinal['p1n'], matchFinal['p1s'], matchFinal['p2n'], matchFinal['p2s'], matchFinal['gend'], matchFinal['gdur'], matchFinal['itg'])
-    # tournament_data = TournamentData(
-    #     match_id_semi_1=matchIdSemi1,
-    #     match_id_semi_2=matchIdSemi2,
-    #     match_id_final=matchIdFinal,
-    #     tournament_end_timestamp=tend,
-    #     tournament_duration_secs=tdur,
-    #)
+# def add_tournament_data(p1=None, p2=None, p3=None, p4=None, matchSemi1=None, matchSemi2=None, matchFinal=None, tend=None, tdur=None):
+def add_tournament_data(semiMatch1, semiMatch2, finalMatch, players, tend, tdur):
+    gend = datetime.fromtimestamp(semiMatch1['endTime'])
+    gdur = semiMatch1['endTime'] - semiMatch1['startTime']
+    matchIdSemi1 = add_game_data(semiMatch1['players'][0], semiMatch1['score'][0], semiMatch1['players'][1], semiMatch1['score'][1], gend, gdur, True)
+    gend = datetime.fromtimestamp(semiMatch2['endTime'])
+    gdur = semiMatch2['endTime'] - semiMatch2['startTime']
+    matchIdSemi2 = add_game_data(semiMatch2['players'][0], semiMatch2['score'][0], semiMatch2['players'][1], semiMatch2['score'][1], gend, gdur, True)
+    gend = datetime.fromtimestamp(finalMatch['endTime'])
+    gdur = finalMatch['endTime'] - finalMatch['startTime']
+    matchIdFinal = add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
     tournament_data = TournamentData(
-        match_id_semi_1=1,
-        match_id_semi_2=2,
-        match_id_final=3,
-        tournament_end_timestamp=datetime.fromtimestamp(time.time()),
-        tournament_duration_secs=30,
+        match_id_semi_1=matchIdSemi1,
+        match_id_semi_2=matchIdSemi2,
+        match_id_final=matchIdFinal,
+        tournament_end_timestamp=tend,
+        tournament_duration_secs=tdur,
     )
     tournament_data.save()

@@ -359,8 +359,18 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         else:
             itg = False
         loop = asyncio.get_event_loop()
-        # await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
-        await loop.run_in_executor(None, lambda: add_tournament_data())
+        await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
+
+    """ Send tournament data to database """
+    async def send_tournamentToDatabase(self, tournament):
+        semiMatch1 = self.set_matches[tournament['matchesSemi'][0]]
+        semiMatch2 = self.set_matches[tournament['matchesSemi'][1]]
+        finalMatch = self.set_matches[tournament['matchFinal']]
+        players = tournament['players']
+        tdur = tournament['endTime'] - tournament['startTime']
+        tend = datetime.fromtimestamp(tournament['endTime'])
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, lambda: add_tournament_data(semiMatch1, semiMatch2, finalMatch, players, tend, tdur))
 
 
     """ Delete a player from connected_users and close connection """
@@ -516,7 +526,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 print(f"Broadcasting: {tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank)}")
                 await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
                 # [store in database]
-                # await self.send_tournamentToDatabase(self.set_tournaments[self.tournament_id])
+                await self.send_tournamentToDatabase(tournament)
                 for player in tournament['players']:
                     if self.connected_users[player]['self'] != self:
                         await PongConsumer.delete_connectedUsers(self.connected_users[player]['self'], 3002)
