@@ -23,3 +23,9 @@ text-scenes-combined:
 	
 scores:
 	google-chrome "batVelocity3Scores.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData
+	
+simple-scenes-combined:
+	google-chrome "simpleScenesCombined.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData
+
+scenes-in-files:
+	google-chrome "scenesInFiles.html" --disable-web-security --user-data-dir=/home/gbooth/Desktop/userData

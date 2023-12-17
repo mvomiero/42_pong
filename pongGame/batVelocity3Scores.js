@@ -2,6 +2,7 @@
 // TODO: integrate other text scenes
 // TODO: better font
 // TODO: better colours inc backgroud colour
+// TODO: pass in player names as arguments
 
 import * as THREE from 'three';
 import { FontLoader } from 'three/FontLoader';
