@@ -16,9 +16,9 @@ function scene0(sceneProperties) {
 function scene0Start(sceneProperties) {
 	const textSize = 0.5;
 	const textHeight = 0.3;
-	const p1Geom = new TextGeometry('Player 1', {font: sceneProperties.font, size: textSize, height: textHeight});
+	const p1Geom = new TextGeometry(sceneProperties.p1Name, {font: sceneProperties.font, size: textSize, height: textHeight});
 	const vsGeom = new TextGeometry('vs', {font: sceneProperties.font, size: textSize, height: textHeight});
-	const p2Geom = new TextGeometry('Player 2', {font: sceneProperties.font, size: textSize, height: textHeight});
+	const p2Geom = new TextGeometry(sceneProperties.p2Name, {font: sceneProperties.font, size: textSize, height: textHeight});
 	const p1Material = new THREE.MeshBasicMaterial({color: sceneProperties.p1Colour});
 	const vsMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.otherTextColour});
 	const p2Material = new THREE.MeshBasicMaterial({color: sceneProperties.p2Colour});

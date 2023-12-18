@@ -47,7 +47,9 @@ function scene2Animate(sceneProperties) {
     updateBats(sceneProperties); 
 }
 
-function scene2End(sceneProperties) {
+function scene2End(sceneProperties, winnerName, winnerColour) {
+    sceneProperties.winnerName = winnerName;
+    sceneProperties.winnerColour = winnerColour;
 	sceneProperties.scene.remove(ball);
 	sceneProperties.scene.remove(bat1);
 	sceneProperties.scene.remove(bat2);
@@ -62,8 +64,8 @@ function scene2End(sceneProperties) {
 
 function createBall(sceneProperties) {
     var geometry = new THREE.SphereGeometry(0.5, ballSize, ballSize);
-    var material = new THREE.WireframeGeometry(geometry);
-    ball = new THREE.Mesh(material);
+    var material = new THREE.MeshBasicMaterial({color: sceneProperties.ballColour});
+    ball = new THREE.Mesh(geometry, material);
     ball.position.set(0, 0, 0);
     sceneProperties.scene.add(ball);
     // Initial ball speed
@@ -74,21 +76,21 @@ function createBall(sceneProperties) {
 
 function createBats(sceneProperties) {
     var batGeometry = new THREE.BoxGeometry(batWidth, batHeight, batDepth);
-    var bat1Material = new THREE.LineBasicMaterial({color: sceneProperties.p1Colour});
-    var bat2Material = new THREE.LineBasicMaterial({color: sceneProperties.p2Colour});
-    bat1 = new THREE.LineSegments(batGeometry, bat1Material);
-    bat1.position.set(-tableWidth/2, 0, 0);
+    var bat1Material = new THREE.MeshBasicMaterial({color: sceneProperties.p1Colour});
+    bat1 = new THREE.Mesh(batGeometry, bat1Material);
+    bat1.position.set(-tableWidth / 2, 0, 0);
     sceneProperties.scene.add(bat1);
-    bat2 = new THREE.LineSegments(batGeometry, bat2Material);
-    bat2.position.set(tableWidth/2, 0, 0);
+    var bat2Material = new THREE.MeshBasicMaterial({color: sceneProperties.p2Colour});
+    bat2 = new THREE.Mesh(batGeometry, bat2Material);
+    bat2.position.set(tableWidth / 2, 0, 0);
     sceneProperties.scene.add(bat2);
     batSpeed = 0.05;
 }
 
 function createTable(sceneProperties) {
     var tableGeometry = new THREE.BoxGeometry(tableWidth, tableHeight, tableDepth);
-    var tableMaterial = new THREE.WireframeGeometry(tableGeometry);
-    table = new THREE.LineSegments(tableMaterial);
+    var tableMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.tableColour});
+    table = new THREE.Mesh(tableGeometry, tableMaterial);
     table.position.set(0, 0, -batDepth/2 - tableDepth);
     sceneProperties.scene.add(table);
 }
@@ -129,7 +131,7 @@ function updateBall(sceneProperties) {
         p1Score++;
 		updateScore(sceneProperties);
         if (p1Score === maxScore)
-        	scene2End(sceneProperties);		
+        	scene2End(sceneProperties, sceneProperties.p1Name, sceneProperties.p1Colour);		
     }
 
     if (ball.position.x < -tableWidth/2)
@@ -137,7 +139,7 @@ function updateBall(sceneProperties) {
         p2Score++;      
 		updateScore(sceneProperties);
         if (p2Score === maxScore)
-        	scene2End(sceneProperties);  		
+        	scene2End(sceneProperties, sceneProperties.p2Name, sceneProperties.p1Name);  		
     }
 }
 

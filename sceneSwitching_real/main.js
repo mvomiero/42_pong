@@ -6,6 +6,11 @@ import {scene1} from './scene1.js';
 import {scene2} from './scene2.js';
 import {scene3} from './scene3.js';
 
+// function setPlayerNames(p1Name, p2Name) {
+// 	sceneProperties.p1Name = p1Name;
+// 	sceneProperties.p1Name = p2Name;
+// }
+
 const fontLoader = new FontLoader();
 fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_serif_regular.typeface.json', function (font) {
 	const scene = new THREE.Scene();
@@ -18,13 +23,17 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 		camera:camera,
 		sceneNum:0,
 		sceneStarted:false,
+		p1Name: 'Player 1',
+		p2Name: 'Player 2',
 		backgroundColour:0x87CEEB,
 		p1Colour:0x990000,
 		otherTextColour:0xFFFFAA,
 		p2Colour:0x009900,
-		ballColour:0x46A07E,
+		ballColour:0xFF0000,
 		tableColour:0x46A07E,
-		font:font
+		font:font,
+		winnerName:undefined,
+		winnerColour:undefined
 	};
 	sceneProperties.scene.background = new THREE.Color(sceneProperties.backgroundColour);
 	function animate() {

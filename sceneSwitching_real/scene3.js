@@ -16,9 +16,9 @@ function scene3(sceneProperties) {
 function scene3Start(sceneProperties) {
 	const textSize = 0.5;
 	const textHeight = 0.3;
-	const playerGeom = new TextGeometry('Player 1', {font: sceneProperties.font, size: textSize, height: textHeight});
+	const playerGeom = new TextGeometry(sceneProperties.winnerName, {font: sceneProperties.font, size: textSize, height: textHeight});
 	const winsGeom = new TextGeometry('Wins!', {font: sceneProperties.font, size: textSize, height: textHeight});    
-	const playerMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.p1Colour});
+	const playerMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.winnerColour});
 	const winsMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.otherTextColour});
 	playerMesh = new THREE.Mesh(playerGeom, playerMaterial);
 	winsMesh = new THREE.Mesh(winsGeom, winsMaterial);
@@ -56,7 +56,7 @@ function shot0(sceneProperties) {
 }
 
 function shot1(sceneProperties) {
-	if(winsMesh.position.x > 0.3) // end x
+	if(winsMesh.position.x > 1) // end x
 		winsMesh.position.x -= 0.3; // speed
 	else
 		shotNum++;
