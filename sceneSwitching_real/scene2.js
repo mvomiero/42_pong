@@ -2,8 +2,6 @@ import * as THREE from 'three';
 import {FontLoader} from 'three/FontLoader';
 import {TextGeometry} from 'three/TextGeometry';
 
-const p1Colour = 0xff0000;
-const p2Colour = 0x00ff00;
 var p1Score = 0;
 var p2Score = 0;
 const maxScore = 3;
@@ -76,8 +74,8 @@ function createBall(sceneProperties) {
 
 function createBats(sceneProperties) {
     var batGeometry = new THREE.BoxGeometry(batWidth, batHeight, batDepth);
-    var bat1Material = new THREE.LineBasicMaterial({ color: p1Colour });
-    var bat2Material = new THREE.LineBasicMaterial({ color: p2Colour });
+    var bat1Material = new THREE.LineBasicMaterial({color: sceneProperties.p1Colour});
+    var bat2Material = new THREE.LineBasicMaterial({color: sceneProperties.p2Colour});
     bat1 = new THREE.LineSegments(batGeometry, bat1Material);
     bat1.position.set(-tableWidth/2, 0, 0);
     sceneProperties.scene.add(bat1);
@@ -156,8 +154,8 @@ function createScoreText(sceneProperties) {
     const textHeight = 0.3;
     const p1ScoreGeom = new TextGeometry(p1Score.toString(), {font: sceneProperties.font, size: textSize, height: textHeight});
     const p2ScoreGeom = new TextGeometry(p2Score.toString(), {font: sceneProperties.font, size: textSize, height: textHeight});
-    const p1ScoreMaterial = new THREE.MeshBasicMaterial({color: p1Colour});
-    const p2ScoreMaterial = new THREE.MeshBasicMaterial({color: p2Colour});
+    const p1ScoreMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.p1Colour});
+    const p2ScoreMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.p2Colour});
     p1ScoreMesh = new THREE.Mesh(p1ScoreGeom, p1ScoreMaterial);
     p2ScoreMesh = new THREE.Mesh(p2ScoreGeom, p2ScoreMaterial);
     p1ScoreMesh.position.x = (-(tableWidth/2) - 3 - 2);

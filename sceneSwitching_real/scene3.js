@@ -18,8 +18,8 @@ function scene3Start(sceneProperties) {
 	const textHeight = 0.3;
 	const playerGeom = new TextGeometry('Player 1', {font: sceneProperties.font, size: textSize, height: textHeight});
 	const winsGeom = new TextGeometry('Wins!', {font: sceneProperties.font, size: textSize, height: textHeight});    
-	const playerMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
-	const winsMaterial = new THREE.MeshBasicMaterial({color: 0xffff00});
+	const playerMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.p1Colour});
+	const winsMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.otherTextColour});
 	playerMesh = new THREE.Mesh(playerGeom, playerMaterial);
 	winsMesh = new THREE.Mesh(winsGeom, winsMaterial);
 	sceneProperties.camera.position.z = 5;

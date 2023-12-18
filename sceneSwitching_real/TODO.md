@@ -1,4 +1,4 @@
-check window resizing
+check window resizing - at the moment we are full screen, resizing does nothing, canvas stays large
 background colour
 player colours
 pass in player names on load

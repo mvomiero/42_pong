@@ -19,10 +19,10 @@ function scene1Start(sceneProperties) {
 	const count2Geom = new TextGeometry('2', {font: sceneProperties.font, size: textSize, height: textHeight});
 	const count1Geom = new TextGeometry('1', {font: sceneProperties.font, size: textSize, height: textHeight});
 	const beginGeom = new TextGeometry('GO!', {font: sceneProperties.font, size: textSize, height: textHeight});
-	const count3Material = new THREE.MeshBasicMaterial({color: 0xff0000});
-	const count2Material = new THREE.MeshBasicMaterial({color: 0xffffaa});
-	const count1Material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-	const beginMaterial = new THREE.MeshBasicMaterial({color: 0x0000ff});
+	const count3Material = new THREE.MeshBasicMaterial({color: sceneProperties.p1Colour});
+	const count2Material = new THREE.MeshBasicMaterial({color: sceneProperties.otherTextColour});
+	const count1Material = new THREE.MeshBasicMaterial({color: sceneProperties.p2Colour});
+	const beginMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.otherTextColour});
 	count3Mesh = new THREE.Mesh(count3Geom, count3Material);
 	count2Mesh = new THREE.Mesh(count2Geom, count2Material);
 	count1Mesh = new THREE.Mesh(count1Geom, count1Material);
