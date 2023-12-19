@@ -1,11 +1,147 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="wrapper">
+<div class="container mt-5">
+    <!-- Pagination -->
+    <nav aria-label="Chart Pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item"><a class="page-link" href="#chart1">1</a></li>
+            <li class="page-item"><a class="page-link" href="#chart2">2</a></li>
+            <!-- Add more li elements for additional charts -->
+            <!-- Example: <li class="page-item"><a class="page-link" href="#chart3">3</a></li> -->
+        </ul>
+    </nav>
 
-  <h1>Dashboard</h1>
-
-  <a href="/">Play again!</a>
-
+    <!-- Chart sections -->
+    <div class="chart-section" id="chart1">
+        <div class="row">
+            <div class="col-md-8">
+                <canvas id="horizontalBarChart" style="height: 400px; width: 800px;"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="chart-section" id="chart2" style="display: none;">
+        <div class="row">
+            <div class="col-md-8">
+                <canvas id="horizontalBarChart2" style="height: 400px; width: 800px;"></canvas>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    // JSON data with static values
+    var chartData = {
+        "Monday": 10,
+        "Tuesday": 15,
+        "Wednesday": 20,
+        "Thursday": 18,
+        "Friday": 12,
+        "Saturday": 27,
+        "Sunday": 22
+    };
+    var chartData2 = {
+        "Monday": 100,
+        "Tuesday": 115,
+        "Wednesday": 20,
+        "Thursday": 18,
+        "Friday": 12,
+        "Saturday": 7,
+        "Sunday": 220
+    };
+
+    // Extracting data for chart
+    var labels = Object.keys(chartData);
+    var data = Object.values(chartData);
+
+    // Get the canvas element and create the chart
+    var canvas = document.getElementById('horizontalBarChart').getContext('2d');
+    var horizontalBarChart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                axis: 'y',
+                // label: 'Number of Games',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Number of Games'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+
+    // Extracting data for chart
+    var labels = Object.keys(chartData2);
+    var data = Object.values(chartData2);
+
+    // Get the canvas element and create the chart
+    var canvas = document.getElementById('horizontalBarChart2').getContext('2d');
+    var horizontalBarChart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                axis: 'y',
+                // label: 'Number of Games',
+                data: data,
+                backgroundColor: 'rgba(154, 162, 35, 0.6)',
+                borderColor: 'rgba(154, 162, 35, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Number of Games'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Function to switch between chart sections based on pagination links
+    document.querySelectorAll('.pagination a').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var targetChart = this.getAttribute('href').substring(1);
+            document.querySelectorAll('.chart-section').forEach(function(section) {
+                if (section.id === targetChart) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+</script>
 {% endblock content %}
