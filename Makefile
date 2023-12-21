@@ -11,6 +11,9 @@ clean:
 	rm -f db.sqlite3
 	make migrate
 	make su
-	
+
+chrome:
+	google-chrome --disable-web-security --disable-application-cache --user-data-dir=/home/gbooth/Desktop/userData
+
 su:
 	python3 manage.py createsuperuser

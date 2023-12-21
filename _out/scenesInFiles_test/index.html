@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three.js Example with es-module-shims.js</title>
+  <!-- Include es-module-shims.js from CDN -->
+  <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+  <!-- Import map for Three.js and FontLoader -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.138.3/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

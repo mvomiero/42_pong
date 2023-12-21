@@ -1,3 +1,12 @@
+// Websocket code: move to webSocket.js
+var roomCode = document.getElementById("game_board").getAttribute("room_code");
+char_choice = document
+  .getElementById("game_board")
+  .getAttribute("char_choice");
+var char_choice;
+var connectionString = "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
+console.log("connectionString: ", connectionString);
+var gameSocket = new WebSocket(connectionString);
 
 /*******************************************************/
 /******************* SENDING DATA **********************/
