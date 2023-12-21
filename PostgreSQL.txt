@@ -1,0 +1,41 @@
+Create PostgreSQL Database
+1) Install PostgreSQL
+2) Create a PostgreSQL Database and User
+	- open PostgreSQL command line interface with default user 'postgre': sudo -u postgres psql
+	- create database: CREATE DATABASE pong_database;
+	- create user and password: CREATE USER pong_user WITH PASSWORD 'pong';
+	- grant privileges ans status to the user (we have to check what is really needed):
+		GRANT ALL PRIVILEGES ON DATABASE pong_database TO pong_user;
+		GRANT ALL PRIVILEGES ON SCHEMA public TO pong_user;
+		GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO pong_user;
+		ALTER USER pong_user WITH SUPERUSER;
+
+
+Integrate PostgreSQL Database in Django:
+1) in settings.py of project, edit DATABASES:
+	DATABASES = {
+		'default': {
+	        'ENGINE': 'django.db.backends.postgresql',
+        	'NAME': 'pong_database',
+        	'USER': 'pong_user',
+        	'PASSWORD': 'pong',
+        	'HOST': 'localhost',    # Change this if your database is hosted elsewhere
+        	'PORT': '5432',         # Set the port if needed
+    		}
+	}
+2) run migrations:
+	python3 manage.py makemigrations
+	python3 manage.py migrate
+3) create superuser (for Django admin-page): python3 manage.py createsuperuser
+	username: pong_admin
+	PW: admin
+
+Default Script to initialize Database when starting Django App:
+1) add new file 'signals.py' (name can be changed) to pong app
+2) add function to initialize data - '@receiver(post_migrate)' over the function declaration means that the function listens to the signal send after migration (python3 manage.py migrate) and will only in this case be executed
+3) add in apps.py:
+	def ready(self):
+		import pong.signals
+
+
+

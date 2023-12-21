@@ -17,7 +17,7 @@ function drawChart1() {
     var data = Object.values(chartData);
 
     // Get the canvas element and create the chart
-    var canvas = document.getElementById('horizontalBarChart').getContext('2d');
+    var canvas = document.getElementById('horizontalBarChart1').getContext('2d');
     var horizontalBarChart = new Chart(canvas, {
         type: 'bar',
         data: {
@@ -39,7 +39,7 @@ function drawChart1() {
                 },
                 title: {
                     display: true,
-                    text: 'Games played per day',
+                    text: 'Matches and Players per day',
                     font: {
                         size: 18,
                         color: '#333',
@@ -221,6 +221,122 @@ function drawChart3() {
     });
 }
 
+function drawChart4() {
+    // JSON data with static values
+    var chartData = {
+        "Monday": 2,
+        "Tuesday": 16,
+        "Wednesday": 20,
+        "Thursday": 8,
+        "Friday": 12,
+        "Saturday": 26,
+        "Sunday": 22
+    };
+
+    // Extracting data for chart
+    var labels = Object.keys(chartData);
+    var data = Object.values(chartData);
+
+    // Get the canvas element and create the chart
+    var canvas = document.getElementById('horizontalBarChart2').getContext('2d');
+    var horizontalBarChart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                axis: 'y',
+                // label: 'Number of Games',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Players per day',
+                    font: {
+                        size: 18,
+                        color: '#333',
+                        family: 'Arial'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Number of Games'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function drawChart5() {
+    // JSON data with static values
+    var chartData = [];
+    for (var i = 0; i < 24; i++) {
+        var hour = (i < 10 ? '0' : '') + i + ':00'; // Formatting the hour
+        var randomValue = Math.floor(Math.random() * 31); // Random number between 0 and 30
+        chartData.push({ hour: hour, value: randomValue });
+    }
+
+    // Extracting data for chart
+    var labels = chartData.map(item => item.hour);
+    var data = chartData.map(item => item.value);
+
+    // Get the canvas element and create the chart
+    var canvas = document.getElementById('barChart').getContext('2d');
+    var barChart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                axis: 'x',
+                data: data,
+                backgroundColor: 'rgba(154, 222, 35, 0.6)',
+                borderColor: 'rgba(154, 222, 35, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'x',
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Players per day',
+                    font: {
+                        size: 18,
+                        color: '#333',
+                        family: 'Arial'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Number of Players'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
 function setupPagination() {
     // Function to switch between chart sections based on pagination links
     document.querySelectorAll('.pagination a').forEach(function(link) {
@@ -241,5 +357,6 @@ function setupPagination() {
 drawChart1();
 drawChart2();
 drawChart3();
-// drawChart4();
+drawChart4();
+drawChart5();
 setupPagination();
