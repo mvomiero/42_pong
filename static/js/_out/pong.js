@@ -78,7 +78,7 @@ function scene2Start(sceneProperties) {
 
 function scene2Animate(sceneProperties) {
   updateBall(sceneProperties);
-  updateBats(sceneProperties);
+  updatePaddles(sceneProperties);
   sendMatchInfo("update");
   sendGameData();    
 }
@@ -133,6 +133,22 @@ function createTable(sceneProperties) {
     tableMesh = new THREE.Mesh(tableGeometry, tableMaterial);
     tableMesh.position.set(0, 0, -paddleDepth/2 - tableDepth);
     sceneProperties.scene.add(tableMesh);
+}
+
+// Update bat position based on user input and key duration
+function updatePaddles() {
+  if (movement.W && leftPaddle.position.y + batHeight/2 < tableHeight/2) {
+      leftPaddle.position.y += bat1Velocity;
+  }
+  if (movement.S && leftPaddle.position.y - batHeight/2 > -tableHeight/2) {
+      leftPaddle.position.y -= bat1Velocity;
+  }
+  if (movement.O && rightPaddle.position.y + batHeight/2 < tableHeight/2) {
+      rightPaddle.position.y += bat2Velocity;
+  }
+  if (movement.L && rightPaddle.position.y - batHeight/2 > -tableHeight/2) {
+      rightPaddle.position.y -= bat2Velocity;
+  }
 }
 
 function updateBall(sceneProperties) {
