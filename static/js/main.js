@@ -18,7 +18,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     const camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ canvas: canvas });
     renderer.setSize(canvas.width, canvas.height);
-	
 	let sceneProperties = {
 		canvas:canvas,
 		scene:scene,

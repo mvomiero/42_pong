@@ -2,24 +2,15 @@ import * as THREE from 'three';
 import {FontLoader} from 'three/FontLoader';
 import {TextGeometry} from 'three/TextGeometry';
 
-var p1Score = 0;
-var p2Score = 0;
+var p1Score = 0, p2Score = 0;
 const maxScore = 3;
-var p1ScoreMesh;
-var p2ScoreMesh;
-var ball, ballSpeedX, ballSpeedY, ballVelocity;
-var ballSize;
+var p1ScoreMesh, p2ScoreMesh;
+var ball, ballSpeedX, ballSpeedY, ballVelocity, ballSize;
 var bat1, bat2, batSpeed = 0.05, bat1Velocity, bat2Velocity, batAcceleration = 0.009;
-var batWidth;
-var batHeight;
-var batDepth = 1; // TODO: set in scene2start;
-var textSize, textHeight, textYpos, textXpos;
-var zoomFactor = 0.027;
-var zcw, zch;
-var table;
-var tableWidth;
-var tableHeight;
-var tableDepth = 0.1;  // TODO: set in scene2start;
+var batWidth, batHeight, batDepth;
+var scoreSize, scoreHeight, scoreYpos, leftScoreXpos, rightScoreXpos;
+var zoomFactor = 0.027, zcw, zch;
+var table, tableWidth, tableHeight, tableDepth;
 const movement = {W: false, S: false, O: false, L: false};
 const keyHeldDuration = {W: 0, S: 0, O: 0, L: 0};
 
@@ -35,19 +26,33 @@ function scene2Start(sceneProperties) {
     zch = sceneProperties.canvas.height * zoomFactor;
     tableWidth = zcw * 0.75;
     tableHeight = zch * 0.75;
+    tableDepth = zch * 0.01;
     batWidth = zcw * 0.02;
-    batHeight = zcw * 0.2;    
+    batHeight = zcw * 0.2;
+    batDepth = zch * 0.05;    
     ballSize = zcw * 0.5;
-    textSize = 1; // to set
-    textHeight = 0.3; // to set
-    textYpos = 1; // to set
-    textXpos = 1; // to set
+    scoreSize = zch * 0.075;
+    scoreHeight = zch * 0.0001;
+    scoreYpos = zch * 0.38;
+    leftScoreXpos = (zcw * 0.08) - (zcw / 2);
+    rightScoreXpos = (zcw * 0.87) - (zcw / 2);
 	sceneProperties.camera.position.x = 0;
 	sceneProperties.camera.position.y = 0;
 	sceneProperties.camera.position.z = 10;
 	sceneProperties.camera.rotation.x = 0;
 	sceneProperties.camera.rotation.y = 0;
 	sceneProperties.camera.rotation.z = 0;
+    // sceneProperties.camera.position.x = 0;
+    // sceneProperties.camera.position.y = -15;
+    // sceneProperties.camera.position.z = 2;
+    // sceneProperties.camera.rotation.x = 1.4;
+    // sceneProperties.camera.rotation.y = 0;
+    // sceneProperties.camera.rotation.z = 0;
+
+    const light = new THREE.PointLight( 0xffddaa, 1.3, 150 );
+    light.position.set( 0, 0, 12 );
+    sceneProperties.scene.add(light);  
+
 	initBatKeys();	
 	createBall(sceneProperties);
 	createBats(sceneProperties);
@@ -78,23 +83,25 @@ function scene2End(sceneProperties, winnerName, winnerColour) {
 
 function createBall(sceneProperties) {
     var geometry = new THREE.SphereGeometry(0.5, ballSize, ballSize);
-    var material = new THREE.MeshBasicMaterial({color: sceneProperties.ballColour});
+    var material = new THREE.MeshPhongMaterial({color: sceneProperties.ballColour});
     ball = new THREE.Mesh(geometry, material);
     ball.position.set(0, 0, 0);
     sceneProperties.scene.add(ball);
     // Initial ball speed
-    ballSpeedX = 0.05 * (Math.random() < 0.5 ? 1 : -1);
-    ballSpeedY = 0.03;
+    ballSpeedX = 0;
+    ballSpeedY = 0;    
+    // ballSpeedX = 0.05 * (Math.random() < 0.5 ? 1 : -1);
+    // ballSpeedY = 0.03;
     ballVelocity = 2;
 }
 
 function createBats(sceneProperties) {
     var batGeometry = new THREE.BoxGeometry(batWidth, batHeight, batDepth);
-    var bat1Material = new THREE.MeshBasicMaterial({color: sceneProperties.p1Colour});
+    var bat1Material = new THREE.MeshPhongMaterial({color: sceneProperties.p1Colour});
     bat1 = new THREE.Mesh(batGeometry, bat1Material);
     bat1.position.set(-tableWidth / 2, 0, 0);
     sceneProperties.scene.add(bat1);
-    var bat2Material = new THREE.MeshBasicMaterial({color: sceneProperties.p2Colour});
+    var bat2Material = new THREE.MeshPhongMaterial({color: sceneProperties.p2Colour});
     bat2 = new THREE.Mesh(batGeometry, bat2Material);
     bat2.position.set(tableWidth / 2, 0, 0);
     sceneProperties.scene.add(bat2);
@@ -103,7 +110,7 @@ function createBats(sceneProperties) {
 
 function createTable(sceneProperties) {
     var tableGeometry = new THREE.BoxGeometry(tableWidth, tableHeight, tableDepth);
-    var tableMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.tableColour});
+    var tableMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.tableColour});
     table = new THREE.Mesh(tableGeometry, tableMaterial);
     table.position.set(0, 0, -batDepth/2 - tableDepth);
     sceneProperties.scene.add(table);
@@ -166,17 +173,17 @@ function updateScore(sceneProperties) {
 }
 
 function createScoreText(sceneProperties) {
-    const p1ScoreGeom = new TextGeometry(p1Score.toString(), {font: sceneProperties.font, size: textSize, height: textHeight});
-    const p2ScoreGeom = new TextGeometry(p2Score.toString(), {font: sceneProperties.font, size: textSize, height: textHeight});
-    const p1ScoreMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.p1Colour});
-    const p2ScoreMaterial = new THREE.MeshBasicMaterial({color: sceneProperties.p2Colour});
+    const p1ScoreGeom = new TextGeometry(p1Score.toString(), {font: sceneProperties.font, size: scoreSize, height: scoreHeight});
+    const p2ScoreGeom = new TextGeometry(p2Score.toString(), {font: sceneProperties.font, size: scoreSize, height: scoreHeight});
+    const p1ScoreMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.p1Colour});
+    const p2ScoreMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.p2Colour});
     p1ScoreMesh = new THREE.Mesh(p1ScoreGeom, p1ScoreMaterial);
     p2ScoreMesh = new THREE.Mesh(p2ScoreGeom, p2ScoreMaterial);
-    p1ScoreMesh.position.x = (-(tableWidth/2) - 3 - 2);
-    p1ScoreMesh.position.y -= 1.4;
+    p1ScoreMesh.position.x = leftScoreXpos;
+    p1ScoreMesh.position.y = scoreYpos;
     sceneProperties.scene.add(p1ScoreMesh);
-    p2ScoreMesh.position.x = (tableWidth/2) + 3 - 2;
-    p2ScoreMesh.position.y -= 1.4;
+    p2ScoreMesh.position.x = rightScoreXpos;
+    p2ScoreMesh.position.y = scoreYpos;
     sceneProperties.scene.add(p2ScoreMesh);
 }    
 
