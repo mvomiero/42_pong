@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import GameData, TournamentData
 import time
+import pytz
 from datetime import datetime
 
 def index(request):
@@ -67,8 +68,12 @@ def error_disconnection(request):
 
 # database functions:
 
+# format dates:
+#     games (gend) = datetime object (e.g. datetime.fromtimestamp(time.time())
+#     durations (e.g. gdur) = number (e.g. 10)
 def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
+        gend = (pytz.timezone('UTC')).localize(gend)
         game_data = GameData(
             player1_name=p1n,
             player1_points=p1s,
@@ -82,7 +87,10 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
         game_data.save()
         return game_data.id
 
-# def add_tournament_data(p1=None, p2=None, p3=None, p4=None, matchSemi1=None, matchSemi2=None, matchFinal=None, tend=None, tdur=None):
+# format dates:
+#     games (e.g. match['endTime']) = floating point number / POSIX timestamp (e.g. time.time())
+#     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
+#     durations (e.g. tdur) = number (e.g. 10)
 def add_tournament_data(semiMatch1, semiMatch2, finalMatch, players, tend, tdur):
     gend = datetime.fromtimestamp(semiMatch1['endTime'])
     gdur = semiMatch1['endTime'] - semiMatch1['startTime']
@@ -93,6 +101,7 @@ def add_tournament_data(semiMatch1, semiMatch2, finalMatch, players, tend, tdur)
     gend = datetime.fromtimestamp(finalMatch['endTime'])
     gdur = finalMatch['endTime'] - finalMatch['startTime']
     matchIdFinal = add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
+    tend = (pytz.timezone('UTC')).localize(tend)
     tournament_data = TournamentData(
         match_id_semi_1=matchIdSemi1,
         match_id_semi_2=matchIdSemi2,

@@ -3,33 +3,38 @@ from django.dispatch import receiver
 from pong.views import add_game_data, add_tournament_data
 from pong.models import GameData, TournamentData
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
+import time
+import calendar
 import random
 
 @receiver(post_migrate)
 def initialize_database(sender, **kwargs):
 
-    #GameData.objects.all().delete()
-    #TournamentData.objects.all().delete()
+    GameData.objects.all().delete()
+    TournamentData.objects.all().delete()
 
     print(f"Database initialization (nbr objects match: {GameData.objects.count()} | nbr objects tournament: {TournamentData.objects.count()})")
 
-    database_start = timezone.datetime(2023, 11, 1, tzinfo=timezone.utc)
-    database_end = timezone.now()
-    time_diff = (database_end - database_start).total_seconds()
+    database_end = time.time()
+    my_time = (2023, 11, 1, 0, 0, 0, 2, 305, -1)
+    database_start = calendar.timegm(time.struct_time(my_time))
+    time_diff = database_end - database_start
 
     # add entries to have 100 matches in database
     size_GameData = GameData.objects.count()
     while size_GameData < 100:
         add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
-        size_GameData = GameData.objects.count()
+        size_GameData += 1
+        #size_GameData = GameData.objects.count()
     
     
     # add entries to have 10 tournaments in database
     size_TournamentData = TournamentData.objects.count()
     while size_TournamentData < 10:
         add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData))
-        size_TournamentData = TournamentData.objects.count()
+        size_TournamentData += 1
+        #size_TournamentData = TournamentData.objects.count()
 
     print(f"After initialization (match objects: {GameData.objects.count()} | tournament objects: {TournamentData.objects.count()})")
 
@@ -47,7 +52,10 @@ def generate_random_match(database_end, time_diff, is_tournament, size_GameData)
         p1s = random.randint(0, pts_to_win - 1)
         p2s = pts_to_win
     gdur = random.randint(4, 1000)  # change to positive skewed distribution
-    gend = database_end - timedelta(seconds=random.uniform(0, time_diff - gdur))
+    gend = database_end - random.randint(0, int(time_diff) - gdur)
+
+    if not is_tournament:
+        gend = datetime.fromtimestamp(gend)
 
     return p1n, p1s, p2n, p2s, gend, gdur, is_tournament
 
@@ -64,23 +72,12 @@ def generate_random_tournament(database_end, time_diff, size_TournamentData):
     
     # set the players and the end time and duration of the tournament
     players = [semiMatch1['players'][0], semiMatch1['players'][1], semiMatch2['players'][0], semiMatch2['players'][1]]
-    tend = finalMatch['endTime']
-    print(f"tend: {tend} | semiMatch1['startTime']: {semiMatch1['startTime']} | semiMatch2['startTime']: {semiMatch2['startTime']}")
-    print(f"duration: {tend - min(semiMatch1['startTime'], semiMatch2['startTime'])}")
-    tdur = (tend - min(semiMatch1['startTime'], semiMatch2['startTime'])).total_seconds()
-    print(f"tdur: {tdur}")
-
-    # convert datetime to timestamp (float) for matches
-    semiMatch1['endTime'] = semiMatch1['endTime'].timestamp()
-    semiMatch1['startTime'] = semiMatch1['startTime'].timestamp()
-    semiMatch2['endTime'] = semiMatch2['endTime'].timestamp()
-    semiMatch2['startTime'] = semiMatch2['startTime'].timestamp()
-    finalMatch['endTime'] = finalMatch['endTime'].timestamp()
-    finalMatch['startTime'] = finalMatch['startTime'].timestamp()
+    tdur = finalMatch['endTime'] - min(semiMatch1['startTime'], semiMatch2['startTime'])
+    tend = datetime.fromtimestamp(finalMatch['endTime'])
 
     return semiMatch1, semiMatch2, finalMatch, players, tend, tdur
 
 
 def match_to_list(p1n, p1s, p2n, p2s, gend, gdur, itg):
-    return {'players': [p1n, p2n], 'score': [p1s, p2s], 'endTime': gend, 'startTime': gend - timedelta(seconds=gdur), 'is_tournament_game': itg}
+    return {'players': [p1n, p2n], 'score': [p1s, p2s], 'endTime': gend, 'startTime': gend - gdur, 'is_tournament_game': itg}
 
