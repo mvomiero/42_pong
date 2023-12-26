@@ -2,61 +2,28 @@ import * as THREE from 'three';
 import {FontLoader} from 'three/FontLoader';
 import {TextGeometry} from 'three/TextGeometry';
 
-// no countdown
-// no pause before start
-// no ability to pause
-// addLog function is defined in webSocket.js
-// we place the initial values in leftPaddle, rightPaddle and ball objects, and createPaddles and createBall functions will pick them up
-
 var scorePlayer1 = 0, scorePlayer2 = 0;
-const winningScore = 3;
-var scorePlayer1Mesh, scorePlayer2Mesh;
-var ballMesh, ballSize;
-var leftPaddleMesh, rightPaddleMesh, leftPaddleVelocity, rightPaddleVelocity, paddleSpeed = 6;
-var paddleWidth, paddleHeight, paddleDepth;
-var scoreSize, scoreHeight, scoreYpos, leftScoreXpos, rightScoreXpos;
+const winningScore = 3333;
+const leftPaddle = {}, rightPaddle = {}, ball = {};
 var zoomFactor = 0.027, zcw, zch;
 var tableMesh, tableWidth, tableHeight, tableDepth;
+var ballMesh, ballWidth, ballHeight, ballSpeed, ballDx, ballDy;
+var leftPaddleMesh, rightPaddleMesh, leftPaddleX, rightPaddleX, paddleWidth, paddleHeight, paddleDepth, paddleSpeed;
+var scorePlayer1Mesh, scorePlayer2Mesh, scoreSize, scoreHeight, scoreYpos, leftScoreXpos, rightScoreXpos;
+
 var player1 = 'Player 1'; // eventually this needs to come from main.js
 var player2 = 'Player 2'; // eventually this needs to come from main.js
+
 var gamePaused = false;
 var winner = "";
 var tournament_stage = "";
 var player = 0;
-var paddleDepth = 1;
-var tableMesh, tableDepth = 0.1;
-
 // var match = 1;
-
-const leftPaddle = {
-  x: undefined,
-  y: undefined,
-  width: undefined, // TODO: this must be set!
-  height: undefined, // TODO: this must be set!
-  dy: 0, // paddle velocity
-};
-const rightPaddle = {
-  x: undefined,
-  y: undefined,
-  width: undefined,
-  height: undefined,
-  dy: 0, // paddle velocity
-};
-const ball = {
-  x: 0,
-  y: 0,
-  width: 6,
-  height: 6,
-  dx: 0, // ball velocity (start going to the top-right corner)
-  dy: 0,
-  speed: 5,
-  resetting: false, // keep track of when need to reset the ball position
-};
 
 function startGame() {
   // should this just be done in scene2Start?!? Probably
   console.log("startGamefunction called!");
-  sendGameData();
+  // sendGameData(); // needed
   addLog("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
 }
 
@@ -68,49 +35,83 @@ function scene2(sceneProperties) {
 }
 
 function scene2Start(sceneProperties) {
-  sendGameData(); // here or at end of function?
-  sendMatchInfo("update");
+  // sendMatchInfo("update");
   zcw = sceneProperties.canvas.width * zoomFactor;
   zch = sceneProperties.canvas.height * zoomFactor;
-  tableWidth = zcw * 0.75;
-  tableHeight = zch * 0.75;
-  tableDepth = zch * 0.01;
-  paddleWidth = zcw * 0.02;
-  paddleHeight = zcw * 0.2;
-  paddleDepth = zch * 0.05;
-  leftPaddle.x = -tableWidth / 2;
-  leftPaddle.y = 0;
-  leftPaddle.dy = 0;
-  rightPaddle.x = tableWidth / 2;
-  rightPaddle.y = 0;
-  rightPaddle.dy = 0;
-  ballSize = zcw * 0.5;
-  scoreSize = zch * 0.075;
-  scoreHeight = zch * 0.0001;
-  scoreYpos = zch * 0.38;
-  leftScoreXpos = (zcw * 0.08) - (zcw / 2);
-  rightScoreXpos = (zcw * 0.87) - (zcw / 2);
+  initTable();
+  initPaddles();
+  initBall();
+  initScore();
+  sendGameData(); // here or at end of function or at all?
 	sceneProperties.camera.position.x = 0;
 	sceneProperties.camera.position.y = 0;
 	sceneProperties.camera.position.z = 10;
 	sceneProperties.camera.rotation.x = 0;
 	sceneProperties.camera.rotation.y = 0;
 	sceneProperties.camera.rotation.z = 0;
-  const light = new THREE.PointLight( 0xffddaa, 1.3, 150 );
-  light.position.set( 0, 0, 12 );
+
+  // sceneProperties.camera.position.x = 0;
+  // sceneProperties.camera.position.y = -15;
+  // sceneProperties.camera.position.z = 2;
+  // sceneProperties.camera.rotation.x = 1.4;
+  // sceneProperties.camera.rotation.y = 0;
+  // sceneProperties.camera.rotation.z = 0;  
+  const light = new THREE.PointLight(0xffddaa, 1.3, 150);
+  light.position.set(0, 0, 12);
   sceneProperties.scene.add(light);  
 	createBall(sceneProperties);
 	createPaddles(sceneProperties);
 	createTable(sceneProperties);
-	createScoreText(sceneProperties);
+	createP1ScoreText(sceneProperties);
+  createP2ScoreText(sceneProperties);
 	sceneProperties.sceneStarted = true;
 }
 
+function initTable() {
+  tableWidth = zcw * 0.75;
+  tableHeight = zch * 0.75;
+  tableDepth = zch * 0.01;
+}
+
+function initPaddles() {
+  paddleWidth = zcw * 0.02;
+  paddleHeight = zcw * 0.2;
+  paddleDepth = zch * 0.05;
+  leftPaddleX = -tableWidth / 2;
+  rightPaddleX = tableWidth / 2;
+  paddleSpeed = 0;
+  leftPaddle.y = 0;
+  rightPaddle.y = 0;
+}
+
+function initBall() {
+  ball.x = 0;
+  ball.y = 0;
+  ballWidth = 6;
+  ballHeight = 6;
+  ballSpeed = 0.15;
+  // ballDx = ballSpeed * (Math.random() < 0.5 ? 1 : -1);
+  // ballDy = ballSpeed * (Math.random() < 0.5 ? 1 : -1);
+  ballDx = ballSpeed * -1;
+  ballDy = ballSpeed * -1;  
+}
+
+function initScore() {
+  scoreSize = zch * 0.075;
+  scoreHeight = zch * 0.01;
+  scoreYpos = zch * 0.38;
+  leftScoreXpos = (zcw * 0.08) - (zcw / 2);
+  rightScoreXpos = (zcw * 0.87) - (zcw / 2);
+}
+
 function scene2Animate(sceneProperties) {
-  updateBall(sceneProperties);
-  updatePaddles(sceneProperties);
-  sendMatchInfo("update");
-  sendGameData();    
+  // sendMatchInfo("update");
+  // if (!gamePaused) {
+    updatePaddles(sceneProperties);
+    updateBall(sceneProperties);
+    
+  // }
+  sendGameData();
 }
 
 function scene2End(sceneProperties, winnerName, winnerColour) {  
@@ -124,10 +125,9 @@ function scene2End(sceneProperties, winnerName, winnerColour) {
 	sceneProperties.scene.remove(scorePlayer2Mesh);
 	sceneProperties.sceneStarted = false;
 	sceneProperties.sceneNum++;
-  // marcoflo code:
-  winner = winnerName;
-  sendMatchInfo("update");
-  sendMatchInfo("end");
+  // winner = winnerName;
+  // sendMatchInfo("update");
+  // sendMatchInfo("end");
 }
 
 // game
@@ -138,21 +138,17 @@ function createBall(sceneProperties) {
     ballMesh = new THREE.Mesh(geometry, material);
     ballMesh.position.set(ball.x, ball.y, 0);
     sceneProperties.scene.add(ballMesh);
-    // Initial ball speed
-    ball.speed = 0.05 * (Math.random() < 0.5 ? 1 : -1);
-    ball.dx = 2;
-    ball.dy = 2;
 }
 
 function createPaddles(sceneProperties) {
     var batGeometry = new THREE.BoxGeometry(paddleWidth, paddleHeight, paddleDepth);
     var leftPaddleMeshMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.p1Colour});
     leftPaddleMesh = new THREE.Mesh(batGeometry, leftPaddleMeshMaterial);
-    leftPaddleMesh.position.set(leftPaddle.x, leftPaddle.y, 0);
+    leftPaddleMesh.position.set(leftPaddleX, leftPaddle.y, 0);
     sceneProperties.scene.add(leftPaddleMesh);
     var rightPaddleMeshMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.p2Colour});
     rightPaddleMesh = new THREE.Mesh(batGeometry, rightPaddleMeshMaterial);
-    rightPaddleMesh.position.set(rightPaddle.x, rightPaddle.y, 0);
+    rightPaddleMesh.position.set(rightPaddleX, rightPaddle.y, 0);
     sceneProperties.scene.add(rightPaddleMesh);
 }
 
@@ -160,98 +156,97 @@ function createTable(sceneProperties) {
     var tableGeometry = new THREE.BoxGeometry(tableWidth, tableHeight, tableDepth);
     var tableMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.tableColour});
     tableMesh = new THREE.Mesh(tableGeometry, tableMaterial);
-    tableMesh.position.set(0, 0, -paddleDepth/2 - tableDepth);
+    tableMesh.position.set(0, 0, -paddleDepth/2 - tableDepth); //  
     sceneProperties.scene.add(tableMesh);
 }
 
 function updateBall(sceneProperties) {
-    if (!gamePaused) {
-      ballMesh.position.x += ball.speed * ball.dx;
-      ballMesh.position.y += ball.speed * ball.dy;
-    }
+    ball.x += ballDx;
+    // ball.y += ballDy;
+    ballMesh.position.x = ball.x;
+    ballMesh.position.y = ball.y;   
+    checkIfBallHitTopBottomTable();
+    checkIfBallHitPaddle(leftPaddle, leftPaddleX);
+    checkIfBallHitPaddle(rightPaddle, rightPaddleX);
+    checkIfBallPassedPaddle(sceneProperties);
+}
 
-    // Check collisions with top and bottom walls
+function checkIfBallHitTopBottomTable()
+{
     if (ballMesh.position.y > tableHeight/2 || ballMesh.position.y < -tableHeight/2) {
-      ball.dy = -ball.dy;
-    }
+      ballDy = -ballDy;
+    }  
+}
 
-    // Check collisions with bats
+function checkIfBallHitPaddle(paddle, paddleX)
+{
     if (
-        ballMesh.position.x < leftPaddleMesh.position.x + paddleWidth/2 &&
-        ballMesh.position.x > leftPaddleMesh.position.x - paddleWidth/2 &&
-        ballMesh.position.y < leftPaddleMesh.position.y + paddleHeight/2 &&
-        ballMesh.position.y > leftPaddleMesh.position.y - paddleHeight/2   
+        ball.x < paddleX + paddleWidth/2 &&
+        ball.x > paddleX - paddleWidth/2 &&
+        ball.y < paddle.y + paddleHeight/2 &&
+        ball.y > paddle.y - paddleHeight/2   
     ) {
-        ball.speed = -ball.speed;
-        // ball.dx += leftPaddleVelocity;
-        // ball.dy += leftPaddleVelocity;
+        ballDx = -ballDx;
     }
+}
 
-    if (
-        ballMesh.position.x < rightPaddleMesh.position.x + paddleWidth/2 &&
-        ballMesh.position.x > rightPaddleMesh.position.x - paddleWidth/2 &&
-        ballMesh.position.y < rightPaddleMesh.position.y + paddleHeight/2 &&
-        ballMesh.position.y > rightPaddleMesh.position.y - paddleHeight/2
-    ) {
-        ball.speed = -ball.speed;
-        // ball.dx += rightPaddleVelocity;
-        // ball.dy += rightPaddleVelocity;
-    }
-
-    // Check if scored
-    if (ballMesh.position.x > tableWidth/2)
-    {
-        scorePlayer1++;
-		    updateScore(sceneProperties);
-        if (scorePlayer1 === winningScore)
-        	scene2End(sceneProperties, sceneProperties.p1Name, sceneProperties.p1Colour);		
-    }
-
-    if (ballMesh.position.x < -tableWidth/2)
-    {
-        scorePlayer2++;      
-		    updateScore(sceneProperties);
-        if (scorePlayer2 === winningScore)
-        	scene2End(sceneProperties, sceneProperties.p2Name, sceneProperties.p1Name);  		
-    }
+function checkIfBallPassedPaddle(sceneProperties) {
+  if (ballMesh.position.x > tableWidth/2)
+  {
+      scorePlayer1++;
+      sceneProperties.scene.remove(scorePlayer1Mesh);
+      createP1ScoreText(sceneProperties);
+      initBall(sceneProperties);
+      if (scorePlayer1 === winningScore)
+        scene2End(sceneProperties, sceneProperties.p1Name, sceneProperties.p1Colour);		
+  }
+  if (ballMesh.position.x < -tableWidth/2)
+  {
+   scorePlayer2++;      
+    sceneProperties.scene.remove(scorePlayer2Mesh);
+    createP2ScoreText(sceneProperties);
+    initBall(sceneProperties);
+      if (scorePlayer2 === winningScore)
+        scene2End(sceneProperties, sceneProperties.p2Name, sceneProperties.p1Name);  		
+  }
 }
 
 function updatePaddles() {
-  // if (leftPaddle.position.y + paddleHeight/2 < tableHeight/2) {
-    leftPaddleMesh.position.y += leftPaddle.dy;
-  // }
-  // if (leftPaddle.position.y - paddleHeight/2 > -tableHeight/2) {
-    leftPaddleMesh.position.y -= leftPaddle.dy;
-  // }
+  leftPaddleMesh.position.y = leftPaddle.y;
+  // rightPaddleMesh.position.y = rightPaddle.y;
+  
+  
+    
+
+
   // if (rightPaddle.position.y + paddleHeight/2 < tableHeight/2) {
-    rightPaddleMesh.position.y += rightPaddle.dy;
+    // rightPaddle.y += paddleSpeed;
   // }
   // if (rightPaddle.position.y - paddleHeight/2 > -tableHeight/2) {
-    rightPaddleMesh.position.y -= rightPaddle.dy;
+    // rightPaddle.y -= paddleSpeed;
   // }
 }
 
-function updateScore(sceneProperties) {
-	sceneProperties.scene.remove(scorePlayer1Mesh);
-	sceneProperties.scene.remove(scorePlayer2Mesh);
-	createScoreText(sceneProperties);
-	sceneProperties.scene.remove(ballMesh);
-	createBall(sceneProperties);	
+function createP1ScoreText(sceneProperties) {
+  const scorePlayer1Geom = new TextGeometry(scorePlayer1.toString(), {font: sceneProperties.font, size: scoreSize, height: scoreHeight});
+  const scorePlayer1Material = new THREE.MeshPhongMaterial({color: sceneProperties.p1Colour});
+  scorePlayer1Mesh = new THREE.Mesh(scorePlayer1Geom, scorePlayer1Material);
+  scorePlayer1Mesh.position.x = leftScoreXpos;
+  scorePlayer1Mesh.position.y = scoreYpos;
+  sceneProperties.scene.add(scorePlayer1Mesh);
 }
 
-function createScoreText(sceneProperties) {
-    const scorePlayer1Geom = new TextGeometry(scorePlayer1.toString(), {font: sceneProperties.font, size: scoreSize, height: scoreHeight});
-    const scorePlayer2Geom = new TextGeometry(scorePlayer2.toString(), {font: sceneProperties.font, size: scoreSize, height: scoreHeight});
-    const scorePlayer1Material = new THREE.MeshPhongMaterial({color: sceneProperties.p1Colour});
-    const scorePlayer2Material = new THREE.MeshPhongMaterial({color: sceneProperties.p2Colour});
-    scorePlayer1Mesh = new THREE.Mesh(scorePlayer1Geom, scorePlayer1Material);
-    scorePlayer2Mesh = new THREE.Mesh(scorePlayer2Geom, scorePlayer2Material);
-    scorePlayer1Mesh.position.x = leftScoreXpos;
-    scorePlayer1Mesh.position.y = scoreYpos;
-    sceneProperties.scene.add(scorePlayer1Mesh);
-    scorePlayer2Mesh.position.x = rightScoreXpos;
-    scorePlayer2Mesh.position.y = scoreYpos;
-    sceneProperties.scene.add(scorePlayer2Mesh);
+function createP2ScoreText(sceneProperties) {
+  const scorePlayer2Geom = new TextGeometry(scorePlayer2.toString(), {font: sceneProperties.font, size: scoreSize, height: scoreHeight});
+  const scorePlayer2Material = new THREE.MeshPhongMaterial({color: sceneProperties.p2Colour});
+  scorePlayer2Mesh = new THREE.Mesh(scorePlayer2Geom, scorePlayer2Material);
+  scorePlayer2Mesh.position.x = rightScoreXpos;
+  scorePlayer2Mesh.position.y = scoreYpos;
+  sceneProperties.scene.add(scorePlayer2Mesh);
+}
+
+function updateP1Score(sceneProperties) {
+
 }
 
 // HTML Button click event to trigger the WebSocket actions
@@ -260,89 +255,81 @@ document.getElementById("startGameButton").addEventListener("click", function ()
   scene2(sceneProperties);
 });
 
-// KEYBOARD EVENTS CODE
-// listen to keyboard events to move the paddles
+// // KEYBOARD EVENTS CODE
+// // listen to keyboard events to move the paddles
 document.addEventListener("keydown", function (e) {
-  if (e.key === " ") {
-      if (player !== 0) {
-          e.preventDefault(); // Check for space bar key press
-          gamePaused = !gamePaused; // Toggle game pause state
-          sendGamePause();
-      }
-      return;
-  }
+  // if (e.key === " ") {
+  //     if (player !== 0) {
+  //         e.preventDefault(); // Check for space bar key press
+  //         gamePaused = !gamePaused; // Toggle game pause state
+  //         sendGamePause();
+  //     }
+  //     return;
+  // }
 
   // Player 1 controls (left paddle) - Arrow keys
-  if (player === 1) {
-      console.log("Player 1 moving paddle");
+  // if (player === 1) {
       // Up arrow key
       if (e.key === "ArrowUp") {
-          leftPaddle.dy = -paddleSpeed;
+          if (leftPaddle.y + paddleHeight/2 < tableHeight/2) {
+            paddleSpeed = 0.2;
+            leftPaddle.y += paddleSpeed;
+          }
+          else {
+            paddleSpeed = 0;
+          }
+          sendGameData();
       }
       // Down arrow key
       else if (e.key === "ArrowDown") {
-          leftPaddle.dy = paddleSpeed;
+          if (leftPaddle.y - paddleHeight/2 > -tableHeight/2) {
+            paddleSpeed = -0.2;
+          }
+          else {
+            paddleSpeed = 0;
+          }          
+          // sendGameData();
       }
-  }
+  // }
 
-  // Player 2 controls (right paddle) - Arrow keys
-  if (player === 2) {
-      console.log("Player 2 moving paddle");
-      // Up arrow key
-      if (e.key === "ArrowUp") {
-          rightPaddle.dy = -paddleSpeed;
-      }
-      // Down arrow key
-      else if (e.key === "ArrowDown") {
-          rightPaddle.dy = paddleSpeed;
-      }
-  }
-
-  sendGameData();
+//   // Player 2 controls (right paddle) - Arrow keys
+//   // if (player === 2) {
+//       console.log("Player 2 moving paddle");
+//       // Up arrow key
+//       if (e.key === "ArrowUp") {
+//           rightPaddle.dy = -paddleSpeed;
+//           sendGameData();
+//       }
+//       // Down arrow key
+//       else if (e.key === "ArrowDown") {
+//           rightPaddle.dy = paddleSpeed;
+//           sendGameData();
+//       }
+//   // }
 });
 
 
 // listen to keyboard events to stop the paddle if key is released
 document.addEventListener("keyup", function (e) {
   // Player 1 controls
-  if (player === 1) {
+  // if (player === 1) {
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-          leftPaddle.dy = 0;
+          paddleSpeed = 0;
+          // sendGameData();
       }
-  }
+  // }
 
   // Player 2 controls
-  if (player === 2) {
-      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-          rightPaddle.dy = 0;
-      }
-  }
-
-  sendGameData();
+  // if (player === 2) {
+      // if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      //     rightPaddle.dy = 0;
+      //     sendGameData();
+      // }
+  // }
 });
-
-// HTML Button click event to trigger the WebSocket actions
-document.getElementById("startGameButton").addEventListener("click", function () {
-  // Call the function when the button is clicked
-  startGame();
-});
-
-// Listen to keyboard events to pause/resume the game
-document.addEventListener("keydown", function (e) {
-  console.log("gamePaused: ", gamePaused);
-  if (e.key === " ") {
-      if (player !== 0) {
-          e.preventDefault(); // Check for space bar key press
-          gamePaused = !gamePaused; // Toggle game pause state
-          sendGamePause();
-      }
-  }
-});
-
 
 // WEBSOCKET CODE
 
-// Websocket code: move to webSocket.js
 var roomCode = document.getElementById("game_board").getAttribute("room_code");
 char_choice = document
   .getElementById("game_board")
@@ -373,35 +360,35 @@ function addLog(message, elementId) {
 //   gameSocket.send(JSON.stringify(logData));
 // }
 
-function sendMatchInfo(mode) {
-  if (player === 0)
-    return;
-//  console.log("SendMatchInfo called");
-  var matchInfo = {
-    command: "match_info",
-    mode: mode,
-    score: {
-      player1: scorePlayer1,
-      player2: scorePlayer2,
-    },
-    winner: winner,
-  };
+// function sendMatchInfo(mode) {
+//   if (player === 0)
+//     return;
+// //  console.log("SendMatchInfo called");
+//   var matchInfo = {
+//     command: "match_info",
+//     mode: mode,
+//     score: {
+//       player1: scorePlayer1,
+//       player2: scorePlayer2,
+//     },
+//     winner: winner,
+//   };
 
-  gameSocket.send(JSON.stringify(matchInfo));
-}
+//   gameSocket.send(JSON.stringify(matchInfo));
+// }
 
-function sendGamePause() {
-  console.log("SendGamePause called");
-  var gamePause = {
-    command: "gamePause",
-    gamePaused: gamePaused,
-  };
+// function sendGamePause() {
+//   console.log("SendGamePause called");
+//   var gamePause = {
+//     command: "gamePause",
+//     gamePaused: gamePaused,
+//   };
 
-  console.log("Sending data:", gamePause);
+//   console.log("Sending data:", gamePause);
 
-  // Send the game data to the server via WebSocket
-  gameSocket.send(JSON.stringify(gamePause));
-}
+//   // Send the game data to the server via WebSocket
+//   gameSocket.send(JSON.stringify(gamePause));
+// }
 
 function sendGameData() {
   if (player === 0)
@@ -409,34 +396,21 @@ function sendGameData() {
 //  console.log("SendGameData called");
   var gameData = {
     command: "update",
-    //players: {
-    //	scorePlayer1: scorePlayer1,
-    //	scorePlayer2: scorePlayer2,
-    //},
     leftPaddle: {
-      x: leftPaddle.x,
       y: leftPaddle.y,
-      dy: leftPaddle.dy,
+      // dy: leftPaddle.dy,
     },
     rightPaddle: {
-      x: rightPaddle.x,
       y: rightPaddle.y,
-      dy: rightPaddle.dy,
+      // dy: rightPaddle.dy,
     },
     ball: {
       x: ball.x,
       y: ball.y,
-      dx: ball.dx,
-      dy: ball.dy,
-      resetting: ball.resetting,
-      speed: ball.speed,
-    },
-    // Include other relevant data if needed
+      // speed: ball.speed,
+    }
   };
-
   //console.log("Sending data:", gameData);
-
-  // Send the game data to the server via WebSocket
   gameSocket.send(JSON.stringify(gameData));
 }
 
@@ -453,15 +427,15 @@ gameSocket.onopen = function (event) {
 
 gameSocket.onmessage = function (event) {
   try {
-    //console.log("RECEIVED DATA:", event.data);
+    // console.log("RECEIVED DATA:", event.data);
     var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
     //console.log("Parsed inner data:", data);
 
-    if (data.command === "set_player") {
-      char_choice = data.player;
-      console.log("set_player called");
-      console.log("char_choice:", char_choice);
-    }
+    // if (data.command === "set_player") {
+    //   char_choice = data.player;
+    //   console.log("set_player called");
+    //   console.log("char_choice:", char_choice);
+    // }
 
     if (data.command === "match_info") {
       if (data.mode === "start") {
@@ -482,34 +456,29 @@ gameSocket.onmessage = function (event) {
         console.log("STAGE: " + tournament_stage);
         startGame();
       }
-      else if (data.mode === "end") {
-        ball.dx = 0;
-        ball.dy = 0;
-        ball.x = canvas.width - grid;
-        ball.y = canvas.height / 2 - paddleHeight / 2;
-        console.log("reciving game END message");
-        sendGameData();
-        addLog("match END!, winner is " + data.winner, "match");
-      }
-      else if (data.mode === "update") {
-        scorePlayer1 = data.score.player1;
-        scorePlayer2 = data.score.player2;
-      }
+      // else if (data.mode === "end") {
+      //   console.log("reciving game END message");
+      //   addLog("match END!, winner is " + data.winner, "match");
+      // }
+      // else if (data.mode === "update") {
+      //   scorePlayer1 = data.score.player1;
+      //   scorePlayer2 = data.score.player2;
+      // }
     }
 
-    if (data.command === "tournament_info") {
-      console.log("TOURNAMENT_info called");
-      console.log("data:", data);
-      addLog("TOURNAMENT INFO: " + event.data, "tournament");
-      // Check if both players in the final match are set
-      console.log("data.matchFinal.player1: ", data.matchFinal.player1);
-      console.log("data.matchFinal.player2: ", data.matchFinal.player2);
-      if (data.matchFinal.player1 !== undefined && data.matchFinal.player2 !== undefined) {
-        tournament_stage = "final";
-      } else {
-        tournament_stage = "semifinal";
-      }
-    }
+    // if (data.command === "tournament_info") {
+    //   console.log("TOURNAMENT_info called");
+    //   console.log("data:", data);
+    //   addLog("TOURNAMENT INFO: " + event.data, "tournament");
+    //   // Check if both players in the final match are set
+    //   console.log("data.matchFinal.player1: ", data.matchFinal.player1);
+    //   console.log("data.matchFinal.player2: ", data.matchFinal.player2);
+    //   if (data.matchFinal.player1 !== undefined && data.matchFinal.player2 !== undefined) {
+    //     tournament_stage = "final";
+    //   } else {
+    //     tournament_stage = "semifinal";
+    //   }
+    // }
 
     // Check if the received command is for broadcasting log messages
     // if (data.command === "broadcast_log") {
@@ -521,23 +490,18 @@ gameSocket.onmessage = function (event) {
 
     // Now you can access the properties correctly
     if (data.command === "update") {
-      leftPaddle.x = data.leftPaddle.x;
       leftPaddle.y = data.leftPaddle.y;
-      leftPaddle.dy = data.leftPaddle.dy;
-      rightPaddle.x = data.rightPaddle.x;
+      // leftPaddle.dy = data.leftPaddle.dy;
       rightPaddle.y = data.rightPaddle.y;
-      rightPaddle.dy = data.rightPaddle.dy;
+      // rightPaddle.dy = data.rightPaddle.dy;
       ball.x = data.ball.x;
       ball.y = data.ball.y;
-      ball.dx = data.ball.dx;
-      ball.dy = data.ball.dy;
-      ball.resetting = data.ball.resetting;
-      ball.ballSpeed = data.ball.speed;
+      // ball.speed = data.ball.speed;
     }
 
-    if (data.command === "gamePause") {
-      gamePaused = data.gamePaused;
-    }
+    // if (data.command === "gamePause") {
+    //   gamePaused = data.gamePaused;
+    // }
 
   } catch (error) {
     console.error("Error parsing received data:", error);
