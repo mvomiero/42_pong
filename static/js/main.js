@@ -4,12 +4,15 @@ import {TextGeometry} from 'three/TextGeometry';
 // import {scene0} from './scene0.js';
 // import {scene1} from './scene1.js';
 import {scene2} from './scene2.js';
+import {pressStartGameButton} from './scene2.js';
 // import {scene3} from './scene3.js';
 
 // function setPlayerNames(p1Name, p2Name) {
 // 	sceneProperties.p1Name = p1Name;
 // 	sceneProperties.p1Name = p2Name;
 // }
+
+
 
 const fontLoader = new FontLoader();
 fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_serif_regular.typeface.json', function (font) {
@@ -23,7 +26,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 		scene:scene,
 		camera:camera,
 		sceneNum:0,
-		sceneStarted:false,	
+		sceneInitialised:false,
+		sceneStarted:false,
+		sceneAnimating:false,
 		p1Name: 'Player 1',
 		p2Name: 'Player 2',
 		backgroundColour:0x87CEEB,
@@ -37,6 +42,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 		winnerColour:undefined
 	};
 	sceneProperties.scene.background = new THREE.Color(sceneProperties.backgroundColour);
+	document.getElementById("startGameButton").addEventListener("click", function () {
+		pressStartGameButton(sceneProperties);
+	});
 	function animate() {
 		requestAnimationFrame(animate);
 		switch(sceneProperties.sceneNum) {

@@ -1,8 +1,26 @@
 every time sendGameData is called and received on the other end, the players local variables will be updated
 so the rule is we every time data changes we send it
 
+# PADDLE LOGIC
 
-Logic
+When I press the up or down arrow keys, depending on the player I am, I control a different bat
+p1 left
+p2 right
+When both arrow keys are pressed at once they should cancel each other out
+
+## Example for the up key, p1 left
+For each animated frame
+- the y position of the left paddle will be incremented by paddleSpeed
+
+When key is pressed
+- paddleSpeed is set to 0.2
+
+When key is released
+- paddleSpeed is set to 0
+
+The position of the left paddle should be sent to each player 
+
+# Other Logic
 
 game starts only when startGame button is clicked
 
