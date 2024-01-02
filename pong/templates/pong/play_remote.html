@@ -10,6 +10,7 @@
   <form method="POST">
 	
     {% csrf_token %}
+  <div class='button-container'>
     <div class='form-control'>
       <!-- <label for="game_type">Match or Tournament?</label> -->
       <!-- <input id="game_type" type="text" name="game_type" required /> -->
@@ -24,5 +25,6 @@
     </div>
     <input type="submit" class="button" value="Start Game" />
   </form>
+</div>
 </div>
 {% endblock content %}
