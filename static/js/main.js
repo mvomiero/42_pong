@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {FontLoader} from 'three/FontLoader';
 import {TextGeometry} from 'three/TextGeometry';
+import {OrbitControls} from 'three/OrbitControls';
 // import {scene0} from './scene0.js';
 // import {scene1} from './scene1.js';
 import {scene2} from './scene2.js';
@@ -11,8 +12,6 @@ import {pressStartGameButton} from './scene2.js';
 // 	sceneProperties.p1Name = p1Name;
 // 	sceneProperties.p1Name = p2Name;
 // }
-
-
 
 const fontLoader = new FontLoader();
 fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_serif_regular.typeface.json', function (font) {
@@ -25,6 +24,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 		canvas:canvas,
 		scene:scene,
 		camera:camera,
+		renderer:renderer,
 		sceneNum:0,
 		sceneInitialised:false,
 		sceneStarted:false,
@@ -37,6 +37,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 		p2Colour:0x009900,
 		ballColour:0xFF0000,
 		tableColour:0x46A07E,
+		tableWallsColour:0x77777E,
 		font:font,
 		winnerName:undefined,
 		winnerColour:undefined

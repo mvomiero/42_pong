@@ -1,23 +1,19 @@
-// table appears as soon as we join the room
-// corresponding bat appears as each player joins the game
-// ball appears only when startGameButton is pressed
-// startGameButton shouldn't be pressable until both players have joined the game
+// TODO: corresponding bat appears as each player joins the game
+// ball appears only when startGameButton is pressed and when both players have joined the game
 // game can be paused by pressing space bar
 // make it work with 2 players in separate browsers
-// game should only start when second player joins (paused until then, then autostarts)
-// add top bottom walls , table border, and middle dotted line net
-// view from side and make ball bounce and go up in z as it reaches middle and down in z as it reaches sides (always related to y pos)
 
 import * as THREE from 'three';
 import {FontLoader} from 'three/FontLoader';
 import {TextGeometry} from 'three/TextGeometry';
+import {OrbitControls} from 'three/OrbitControls';
 
 var scorePlayer1 = 0, scorePlayer2 = 0;
 const winningScore = 3333;
 const leftPaddle = {}, rightPaddle = {}, ball = {};
 var zoomFactor = 0.027, zcw, zch;
-var tableMesh, tableWidth, tableHeight, tableDepth;
-var ballMesh, ballWidth, ballHeight, ballSpeed, ballDx, ballDy;
+var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
+var ballMesh, ballSize, ballSpeed, ballDx, ballDy, minBallHeight, maxBallHeight, ballHeight;
 var leftPaddleMesh, rightPaddleMesh, leftPaddleX, rightPaddleX, paddleWidth, paddleHeight, paddleDepth, leftPaddleSpeed, rightPaddleSpeed;
 var scorePlayer1Mesh, scorePlayer2Mesh, scoreSize, scoreHeight, scoreYpos, leftScoreXpos, rightScoreXpos;
 
@@ -28,7 +24,7 @@ var gamePaused = false;
 var winner = "";
 var tournament_stage = "";
 var player = 0;
-var player1set = false, player2set = false;
+// var player1set = false, player2set = false;
 // var match = 1;
 
 function scene2(sceneProperties) {
@@ -36,14 +32,12 @@ function scene2(sceneProperties) {
     initGame(sceneProperties);
 	else if (sceneProperties.sceneStarted === true) // set by pressing start button
     startGame(sceneProperties);
-  else if (player1set === true) {
-    initLeftPaddle();
-    createLeftPaddle(sceneProperties);  
-  }
-  else if (player2set === true) {
-    initRightPaddle();
-    createRightPaddle(sceneProperties);  
-  }  
+  // else if (player1set === true) {
+  //   // player1set = false;
+  // }
+  // else if (player2set === true) {
+  //   // player2set = false;
+  // }  
   else if (sceneProperties.sceneAnimating === true) // set to true in StartGame
     animateGame(sceneProperties);
 }
@@ -55,7 +49,9 @@ function initGame(sceneProperties) {
   zch = sceneProperties.canvas.height * zoomFactor;
   paddleWidth = zcw * 0.02;
   paddleHeight = zcw * 0.2;
-  paddleDepth = zch * 0.05;  
+  paddleDepth = zch * 0.05;
+  minBallHeight = zcw * 0.05;
+  maxBallHeight = zcw * 0.15;
   initCamera(sceneProperties);
   initLight(sceneProperties);
   initTable();
@@ -63,14 +59,45 @@ function initGame(sceneProperties) {
 	sceneProperties.sceneInitialised = true;
 }
 
+// function initCamera(sceneProperties) {
+// 	sceneProperties.camera.position.x = 0;
+// 	sceneProperties.camera.position.y = 0;
+// 	sceneProperties.camera.position.z = 10;
+// 	sceneProperties.camera.rotation.x = 0;
+// 	sceneProperties.camera.rotation.y = 0;
+// 	sceneProperties.camera.rotation.z = 0;
+// }
+
+// function initCamera(sceneProperties) {
+//   sceneProperties.camera.position.x = 0;
+//   sceneProperties.camera.position.y = -14;
+//   sceneProperties.camera.position.z = 3;
+//   sceneProperties.camera.rotation.x = 1.4;
+//   sceneProperties.camera.rotation.y = 0;
+//   sceneProperties.camera.rotation.z = 0;  
+// }
+
 function initCamera(sceneProperties) {
-	sceneProperties.camera.position.x = 0;
-	sceneProperties.camera.position.y = 0;
-	sceneProperties.camera.position.z = 10;
-	sceneProperties.camera.rotation.x = 0;
-	sceneProperties.camera.rotation.y = 0;
-	sceneProperties.camera.rotation.z = 0;
+  // Set initial camera position
+  sceneProperties.camera.position.set(0, -14, 3);
+
+  // Create OrbitControls
+  var controls = new OrbitControls(sceneProperties.camera, sceneProperties.renderer.domElement);
+  controls.enableDamping = true; // an animation loop is required when damping is enabled
+  controls.dampingFactor = 0.25; // set to 0.25 for example, adjust as needed
+  controls.screenSpacePanning = false;
+  controls.maxPolarAngle = Math.PI / 2; // limit vertical rotation
+
+  // Handle resize events
+  var onWindowResize = function () {
+      sceneProperties.camera.aspect = window.innerWidth / window.innerHeight;
+      sceneProperties.camera.updateProjectionMatrix();
+  };
+
+  // Add event listener for window resize
+  window.addEventListener('resize', onWindowResize, false);
 }
+
 
 function initLight(sceneProperties) {
   const light = new THREE.PointLight(0xffddaa, 1.3, 150);
@@ -80,10 +107,14 @@ function initLight(sceneProperties) {
 
 function startGame(sceneProperties) {
   console.log("startGame called");
-  initBall();
-  initScore();
   // sendGameData(); // here or at end of function or at all?
+  initLeftPaddle();
+  createLeftPaddle(sceneProperties);
+  initRightPaddle();
+  createRightPaddle(sceneProperties);
+  initBall();
   createBall(sceneProperties);
+  initScore();
 	createP1ScoreText(sceneProperties);
   createP2ScoreText(sceneProperties);
   sceneProperties.sceneStarted = false;
@@ -111,11 +142,12 @@ function initRightPaddle() {
 function initBall() {
   ball.x = 0;
   ball.y = 0;
-  ballWidth = 6;
-  ballHeight = 6;
+  ballSize = 0.4;
   ballSpeed = 0.15;
   ballDx = ballSpeed * (Math.random() < 0.5 ? 1 : -1);
   ballDy = ballSpeed * (Math.random() < 0.5 ? 1 : -1);
+  // ballDy = 0;
+  ballHeight = generateRandomBallHeight();
 }
 
 function initScore() {
@@ -154,7 +186,7 @@ function scene2End(sceneProperties, winnerName, winnerColour) {
 // game
 
 function createBall(sceneProperties) {
-    var geometry = new THREE.SphereGeometry(0.5, ball.width, ball.height);
+    var geometry = new THREE.SphereGeometry(ballSize, 50);
     var material = new THREE.MeshPhongMaterial({color: sceneProperties.ballColour});
     ballMesh = new THREE.Mesh(geometry, material);
     ballMesh.position.set(ball.x, ball.y, 0);
@@ -181,19 +213,38 @@ function createTable(sceneProperties) {
     var tableGeometry = new THREE.BoxGeometry(tableWidth, tableHeight, tableDepth);
     var tableMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.tableColour});
     tableMesh = new THREE.Mesh(tableGeometry, tableMaterial);
-    tableMesh.position.set(0, 0, -paddleDepth/2 - tableDepth); //  
+    tableMesh.position.set(0, 0, -paddleDepth/2 - tableDepth);
     sceneProperties.scene.add(tableMesh);
+
+    var tableUpperWallGeometry = new THREE.BoxGeometry(tableWidth, zch * 0.02, tableDepth * 2);
+    var tableWallsMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.tableWallsColour});    
+    tableUpperWallMesh = new THREE.Mesh(tableUpperWallGeometry, tableWallsMaterial);
+    tableUpperWallMesh.position.set(0, tableHeight/2, -paddleDepth/2 - tableDepth);
+    sceneProperties.scene.add(tableUpperWallMesh);
+
+    var tableLowerWallGeometry = new THREE.BoxGeometry(tableWidth, zch * 0.02, tableDepth * 2);
+    var tableWallsMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.tableWallsColour});    
+    tableLowerWallMesh = new THREE.Mesh(tableLowerWallGeometry, tableWallsMaterial);
+    tableLowerWallMesh.position.set(0, -tableHeight/2, -paddleDepth/2 - tableDepth);
+    sceneProperties.scene.add(tableLowerWallMesh); 
+
+    var netGeometry = new THREE.BoxGeometry(zcw * 0.015, tableHeight * 0.9, tableDepth * 5);
+    var netMaterial = new THREE.MeshPhongMaterial({color: 0xffffff});
+    var netMesh = new THREE.Mesh(netGeometry, netMaterial);
+    netMesh.position.set(0, 0, 0);
+    sceneProperties.scene.add(netMesh);
 }
 
 function updateBall(sceneProperties) {
-    ball.x += ballDx;
-    ball.y += ballDy;
-    ballMesh.position.x = ball.x;
-    ballMesh.position.y = ball.y;   
-    checkIfBallHitTopBottomTable();
-    checkIfBallHitPaddle(leftPaddle, leftPaddleX);
-    checkIfBallHitPaddle(rightPaddle, rightPaddleX);
-    checkIfBallPassedPaddle(sceneProperties);
+  ball.x += ballDx;
+  ball.y += ballDy;
+  ballMesh.position.x = ball.x;
+  ballMesh.position.y = ball.y;
+  ballMesh.position.z = ballHeight - ballHeight * Math.abs(ball.x / (tableWidth / 2));
+  checkIfBallHitTopBottomTable();
+  checkIfBallHitPaddle(leftPaddle, leftPaddleX);
+  checkIfBallHitPaddle(rightPaddle, rightPaddleX);
+  checkIfBallPassedPaddle(sceneProperties);
 }
 
 function checkIfBallHitTopBottomTable()
@@ -201,6 +252,10 @@ function checkIfBallHitTopBottomTable()
     if (ballMesh.position.y > tableHeight/2 || ballMesh.position.y < -tableHeight/2) {
       ballDy = -ballDy;
     }  
+}
+
+function generateRandomBallHeight() {
+  return Math.floor(Math.random() * (maxBallHeight - minBallHeight + 1)) + minBallHeight;
 }
 
 function checkIfBallHitPaddle(paddle, paddleX)
@@ -212,6 +267,7 @@ function checkIfBallHitPaddle(paddle, paddleX)
         ball.y > paddle.y - paddleHeight/2   
     ) {
         ballDx = -ballDx;
+        ballHeight = generateRandomBallHeight();
     }
 }
 
@@ -405,13 +461,7 @@ gameSocket.onmessage = function (event) {
   try {
     // console.log("RECEIVED DATA:", event.data);
     var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
-    //console.log("Parsed inner data:", data);
-
-    // if (data.command === "set_player") {
-    //   char_choice = data.player;
-    //   console.log("set_player called");
-    //   console.log("char_choice:", char_choice);
-    // }
+    // console.log("Parsed inner data:", data);
 
     if (data.command === "match_info") {
       if (data.mode === "start") {
@@ -422,17 +472,17 @@ gameSocket.onmessage = function (event) {
         if (char_choice === player1) {
           console.log("player1set");
           player = 1;
-          player1set = true;
+          // player1set = true;
         }
         else if (char_choice === player2) {
           console.log("player2set");
           player = 2;
-          player2set = true;
+          // player2set = true;
         }
-        else {
-          player = 0;
-          console.log("player set to 0");
-        }
+        // else {
+        //   player = 0;
+        //   console.log("player set to 0");
+        // }
         console.log("STAGE: " + tournament_stage);
         // console.log("startGame");
         // addLog("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
