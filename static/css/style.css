@@ -88,7 +88,7 @@ body {
 } */
 
 .button-container {
-  display: flex;
+  display: block;
   flex-wrap: wrap; /* Allows buttons to wrap to the next line if space is insufficient */
   justify-content: center; /* Centers the buttons horizontally */
   align-items: center; /* Centers items vertically */
@@ -115,10 +115,11 @@ body {
 
 }
 
-/* Additional styles for the Start Game button to apply drop shadow */
+/* Start Game button */
 input[type="submit"].button {
   border: none; /* Remove any default border */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Add drop shadow */
+  margin-top: 30px; /* Add spacing between elements */
 }
 
 /* Additional styles for the select to apply drop shadow */
@@ -144,8 +145,9 @@ label {
 
 /* Additional styles for the form control elements */
 .form-control {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex; /* Set the container as a flex container */
+  flex-direction: column; /* Elements will be stacked vertically */
+  justify-content: center; /* Center elements horizontally */
+  align-items: center; /* Center elements vertically */
   margin-bottom: 10px; /* Add spacing between elements */
 }
