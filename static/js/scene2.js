@@ -1,3 +1,4 @@
+// documentation here: https://www.notion.so/42wolfsburgberlin/Interface-Frontend-Backend-To-Do-List-eff7e8c582ff4a32b088f6aecf87b626
 // TODO: corresponding bat appears as each player joins the game
 // ball appears only when startGameButton is pressed and when both players have joined the game
 // game can be paused by pressing space bar
@@ -9,35 +10,30 @@ import {TextGeometry} from 'three/TextGeometry';
 import {OrbitControls} from 'three/OrbitControls';
 
 var scorePlayer1 = 0, scorePlayer2 = 0;
-const winningScore = 3333;
+const winningScore = 3000;
 const leftPaddle = {}, rightPaddle = {}, ball = {};
 var zoomFactor = 0.027, zcw, zch;
 var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
 var ballMesh, ballSize, ballSpeed, ballDx, ballDy, minBallHeight, maxBallHeight, ballHeight;
 var leftPaddleMesh, rightPaddleMesh, leftPaddleX, rightPaddleX, paddleWidth, paddleHeight, paddleDepth, leftPaddleSpeed, rightPaddleSpeed;
 var scorePlayer1Mesh, scorePlayer2Mesh, scoreSize, scoreHeight, scoreYpos, leftScoreXpos, rightScoreXpos;
+var globalSceneProperties;
 
 var player1 = 'Player 1'; // eventually this needs to come from main.js
 var player2 = 'Player 2'; // eventually this needs to come from main.js
 
 var gamePaused = false;
 var winner = "";
-var tournament_stage = "";
+// var tournament_stage = "";
 var player = 0;
-// var player1set = false, player2set = false;
 // var match = 1;
 
 function scene2(sceneProperties) {
+  globalSceneProperties = sceneProperties;
   if (sceneProperties.sceneInitialised === false) // set to true in initGame
     initGame(sceneProperties);
 	else if (sceneProperties.sceneStarted === true) // set by pressing start button
     startGame(sceneProperties);
-  // else if (player1set === true) {
-  //   // player1set = false;
-  // }
-  // else if (player2set === true) {
-  //   // player2set = false;
-  // }  
   else if (sceneProperties.sceneAnimating === true) // set to true in StartGame
     animateGame(sceneProperties);
 }
@@ -98,7 +94,6 @@ function initCamera(sceneProperties) {
   window.addEventListener('resize', onWindowResize, false);
 }
 
-
 function initLight(sceneProperties) {
   const light = new THREE.PointLight(0xffddaa, 1.3, 150);
   light.position.set(0, 0, 12);
@@ -107,6 +102,7 @@ function initLight(sceneProperties) {
 
 function startGame(sceneProperties) {
   console.log("startGame called");
+  sceneProperties.sceneStarted = true;
   // sendGameData(); // here or at end of function or at all?
   initLeftPaddle();
   createLeftPaddle(sceneProperties);
@@ -167,9 +163,7 @@ function animateGame(sceneProperties) {
   sendGameData();
 }
 
-function scene2End(sceneProperties, winnerName, winnerColour) {  
-  sceneProperties.winnerName = winnerName;
-  sceneProperties.winnerColour = winnerColour;
+function scene2End(sceneProperties) {  
 	sceneProperties.scene.remove(ballMesh);
 	sceneProperties.scene.remove(leftPaddleMesh);
 	sceneProperties.scene.remove(rightPaddleMesh);
@@ -178,9 +172,6 @@ function scene2End(sceneProperties, winnerName, winnerColour) {
 	sceneProperties.scene.remove(scorePlayer2Mesh);
 	// sceneProperties.sceneStarted = false;
 	sceneProperties.sceneNum++;
-  // winner = winnerName;
-  // sendMatchInfo("update");
-  // sendMatchInfo("end");
 }
 
 // game
@@ -272,23 +263,19 @@ function checkIfBallHitPaddle(paddle, paddleX)
 }
 
 function checkIfBallPassedPaddle(sceneProperties) {
-  if (ballMesh.position.x > tableWidth/2)
-  {
-      scorePlayer1++;
-      sceneProperties.scene.remove(scorePlayer1Mesh);
-      createP1ScoreText(sceneProperties);
-      initBall(sceneProperties);
-      if (scorePlayer1 === winningScore)
-        scene2End(sceneProperties, sceneProperties.p1Name, sceneProperties.p1Colour);		
+  if (ballMesh.position.x > tableWidth/2) {
+    scorePlayer1++;
+    sendMatchInfo("update");
+    if (scorePlayer1 === winningScore)
+      winner = player1;
+      sendMatchInfo("end");
   }
-  if (ballMesh.position.x < -tableWidth/2)
-  {
-   scorePlayer2++;      
-    sceneProperties.scene.remove(scorePlayer2Mesh);
-    createP2ScoreText(sceneProperties);
-    initBall(sceneProperties);
-      if (scorePlayer2 === winningScore)
-        scene2End(sceneProperties, sceneProperties.p2Name, sceneProperties.p1Name);  		
+  if (ballMesh.position.x < -tableWidth/2) {
+    scorePlayer2++;
+    sendMatchInfo("update");
+    if (scorePlayer2 === winningScore)
+      winner = player2;
+      sendMatchInfo("end");
   }
 }
 
@@ -321,10 +308,6 @@ function createP2ScoreText(sceneProperties) {
   scorePlayer2Mesh.position.x = rightScoreXpos;
   scorePlayer2Mesh.position.y = scoreYpos;
   sceneProperties.scene.add(scorePlayer2Mesh);
-}
-
-function pressStartGameButton(sceneProperties) {
-  sceneProperties.sceneStarted = true;
 }
 
 // // KEYBOARD EVENTS CODE
@@ -398,22 +381,22 @@ function addLog(message, elementId) {
 //   gameSocket.send(JSON.stringify(logData));
 // }
 
-// function sendMatchInfo(mode) {
-//   if (player === 0)
-//     return;
-// //  console.log("SendMatchInfo called");
-//   var matchInfo = {
-//     command: "match_info",
-//     mode: mode,
-//     score: {
-//       player1: scorePlayer1,
-//       player2: scorePlayer2,
-//     },
-//     winner: winner,
-//   };
+function sendMatchInfo(mode) {
+  if (player === 0)
+    return;
+//  console.log("SendMatchInfo called");
+  var matchInfo = {
+    command: "match_info",
+    mode: mode,
+    score: {
+      player1: scorePlayer1,
+      player2: scorePlayer2,
+    },
+    winner: winner,
+  };
 
-//   gameSocket.send(JSON.stringify(matchInfo));
-// }
+  gameSocket.send(JSON.stringify(matchInfo));
+}
 
 function sendGamePause() {
   console.log("SendGamePause called");
@@ -463,45 +446,59 @@ gameSocket.onmessage = function (event) {
     var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
     // console.log("Parsed inner data:", data);
 
+    if (data.command === "set_player") {
+      char_choice = data.player;
+      console.log("set_player called");
+      console.log("char_choice:", char_choice);
+    }
+
     if (data.command === "match_info") {
       if (data.mode === "start") {
+        console.log("data.player1, data.player2", data.player1, data.player2);
         player1 = data.player1;
         player2 = data.player2;
         scorePlayer1 = 0;
         scorePlayer2 = 0;
         if (char_choice === player1) {
-          console.log("player1set");
           player = 1;
-          // player1set = true;
+          console.log("Player 1 set");
         }
         else if (char_choice === player2) {
-          console.log("player2set");
           player = 2;
-          // player2set = true;
+          console.log("Player 2 set");
         }
-        // else {
-        //   player = 0;
-        //   console.log("player set to 0");
-        // }
-        console.log("STAGE: " + tournament_stage);
-        // console.log("startGame");
-        // addLog("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");
+        else {
+          player = 0;
+          console.log("player set to 0");
+        }
+        // console.log("STAGE: " + tournament_stage);
+        startGame(globalSceneProperties);
+        console.log("startGame");
+        addLog("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");        
       }
-      // else if (data.mode === "end") {
-      //   console.log("reciving game END message");
-      //   addLog("match END!, winner is " + data.winner, "match");
-      // }
-      // else if (data.mode === "update") {
-      //   scorePlayer1 = data.score.player1;
-      //   scorePlayer2 = data.score.player2;
-      // }
+      else if (data.mode === "update") {
+        scorePlayer1 = data.score.player1;
+        scorePlayer2 = data.score.player2;
+        globalSceneProperties.scene.remove(scorePlayer1Mesh);
+        createP1ScoreText(globalSceneProperties);
+        globalSceneProperties.scene.remove(scorePlayer2Mesh);
+        createP2ScoreText(globalSceneProperties);
+        initBall(globalSceneProperties);
+        console.log("data.score.player1, data.score.player2", data.score.player1, data.score.player2);
+      }
+      else if (data.mode === "end") {
+        console.log("reciving game END message");
+        console.log("winner", data.winner);
+        addLog("match END!, winner is " + data.winner, "match");
+        scene2End(sceneProperties);
+      }
     }
 
     // if (data.command === "tournament_info") {
     //   console.log("TOURNAMENT_info called");
     //   console.log("data:", data);
     //   addLog("TOURNAMENT INFO: " + event.data, "tournament");
-    //   // Check if both players in the final match are set
+    //   // PlayerCheck if both players in the final match are set
     //   console.log("data.matchFinal.player1: ", data.matchFinal.player1);
     //   console.log("data.matchFinal.player2: ", data.matchFinal.player2);
     //   if (data.matchFinal.player1 !== undefined && data.matchFinal.player2 !== undefined) {
@@ -519,7 +516,7 @@ gameSocket.onmessage = function (event) {
     //   }
     // }
 
-    // Now you can access the properties correctly
+    // Now you can acPlayercess the properties correctly
     if (data.command === "update") {
       leftPaddle.y = data.leftPaddle.y;
       rightPaddle.y = data.rightPaddle.y;
@@ -543,18 +540,18 @@ gameSocket.onmessage = function (event) {
 gameSocket.onclose = function (event) {
   console.log("WebSocket connection closed! (code: " + event.code + ")");
   setTimeout(function () {
-    if (event.code === 3001 || event.code === 3002) {
-      window.location.href = '/dashboard';
-    }
-    else if (event.code === 4001) {
-      window.location.href = '/error/duplicate';
-    }
-    else if (event.code === 4002) {
-      window.location.href = '/error/full';
-    }
-    else if (event.code === 4005 || event.code === 4006) {
-      window.location.href = '/error/disconnection';
-    }
+    // if (event.code === 3001 || event.code === 3002) {
+    //   window.location.href = '/dashboard';
+    // }
+    // else if (event.code === 4001) {
+    //   window.location.href = '/error/duplicate';
+    // }
+    // else if (event.code === 4002) {
+    //   window.location.href = '/error/full';
+    // }
+    // else if (event.code === 4005 || event.code === 4006) {
+    //   window.location.href = '/error/disconnection';
+    // }
   }, 1000); // 1000 milliseconds = 1 seconds
 };
 
@@ -565,4 +562,3 @@ gameSocket.onerror = function (error) {
 };
 
 export {scene2};
-export {pressStartGameButton};
