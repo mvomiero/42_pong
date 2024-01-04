@@ -3,7 +3,7 @@
 // Fold current --> Ctrl + ]
 // Unfold current --> Ctrl + [
 
-const canvas = document.getElementById("gameCanvas");
+const canvas = document.getElementById("game");
 const context = canvas.getContext("2d");
 const grid = 15;
 const paddleHeight = grid * 5; // 80
@@ -271,32 +271,3 @@ function loop() {
 
 // start the game
 requestAnimationFrame(loop);
-
-
-
-/**************************************************/
-/******************** NEW PART ********************/
-/**************************************************/
-
-// Function to show the name input field
-function showNameInput() {
-    document.getElementById('startRemoteGameButton').style.display = 'none';
-    document.getElementById('nameInputSection').style.display = 'block';
-}
-
-// Function to show the canvas after submitting the name
-function submitNameAndStartGame() {
-    const playerName = document.getElementById('playerName').value;
-    if (playerName.trim() !== '') { // Check if name is not empty
-        document.getElementById('nameInputSection').style.display = 'none';
-        document.getElementById('game_board').style.display = 'block';
-    } else {
-        alert('Please enter a valid name.');
-    }
-}
-
-// Event listener for the Start Game Button
-document.getElementById('startRemoteGameButton').addEventListener('click', showNameInput);
-
-// Event listener for the Submit Name Button
-document.getElementById('submitNameButton').addEventListener('click', submitNameAndStartGame);
