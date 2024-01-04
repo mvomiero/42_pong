@@ -1,8 +1,11 @@
 // documentation here: https://www.notion.so/42wolfsburgberlin/Interface-Frontend-Backend-To-Do-List-eff7e8c582ff4a32b088f6aecf87b626
+// TODO: walls should be higher and transparent(max height ball can go)
 // TODO: corresponding bat appears as each player joins the game
+// TODO: fix vibrating bat issue
 // ball appears only when startGameButton is pressed and when both players have joined the game
 // game can be paused by pressing space bar
 // make it work with 2 players in separate browsers
+// TODO: implement globalSceneProperties throughout
 
 import * as THREE from 'three';
 import {FontLoader} from 'three/FontLoader';
@@ -14,7 +17,7 @@ const winningScore = 3000;
 const leftPaddle = {}, rightPaddle = {}, ball = {};
 var zoomFactor = 0.027, zcw, zch;
 var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
-var ballMesh, ballSize, ballSpeed, ballDx, ballDy, minBallHeight, maxBallHeight, ballHeight;
+var ballMesh, ballSize, ballSpeed, minBallHeight, maxBallHeight;
 var leftPaddleMesh, rightPaddleMesh, leftPaddleX, rightPaddleX, paddleWidth, paddleHeight, paddleDepth, leftPaddleSpeed, rightPaddleSpeed;
 var scorePlayer1Mesh, scorePlayer2Mesh, scoreSize, scoreHeight, scoreYpos, leftScoreXpos, rightScoreXpos;
 var globalSceneProperties;
@@ -105,16 +108,16 @@ function initLight(sceneProperties) {
 function startGame(sceneProperties) {
   console.log("startGame called");
   sceneProperties.sceneStarted = true;
-  // sendGameData(); // here or at end of function or at all?
   initLeftPaddle();
   createLeftPaddle(sceneProperties);
   initRightPaddle();
   createRightPaddle(sceneProperties);
-  initBall();
   createBall(sceneProperties);
   initScore();
 	createP1ScoreText(sceneProperties);
   createP2ScoreText(sceneProperties);
+  if (player === 1)
+    sendMatchInfo("update"); // init ball
   sceneProperties.sceneStarted = false;
   sceneProperties.sceneAnimating = true;
 }
@@ -137,16 +140,14 @@ function initRightPaddle() {
   rightPaddle.y = 0;
 }
 
-function initBall() {
+function initBall(initBallX, initBallY) {
   ball.x = 0;
   ball.y = 0;
   ballSize = 0.4;
   ballSpeed = 0.05;
-  ballDx = ballSpeed * (Math.random() < 0.5 ? 1 : -1);
-  ballDy = ballSpeed * (Math.random() < 0.5 ? 1 : -1);
-  // ballDy = 0;
-  // ballHeight = generateRandomBallHeight();
-  sendGameData();
+  ball.dx = ballSpeed * initBallX;
+  ball.dy = ballSpeed * initBallY;
+  ball.height = generateRandomBallHeight();
 }
 
 function initScore() {
@@ -230,21 +231,21 @@ function createTable(sceneProperties) {
 }
 
 function updateBall(sceneProperties) {
-  ball.x += ballDx;
-  ball.y += ballDy;
+  ball.x += ball.dx;
+  ball.y += ball.dy;
   ballMesh.position.x = ball.x;
   ballMesh.position.y = ball.y;
-  ballMesh.position.z = ballHeight - ballHeight * Math.abs(ball.x / (tableWidth / 2));
+  ballMesh.position.z = ball.height - ball.height * Math.abs(ball.x / (tableWidth / 2));
   checkIfBallHitTopBottomTable();
   checkIfBallHitPaddle(leftPaddle, leftPaddleX);
   checkIfBallHitPaddle(rightPaddle, rightPaddleX);
-  // checkIfBallPassedPaddle(sceneProperties);
+  checkIfBallPassedPaddle(sceneProperties);
 }
 
 function checkIfBallHitTopBottomTable()
 {
     if (ballMesh.position.y > tableHeight/2 || ballMesh.position.y < -tableHeight/2) {
-      ballDy = -ballDy;
+      ball.dy = -ball.dy;
     }  
 }
 
@@ -260,21 +261,22 @@ function checkIfBallHitPaddle(paddle, paddleX)
         ball.y < paddle.y + paddleHeight/2 &&
         ball.y > paddle.y - paddleHeight/2   
     ) {
-        ballDx = -ballDx;
+        ball.dx = -ball.dx;
+        ball.height = generateRandomBallHeight(); 
         sendGameData();
-        //ballHeight = generateRandomBallHeight(); // this must be synced between machines
     }
 }
 
 function checkIfBallPassedPaddle(sceneProperties) {
-  if (ballMesh.position.x > tableWidth/2) {
+  // only one
+  if (ballMesh.position.x > tableWidth/2 && player === 1) {
     scorePlayer1++;
     sendMatchInfo("update");
     // if (scorePlayer1 === winningScore)
     //   winner = player1;
     //   sendMatchInfo("end");
   }
-  if (ballMesh.position.x < -tableWidth/2) {
+  if (ballMesh.position.x < -tableWidth/2 && player === 2) {
     scorePlayer2++;
     sendMatchInfo("update");
     // if (scorePlayer2 === winningScore)
@@ -395,6 +397,8 @@ function sendMatchInfo(mode) {
     score: {
       player1: scorePlayer1,
       player2: scorePlayer2,
+      initBallX: Math.random() < 0.5 ? 1 : -1,
+      initBallY: Math.random() < 0.5 ? 1 : -1
     },
     winner: winner,
   };
@@ -427,6 +431,9 @@ function sendGameData() {
     ball: {
       x: ball.x,
       y: ball.y,
+      dx: ball.dx,
+      dy: ball.dy,
+      height: ball.height
     }
   };
   //console.log("Sending data:", gameData);
@@ -487,7 +494,7 @@ gameSocket.onmessage = function (event) {
         createP1ScoreText(globalSceneProperties);
         globalSceneProperties.scene.remove(scorePlayer2Mesh);
         createP2ScoreText(globalSceneProperties);
-        initBall(globalSceneProperties);
+        initBall(data.initBallX, data.initBallY);
         console.log("data.score.player1, data.score.player2", data.score.player1, data.score.player2);
       }
       else if (data.mode === "end") {
@@ -520,12 +527,14 @@ gameSocket.onmessage = function (event) {
     //   }
     // }
 
-    // Now you can acPlayercess the properties correctly
+    // Now you can acccess the properties correctly
     if (data.command === "update") {
       leftPaddle.y = data.leftPaddle.y;
       rightPaddle.y = data.rightPaddle.y;
       ball.x = data.ball.x;
       ball.y = data.ball.y;
+      ball.dx = data.ball.dx;
+      ball.dy = data.ball.dy;
     }
 
     if (data.command === "gamePause") {
