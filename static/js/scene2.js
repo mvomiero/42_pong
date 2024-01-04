@@ -75,14 +75,16 @@ function initGame(sceneProperties) {
 
 function initCamera(sceneProperties) {
   // Set initial camera position
-  sceneProperties.camera.position.set(0, -14, 3);
+  sceneProperties.camera.position.set(0, 0, 10);
 
   // Create OrbitControls
   var controls = new OrbitControls(sceneProperties.camera, sceneProperties.renderer.domElement);
   controls.enableDamping = true; // an animation loop is required when damping is enabled
   controls.dampingFactor = 0.25; // set to 0.25 for example, adjust as needed
   controls.screenSpacePanning = false;
-  controls.maxPolarAngle = Math.PI / 2; // limit vertical rotation
+  controls.minAzimuthAngle = -Math.PI / 2; // Set the minimum azimuth angle (left limit)
+  controls.maxAzimuthAngle = Math.PI / 2; 
+  controls.maxPolarAngle = Math.PI / 1; // limit vertical rotation
 
   // Handle resize events
   var onWindowResize = function () {
@@ -139,11 +141,12 @@ function initBall() {
   ball.x = 0;
   ball.y = 0;
   ballSize = 0.4;
-  ballSpeed = 0.15;
+  ballSpeed = 0.05;
   ballDx = ballSpeed * (Math.random() < 0.5 ? 1 : -1);
   ballDy = ballSpeed * (Math.random() < 0.5 ? 1 : -1);
   // ballDy = 0;
-  ballHeight = generateRandomBallHeight();
+  // ballHeight = generateRandomBallHeight();
+  sendGameData();
 }
 
 function initScore() {
@@ -235,7 +238,7 @@ function updateBall(sceneProperties) {
   checkIfBallHitTopBottomTable();
   checkIfBallHitPaddle(leftPaddle, leftPaddleX);
   checkIfBallHitPaddle(rightPaddle, rightPaddleX);
-  checkIfBallPassedPaddle(sceneProperties);
+  // checkIfBallPassedPaddle(sceneProperties);
 }
 
 function checkIfBallHitTopBottomTable()
@@ -258,7 +261,8 @@ function checkIfBallHitPaddle(paddle, paddleX)
         ball.y > paddle.y - paddleHeight/2   
     ) {
         ballDx = -ballDx;
-        ballHeight = generateRandomBallHeight();
+        sendGameData();
+        //ballHeight = generateRandomBallHeight(); // this must be synced between machines
     }
 }
 
@@ -266,16 +270,16 @@ function checkIfBallPassedPaddle(sceneProperties) {
   if (ballMesh.position.x > tableWidth/2) {
     scorePlayer1++;
     sendMatchInfo("update");
-    if (scorePlayer1 === winningScore)
-      winner = player1;
-      sendMatchInfo("end");
+    // if (scorePlayer1 === winningScore)
+    //   winner = player1;
+    //   sendMatchInfo("end");
   }
   if (ballMesh.position.x < -tableWidth/2) {
     scorePlayer2++;
     sendMatchInfo("update");
-    if (scorePlayer2 === winningScore)
-      winner = player2;
-      sendMatchInfo("end");
+    // if (scorePlayer2 === winningScore)
+    //   winner = player2;
+    //   sendMatchInfo("end");
   }
 }
 
@@ -384,7 +388,7 @@ function addLog(message, elementId) {
 function sendMatchInfo(mode) {
   if (player === 0)
     return;
-//  console.log("SendMatchInfo called");
+  console.log("SendMatchInfo called");
   var matchInfo = {
     command: "match_info",
     mode: mode,
