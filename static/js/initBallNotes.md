@@ -1,3 +1,10 @@
+// ball now only goes to right on game start
+// when it passes the right paddle, the ball splits, one ball is reset, the other continues on and keeps scoring! why?
+// eventually the other ball resets too, but when scores the second time we have a problem
+
+
+
+
 When the ball passes the left end of the table
     player 1 sends a ball reset
 When the ball passses the right end of the table
@@ -26,3 +33,15 @@ sendMatchInfo
 only the player whose paddle who has been passed should send the score update
 this update should contain the randomly generated ball X and Y directions
 these will be received by both players and updated
+
+// CLARIFY
+when match_info start command received over the network, players are set and we call startGame function
+in startGame function we initialise and create paddles and ball
+but we 
+
+
+ball is only detected as passing right paddle by player 2
+on player one's screen it will continue until the ball reset 
+
+
+We will run a smaller make-up session this Friday from 5-6:30pm in the lab itself. Please contact me directly if you would like to participate, as it will not appear directly on Intra :raising_hand:
