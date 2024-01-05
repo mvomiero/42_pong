@@ -121,7 +121,7 @@ function startGame(sceneProperties) {
 
 function initTable() {
   tableWidth = zcw * 0.75;
-  tableHeight = zch * 0.75;
+  tableHeight = zch * 0.75;w
   tableDepth = zch * 0.01;
 }
 
