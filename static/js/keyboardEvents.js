@@ -3,6 +3,18 @@
 
 // listen to keyboard events to move the paddles
 document.addEventListener("keydown", function (e) {
+    
+/*********************************************************/
+/***************** CHANGES STARTING HERE *****************/
+/*********************************************************/
+    if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN) {
+        console.log("gameSocket.readyState: ", gameSocket.readyState);
+        e.preventDefault();
+    }
+/*********************************************************/
+/****************** CHANGES ENDING HERE ******************/
+/*********************************************************/
+
     if (e.key === " ") {
         if (player !== 0) {
             e.preventDefault(); // Check for space bar key press
@@ -68,10 +80,10 @@ document.addEventListener("keyup", function (e) {
 // comment out because button is not existent anymore
 
 // HTML Button click event to trigger the WebSocket actions
-document.getElementById("startGameButton").addEventListener("click", function () {
+/* document.getElementById("startGameButton").addEventListener("click", function () {
     // Call the function when the button is clicked
     startGame();
-});
+}); */
 
 /*********************************************************/
 /****************** CHANGES ENDING HERE ******************/

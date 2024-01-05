@@ -305,6 +305,11 @@ function submitNameAndStartGame() {
       "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
     gameSocket = new WebSocket(connectionString);
     console.log("[WebSocket starte] connectionString: ", connectionString);
+
+    // Set the event handlers
+    gameSocket.onmessage = handleWebSocketOpen;
+    gameSocket.onclose = handleWebSocketClose;
+    gamePaused.onerror = handleWebSocketError;
 }
 
 // Event listener for the Start Game Button

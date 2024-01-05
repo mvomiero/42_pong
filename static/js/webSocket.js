@@ -6,7 +6,7 @@
 // Function to add logs to the logs div
 function addLog(message, elementId) {
   const logsDiv = document.getElementById(elementId);
-  logsDiv.innerHTML = `<p>${message}</p>`;
+  //logsDiv.innerHTML = `<p>${message}</p>`;
 }
 
 // Function to send log messages to the server
@@ -93,12 +93,13 @@ function sendGameData() {
 /*******************************************************/
 
 // Event handler for successful connection
-gameSocket.onopen = function (event) {
+/* gameSocket.onopen = function (event) {
   console.log("WebSocket connection opened!");
   console.log("ConnectionString: ", connectionString);
-};
+}; */
 
-gameSocket.onmessage = function (event) {
+//gameSocket.onmessage = function (event) {
+function handleWebSocketOpen(event) {
   try {
     //console.log("RECEIVED DATA:", event.data);
     var data = JSON.parse(event.data); // Parse the 'data' string within 'parsedData'
@@ -198,9 +199,13 @@ gameSocket.onmessage = function (event) {
 };
 
 // Event handler for connection closure
-gameSocket.onclose = function (event) {
+//gameSocket.onclose = function (event) {
+function handleWebSocketClose(event) {
   console.log("WebSocket connection closed! (code: " + event.code + ")");
-  setTimeout(function () {
+/*********************************************************/
+/***************** CHANGES STARTING HERE *****************/
+/*********************************************************/
+  /* setTimeout(function () {
     if (event.code === 3001 || event.code === 3002) {
       window.location.href = '/dashboard';
     }
@@ -213,11 +218,15 @@ gameSocket.onclose = function (event) {
     else if (event.code === 4005 || event.code === 4006) {
       window.location.href = '/error/disconnection';
     }
-  }, 1000); // 1000 milliseconds = 1 seconds
+  }, 1000); */ // 1000 milliseconds = 1 seconds
+/*********************************************************/
+/****************** CHANGES ENDING HERE ******************/
+/*********************************************************/
 };
 
 // Error handler for WebSocket errors
-gameSocket.onerror = function (error) {
+//gameSocket.onerror = function (error) {
+function handleWebSocketError(error) {
   console.error("WebSocket encountered an error: ", error);
   // Handle WebSocket errors
 };
