@@ -61,11 +61,21 @@ document.addEventListener("keyup", function (e) {
     sendGameData();
 });
 
+/*********************************************************/
+/***************** CHANGES STARTING HERE *****************/
+/*********************************************************/
+
+// comment out because button is not existent anymore
+
 // HTML Button click event to trigger the WebSocket actions
 document.getElementById("startGameButton").addEventListener("click", function () {
     // Call the function when the button is clicked
     startGame();
 });
+
+/*********************************************************/
+/****************** CHANGES ENDING HERE ******************/
+/*********************************************************/
 
 // Listen to keyboard events to pause/resume the game
 document.addEventListener("keydown", function (e) {

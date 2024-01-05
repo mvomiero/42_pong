@@ -59,20 +59,24 @@ function collides(obj1, obj2) {
   );
 }
 
-
-
+/*********************************************************/
+/***************** CHANGES STARTING HERE *****************/
+/*********************************************************/
 
 // Websocket code
-var roomCode = document.getElementById("game_board").getAttribute("room_code");
-char_choice = document
-  .getElementById("game_board")
-  .getAttribute("char_choice");
+var roomCode;
 var char_choice;
 
-var connectionString =
+/* var connectionString =
   "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
 console.log("connectionString: ", connectionString);
-var gameSocket = new WebSocket(connectionString);
+var gameSocket = new WebSocket(connectionString); */
+var gameSocket;
+var connectionString;
+
+/*********************************************************/
+/****************** CHANGES ENDING HERE ******************/
+/*********************************************************/
 
 var player = 0;
 var player1 = "";
@@ -293,6 +297,14 @@ function submitNameAndStartGame() {
     } else {
         alert('Please enter a valid name.');
     }
+
+    // Connect to the websocket
+    roomCode = document.getElementById("room_code").value;
+    char_choice = playerName;
+    connectionString =
+      "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
+    gameSocket = new WebSocket(connectionString);
+    console.log("[WebSocket starte] connectionString: ", connectionString);
 }
 
 // Event listener for the Start Game Button
