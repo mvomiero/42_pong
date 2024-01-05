@@ -23,8 +23,6 @@ def match_info(mode, players, score=None, winner=None):
         'score': {
             'player1': 0,
             'player2': 0,
-            'ballDirX': 0,
-            'ballDirY': 0
         },
         'winner': None,
     }

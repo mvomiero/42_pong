@@ -1,7 +1,12 @@
 // documentation here: https://www.notion.so/42wolfsburgberlin/Interface-Frontend-Backend-To-Do-List-eff7e8c582ff4a32b088f6aecf87b626
 
-// TODO: there is a gap between bats and table
 // TODO: make sure score updates properly when ball gets past bats
+// testing on right side only for now!
+// - ghost ball appears in centre at start (not always)
+// DONE: old score is not deleted!
+// ball slows down, but when we switch to new browser tab, it speeds up again
+// ball gets past bat on other machine - this is why it's slowing down, as we are drawing two balls
+// TODO: there is a gap between bats and table
 // TODO: fix issue that ball can go inside of the bat if hit from the top
 // TODO: batcam!
 // TODO: make sure achieving max points ends the game
@@ -11,6 +16,7 @@
 // TODO: add text names alongside score (max 8 chars)
 // TODO: walls should be higher and transparent (max height ball can go)
 // TODO: corresponding bat/name should appear as each player joins the game
+// TODO: window resizing does not work
 
 // ball appears only when startGameButton is pressed and when both players have joined the game
 // game can be paused by pressing space bar
@@ -107,10 +113,8 @@ function startGame(sceneProperties) {
   createLeftPaddle(sceneProperties);
   initRightPaddle();
   createRightPaddle(sceneProperties);
-  initScore();
-	createP1ScoreText(sceneProperties);
-  createP2ScoreText(sceneProperties);
-  createP1NameText(sceneProperties);
+  // initTextScoreParams needs to be moved to here!
+  // createP1NameText(sceneProperties);
   initBall();
   createBall(sceneProperties);
   if (player === 1) // only player 1 sends the initial score, so that ball is only initalised once for both players
@@ -121,7 +125,7 @@ function startGame(sceneProperties) {
 
 function initTable() {
   tableWidth = zcw * 0.75;
-  tableHeight = zch * 0.75;w
+  tableHeight = zch * 0.75;
   tableDepth = zch * 0.01;
 }
 
@@ -138,16 +142,18 @@ function initRightPaddle() {
 }
 
 function initBall() {
-  ball.x = 0;
-  ball.y = 0;
   ballSize = 0.4;
   ballSpeed = 0.05;
-  ball.dx = ballSpeed * (Math.random() < 0.5 ? 1 : -1),
-  ball.dy = ballSpeed * (Math.random() < 0.5 ? 1 : -1),
+  ball.dirX = 1; // Math.random() < 0.5 ? 1 : -1
+  ball.dirY = 1; // Math.random() < 0.5 ? 1 : -1
+  ball.x = 0;
+  ball.y = 0;
+  ball.dx = ballSpeed * ball.dirX,
+  ball.dy = ballSpeed * ball.dirY,  
   ball.height = minBallHeight;
 }
 
-function initScore() {
+function initTextScoreParams() {
   textSize = zch * 0.075;
   textHeight = zch * 0.01;
   textYpos = zch * 0.38;
@@ -159,18 +165,18 @@ function animateGame(sceneProperties) {
   if (!gamePaused) {
     updatePaddles(sceneProperties);
     updateBall(sceneProperties);
-  }
-  if (ball.x < 0) {
-    if (player === 1) {
-      console.log("ball on left side, player 1 updating gameData")
-      sendGameData();
+    if (ball.x < 0) {
+      if (player === 1) {
+        console.log("ball on left side, player 1 updating gameData")
+        sendGameData();
+      }
     }
-  }
-  else {
-    if (player === 2) {
-      console.log("ball on right side, player 2 updating gameData")
-      sendGameData();
-    } 
+    else {
+      if (player === 2) {
+        console.log("ball on right side, player 2 updating gameData")
+        sendGameData();
+      } 
+    }
   }
 }
 
@@ -272,11 +278,18 @@ function checkIfBallHitPaddle(paddle, paddleX)
 function checkIfBallPassedPaddle(sceneProperties) {
   // left side belongs to p1, right side belongs to p2
   if (ball.x > tableWidth/2 && player === 2) {
+    // reset the ball - p1 should be sending nothing
+    console.log("ball passed paddle - init ball");
     initBall();
-    sendGameData(); // update init ball data for both players
-    scorePlayer1++;
-    console.log("player 2 sending Match Info Update");
-    sendMatchInfo("update");
+    // sendGameData();
+    // this should be enough to update the ball position on both machines
+    // except that player 1 will still be sending their position in the animation loop
+    // who is animating?
+
+    // // increase and update the score for both players
+    // scorePlayer1++;
+    // console.log("player 2 sending Match Info Update");
+    // sendMatchInfo("update");
     // if (scorePlayer1 === winningScore)
     //   winner = player1;
     //   sendMatchInfo("end");
@@ -320,15 +333,15 @@ function createP2ScoreText(sceneProperties) {
   sceneProperties.scene.add(scorePlayer2Mesh);
 }
 
-function createP1NameText(sceneProperties) {
-  const namePlayer1Geom = new TextGeometry(scorePlayer2.toString(), {font: sceneProperties.font, size: textSize, height: textHeight});
-  const namePlayer1Material = new THREE.MeshPhongMaterial({color: sceneProperties.p1Colour});
-  namePlayer1Mesh = new THREE.Mesh(namePlayer1Geom, namePlayer1Material);
-  namePlayer1Mesh.position.x = leftScoreXpos;
-  namePlayer1Mesh.position.y = textYpos;
-  sceneProperties.scene.add(namePlayer1Mesh);
-  console.log("adding p1 name text");
-}
+// function createP1NameText(sceneProperties) {
+//   const namePlayer1Geom = new TextGeometry(scorePlayer2.toString(), {font: sceneProperties.font, size: textSize, height: textHeight});
+//   const namePlayer1Material = new THREE.MeshPhongMaterial({color: sceneProperties.p1Colour});
+//   namePlayer1Mesh = new THREE.Mesh(namePlayer1Geom, namePlayer1Material);
+//   namePlayer1Mesh.position.x = leftScoreXpos;
+//   namePlayer1Mesh.position.y = textYpos;
+//   sceneProperties.scene.add(namePlayer1Mesh);
+//   console.log("adding p1 name text");
+// }
 
 // // KEYBOARD EVENTS CODE
 // // listen to keyboard events to move the paddles
@@ -440,6 +453,8 @@ function sendGameData() {
       y: rightPaddle.y,
     },
     ball: {
+      dirX: ball.dirX,
+      dirY: ball.dirY,
       x: ball.x,
       y: ball.y,
       dx: ball.dx,
@@ -502,9 +517,12 @@ gameSocket.onmessage = function (event) {
         console.log("Updating Match Data");
         scorePlayer1 = data.score.player1;
         scorePlayer2 = data.score.player2;
-        globalSceneProperties.scene.remove(scorePlayer1Mesh);
+        initTextScoreParams();
+        if (scorePlayer1Mesh)
+          globalSceneProperties.scene.remove(scorePlayer1Mesh);
         createP1ScoreText(globalSceneProperties);
-        globalSceneProperties.scene.remove(scorePlayer2Mesh);
+        if (scorePlayer2Mesh)
+          globalSceneProperties.scene.remove(scorePlayer2Mesh);
         createP2ScoreText(globalSceneProperties);
         globalSceneProperties.sceneStarted = false;
         globalSceneProperties.sceneAnimating = true;
@@ -539,10 +557,12 @@ gameSocket.onmessage = function (event) {
     //   }
     // }
 
-    // Now you can acccess the properties correctly
     if (data.command === "update") {
+      console.log("updating game data");
       leftPaddle.y = data.leftPaddle.y;
       rightPaddle.y = data.rightPaddle.y;
+      ball.dirX = data.ball.dirX;
+      ball.dirY = data.ball.dirY;
       ball.x = data.ball.x;
       ball.y = data.ball.y;
       ball.dx = data.ball.dx;
