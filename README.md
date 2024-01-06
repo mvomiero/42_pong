@@ -1,6 +1,6 @@
 # Instructions
 
-1. run `make` to start the server
+1. run `make` to run docker and start the server
 2. open chrome and go to `http://127.0.0.1:8000/blockchainTestApp/blockchainTest/graham/1/yy/4/` (or run `make test`)
 - this will add a record of game data to the database and should return the id of the record as a http response
 3. continue to add records by going to other URLs containing different data i.e. `http://127.0.0.1:8000/blockchainTestApp/blockchainTest/pierre/11/marco/5/`

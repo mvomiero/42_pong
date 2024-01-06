@@ -8,10 +8,10 @@ build:
 	docker build -t database .
 
 runi: # doesn't exit correctly when using CTRL+C
-	docker run -it --rm -p 5173:5173 --name database-container database
+	docker run -it --rm -p 8000:8000 --name database-container database
 
 rund:
-	docker run -d -p 5173:5173 --name database-container database		
+	docker run -d -p 8000:8000 --name database-container database		
 
 stop:
 	docker stop database-container
