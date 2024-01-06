@@ -1,21 +1,14 @@
-FROM python:3.12.0-bookworm
-
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends postgresql-client
-RUN rm -rf /var/lib/apt/lists/*
-COPY requirements.txt ./
-RUN pip install django-cors-headers
-RUN pip install -r requirements.txt
-RUN django-admin startproject backend
-WORKDIR /backend
-#RUN python manage.py collectstatic # CORS related - not quite sure why needed
-RUN python manage.py startapp api
-COPY backend/settings.py ./backend
-COPY api/admin.py ./api
-COPY api/models.py ./api
-COPY api/views.py ./api
-COPY api/urls.py ./api
-COPY backend/urls.py ./backend
-COPY entrypoint.sh .
-
-EXPOSE 8000
+# notes:
+# installing python3-launchpadlib resolves "AttributeError: 'NoneType' object has no attribute 'people'" when trying to install ethereum respository later
+# see here for why --break-system-packages is needed: https://stackoverflow.com/questions/75608323/how-do-i-solve-error-externally-managed-environment-every-time-i-use-pip-3
+FROM node:21
+WORKDIR /usr/blockchain
+RUN apt upgrade && apt update && apt install -y software-properties-common python3 python3-pip python3-launchpadlib nano
+RUN npm install --save ethers
+RUN pip3 install web3 py-solc-x python-dotenv --break-system-packages
+RUN add-apt-repository ppa:ethereum/ethereum -y && apt update
+COPY .env .
+COPY trans.sol .
+COPY compile_sepo.py .
+COPY deploy_sepo.py .
+CMD ["python3","deploy_sepo.py","--host","0.0.0.0"]
