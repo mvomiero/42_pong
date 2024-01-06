@@ -33,7 +33,11 @@ remove_image:
 logs:
 	docker logs database-container
 
-exec:
-	docker exec -it database-container /bin/bash
+test:
+	google-chrome http://127.0.0.1:8000/blockchainTestApp/blockchainTest/graham/1/yy/4/
+	
+admin:
+	google-chrome http://127.0.0.1:8000/admin
 
-.PHONY: all up down build run runi rund stop remove logs exec
+
+.PHONY: all up down build run runi rund stop remove logs exec test admin
