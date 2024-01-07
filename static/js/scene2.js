@@ -163,8 +163,12 @@ function initTextScoreParams() {
 
 function animateGame(sceneProperties) {
   if (!gamePaused) {
-    updatePaddles(sceneProperties);
+    // updatePaddles(sceneProperties);
     updateBall(sceneProperties);
+    checkIfBallHitTopBottomTable();
+    checkIfBallHitPaddle(leftPaddle, leftPaddleX);
+    checkIfBallHitPaddle(rightPaddle, rightPaddleX);
+    checkIfBallPassedPaddle(sceneProperties);    
     if (ball.x < 0) {
       if (player === 1) {
         console.log("ball on left side, player 1 updating gameData")
@@ -249,10 +253,6 @@ function updateBall(sceneProperties) {
   ballMesh.position.x = ball.x;
   ballMesh.position.y = ball.y;
   ballMesh.position.z = ball.height - ball.height * Math.abs(ball.x / (tableWidth / 2));
-  checkIfBallHitTopBottomTable();
-  checkIfBallHitPaddle(leftPaddle, leftPaddleX);
-  checkIfBallHitPaddle(rightPaddle, rightPaddleX);
-  checkIfBallPassedPaddle(sceneProperties);
 }
 
 function checkIfBallHitTopBottomTable()
@@ -277,38 +277,32 @@ function checkIfBallHitPaddle(paddle, paddleX)
 
 function checkIfBallPassedPaddle(sceneProperties) {
   // left side belongs to p1, right side belongs to p2
-  if (ball.x > tableWidth/2 && player === 2) {
-    // reset the ball - p1 should be sending nothing
-    console.log("ball passed paddle - init ball");
-    initBall();
+  if (ball.x > tableWidth/2) {
+    // initBall();
     // sendGameData();
-    // this should be enough to update the ball position on both machines
-    // except that player 1 will still be sending their position in the animation loop
-    // who is animating?
 
-    // // increase and update the score for both players
     // scorePlayer1++;
     // console.log("player 2 sending Match Info Update");
     // sendMatchInfo("update");
+
+
     // if (scorePlayer1 === winningScore)
     //   winner = player1;
     //   sendMatchInfo("end");
   }
-  // if (ball.x < -tableWidth/2 && player === 1) {
-  //   ballSpeed = 0; // prevent scoring againn whilst data gets received
-  //   scorePlayer2++;
-  //   sendMatchInfo("update");
-  //   // if (scorePlayer2 === winningScore)
-  //   //   winner = player2;
-  //   //   sendMatchInfo("end");
+  // if (ball.x < -tableWidth/2) {  
+
   // }
 }
 
-function updatePaddles() {
+function updateLeftPaddle() {
   let newLeftPaddleY = leftPaddle.y + leftPaddleSpeed;
   if (newLeftPaddleY - paddleHeight / 2 > -tableHeight / 2 && newLeftPaddleY + paddleHeight / 2 < tableHeight / 2) {
     leftPaddleMesh.position.y = leftPaddle.y = newLeftPaddleY;
   }
+}
+
+function updateRightPaddle() {
   let newRightPaddleY = rightPaddle.y + rightPaddleSpeed;
   if (newRightPaddleY - paddleHeight / 2 > -tableHeight / 2 && newRightPaddleY + paddleHeight / 2 < tableHeight / 2) {
     rightPaddleMesh.position.y = rightPaddle.y = newRightPaddleY;
@@ -360,11 +354,13 @@ document.addEventListener("keydown", function (e) {
         leftPaddleSpeed = 0.2;
       else if (e.key === "ArrowDown")
         leftPaddleSpeed = -0.2;
+      updateLeftPaddle();
   } else if (player === 2) {
       if (e.key === "ArrowUp")
         rightPaddleSpeed = 0.2;
       else if (e.key === "ArrowDown")
         rightPaddleSpeed = -0.2;
+      updateRightPaddle();
   }
 });
 
@@ -374,10 +370,12 @@ document.addEventListener("keyup", function (e) {
   if (player === 1) {
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         leftPaddleSpeed = 0;
+        updateLeftPaddle();
       }
   } else if (player === 2) {
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         rightPaddleSpeed = 0;
+        updateRightPaddle();
       }
   }
 });
@@ -446,20 +444,20 @@ function sendGameData() {
 //  console.log("SendGameData called");
   var gameData = {
     command: "update",
-    leftPaddle: {
-      y: leftPaddle.y,
-    },
-    rightPaddle: {
-      y: rightPaddle.y,
-    },
+    // leftPaddle: {
+    //   y: leftPaddle.y,
+    // },
+    // rightPaddle: {
+    //   y: rightPaddle.y,
+    // },
     ball: {
-      dirX: ball.dirX,
-      dirY: ball.dirY,
+      // dirX: ball.dirX,
+      // dirY: ball.dirY,
       x: ball.x,
       y: ball.y,
       dx: ball.dx,
       dy: ball.dy,
-      height: ball.height
+      // height: ball.height
     }
   };
   //console.log("Sending data:", gameData);
@@ -561,8 +559,8 @@ gameSocket.onmessage = function (event) {
       console.log("updating game data");
       leftPaddle.y = data.leftPaddle.y;
       rightPaddle.y = data.rightPaddle.y;
-      ball.dirX = data.ball.dirX;
-      ball.dirY = data.ball.dirY;
+      // ball.dirX = data.ball.dirX;
+      // ball.dirY = data.ball.dirY;
       ball.x = data.ball.x;
       ball.y = data.ball.y;
       ball.dx = data.ball.dx;
