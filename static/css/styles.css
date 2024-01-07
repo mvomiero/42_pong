@@ -32,6 +32,7 @@
   --bs-gray-500: #adb5bd;
   --bs-gray-600: #6c757d;
   --bs-gray-700: #495057;
+  --bs-gray-750: #424649;
   --bs-gray-800: #343a40;
   --bs-gray-900: #212529;
   --bs-primary: #1D809F;
@@ -6050,10 +6051,18 @@ form-control
     --bs-spinner-animation-speed: 1.5s;
   }
 }
-canvas {
-    background-color: var(--bs-yellow);
-    width: 100%;
-    height: auto;
+
+.pongCanvas {
+  background-color: rgba(var(--bs-secondary-rgb)) !important;;
+  opacity: 0;
+  width: 100%;
+  height: auto;
+}
+.dashboardCanvas {
+  /* color: ; */
+  opacity: 1;
+  max-width: 100%;
+  height: auto;
 }
 
 .offcanvas, .offcanvas-xxl, .offcanvas-xl, .offcanvas-lg, .offcanvas-md, .offcanvas-sm {

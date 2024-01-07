@@ -3,6 +3,9 @@ from .models import GameData, TournamentData
 import time
 import pytz
 from datetime import datetime
+from django.http import JsonResponse    # NEW FOR CHARTS (http response)
+from django.db.models import Count                      # NEW FOR CHARTS (database query)
+from django.db.models.functions import ExtractWeekDay   # NEW FOR CHARTS (database query)
 
 def index(request):
 	return render(request, "pong/index.html")
@@ -110,3 +113,33 @@ def add_tournament_data(semiMatch1, semiMatch2, finalMatch, players, tend, tdur)
         tournament_duration_secs=tdur,
     )
     tournament_data.save()
+
+
+# NEW FOR CHARTS:
+def get_dashboard_data(request):
+    # Aggregate game data by day of the week and count total games
+    game_data = GameData.objects.annotate(
+        day_of_week=ExtractWeekDay('game_end_timestamp')
+    ).values('day_of_week').annotate(
+        total_games=Count('id')
+    ).order_by('day_of_week')
+
+    print(f'game_data={game_data}')
+
+    # Prepare the data in the format expected by the frontend chart
+    chart_data = {}
+    day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    for day_name in day_names:
+        chart_data[day_name] = 0
+    for entry in game_data:
+        # Assuming 'day_of_week' is returned as 1 for Monday, 2 for Tuesday, etc.
+        day_index = (entry['day_of_week'] + 5) % 7
+        day_name = day_names[day_index]  # Adjust index to start from 0
+        chart_data[day_name] = entry['total_games']
+
+    print(f'chart_data={chart_data}')
+
+    # Prepare the response and return it as JSON
+    response_data = {'chart1': chart_data}
+    return JsonResponse(response_data)
+

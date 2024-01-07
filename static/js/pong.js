@@ -317,3 +317,38 @@ document.getElementById('startRemoteGameButton').addEventListener('click', showN
 
 // Event listener for the Submit Name Button
 document.getElementById('submitNameButton').addEventListener('click', submitNameAndStartGame);
+
+// Function to check if an element is in the viewport
+function isInViewport(element) {
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+  );
+}
+
+/* UPDATE THE URL WITHE THE SECTIONS */
+/* // Function to check if an element is in the viewport
+function isInViewport(element) {
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+  );
+}
+
+// Function to update URL based on the section in view
+function updateURL() {
+  const sections = document.querySelectorAll('section');
+  sections.forEach(section => {
+    if (isInViewport(section)) {
+      const sectionId = section.id;
+      console.log("sectionId: ", sectionId);
+      const sectionName = sectionId === 'pong' ? 'pong' : 'dashboard'; // Customize as needed
+      history.pushState({}, '', `/${sectionName}`);
+    }
+  });
+}
+
+// Listen for scroll events and update the URL accordingly
+window.addEventListener('scroll', updateURL); */

@@ -15,8 +15,14 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css" rel="stylesheet" />
         <!-- Google fonts-->
         <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
+        <!-- Include Chart.js library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     </head>
     <body id="page-top">
         <!-- Navigation-->
@@ -76,13 +82,9 @@
 
                         <!-- Canvas initially hidden -->
                         <div id="game_board" room_code="match" char_choice="player_alias" style="display: none;">
-                            <canvas width="750" height="485" id="gameCanvas"></canvas>
+                            <canvas class="pongCanvas" width="750" height="485" id="gameCanvas"></canvas>
                         </div>
 
-                        <!-- <div id = "game_board" room_code = match char_choice = player_alias>
-                            <canvas width="750" height="485" id="gameCanvas"></canvas>
-                        </div> -->
-                        
                         <script type="text/javascript" src="{% static 'js/pong.js' %}"></script>
                         <script type="text/javascript" src ="{% static 'js/keyboardEvents.js' %}"></script>
                         <script type="text/javascript" src ="{% static 'js/webSocket.js' %}"></script>
@@ -94,11 +96,24 @@
         </section>
         <!-- Dashboard-->
         <section class="content-section bg-primary text-white text-center" id="dashboard">
-            <div class="container px-4 px-lg-5">
+            <div class="container px-4 px-lg-5 text-center">
                 <div class="content-section-heading">
-                    <h3 class="text-secondary mb-0">Dashboard</h3>
-                    <h2 class="mb-5">++++++++++++++++++ ADD THE DASHBOARD HERE ++++++++++++++++++</h2>
+                    <h2 class="text-secondary mb-0">Dashboard</h2>
+                    <h3 class="mb-5">Overview of some faboulous statistics of the Ultimate Pong Game</h3>
                 </div>
+                <div class="row mb-5">
+                    <div class="col-lg-6">
+                        <h4 class="text-white mb-0">Matches and Players per Day</h4>
+                        <canvas id="horizontalBarChart1" width="100%" height="100"></canvas>
+                    </div>
+                    <div class="col-lg-6">
+                        <canvas class="dashboardCanvas" id="scatteredChart" width="100%" height="40"></canvas>
+                    </div>
+                </div>
+
+                
+
+
                 <div class="row gx-4 gx-lg-5">
                     <div class="col-lg-3 col-md-6 mb-5 mb-lg-0">
                         <span class="service-icon rounded-circle mx-auto mb-3"><i class="icon-screen-smartphone"></i></span>
@@ -125,6 +140,9 @@
                         <p class="text-faded mb-0">I mustache you a question...</p>
                     </div>
                 </div>
+
+                
+
             </div>
         </section>
         <!-- Team-->
@@ -263,8 +281,12 @@
         <!-- Scroll to Top Button-->
         <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
         <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script> -->
         <!-- Core theme JS-->
         <!-- <script src="js/scripts.js"></script> -->
+        <script type="text/javascript" src ="{% static 'js_charts/charts.js' %}"></script>
     </body>
 </html>
