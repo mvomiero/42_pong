@@ -539,7 +539,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
 
         # [Broadcast match game-data]
         if (self.match_id is not None 
-            and (received_data['command'] == "update" or received_data['command'] == "gamePause")
+            and (received_data['command'] == "updateLeftPaddle" or received_data['command'] == "updateRightPaddle" or received_data['command'] == "updateBall" or received_data['command'] == "gamePause")
             and self.set_matches[self.match_id]['finished'] == False):
             await self.send_to_group(text_data, self.group_name_match)
 
