@@ -80,6 +80,21 @@
   --bs-highlight-bg: #fbf1cd;
 }
 
+:dashboardColors {
+    backgroundColor: var(--bs-accordion-active-bg);
+    fontColor: var(--bs-accordion-button-color);
+    gridColor: var(--bs-accordion-button-bg);
+    dataColorPrimary: var(--bs-accordion-button-bg);
+    dataColorSecondary: var(--bs-accordion-button-bg);
+}
+
+:chartFonts {
+    fontColor: var(--bs-accordion-button-color);
+    fontFamily: var(--bs-font-sans-serif);
+    fontSize: var(--bs-body-font-size);
+    fontStyle: var(--bs-body-font-weight);
+}
+
 *,
 *::before,
 *::after {
@@ -6054,12 +6069,12 @@ form-control
 
 .pongCanvas {
   background-color: rgba(var(--bs-secondary-rgb)) !important;;
-  opacity: 0;
+  opacity: 0.5;
   width: 100%;
   height: auto;
 }
 .dashboardCanvas {
-  /* color: ; */
+  background-color: rgba(var(--bs-primary-rgb)) !important;;
   opacity: 1;
   max-width: 100%;
   height: auto;

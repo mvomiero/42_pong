@@ -1,6 +1,6 @@
 // Set new default font family and font color to mimic Bootstrap's default styling
-Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-Chart.defaults.global.defaultFontColor = '#292b2c';
+/* Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+Chart.defaults.global.defaultFontColor = '#292b2c'; */
 
 // Get computed color values from CSS variables
 const rootStyles = getComputedStyle(document.documentElement);
@@ -43,11 +43,10 @@ function drawChart1(chartData) {
     // Get the canvas element and create the chart
     var canvas = document.getElementById('horizontalBarChart1').getContext('2d');
     var horizontalBarChart = new Chart(canvas, {
-        type: 'horizontalBar',
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                /* axis: 'y', */
                 label: 'Number of Games',
                 data: data,
                 backgroundColor: bs_secondary
@@ -55,15 +54,22 @@ function drawChart1(chartData) {
         },
         options: {
             indexAxis: 'y',
-            legend: {
-                display: false
+            plugins: {
+                legend: {
+                    display: false  // Hides the legend specifically for horizontal bar chart
+                }
             },
             scales: {
-                xAxes: [{
+                x: {
                     title: {
                         display: true,
                         text: 'Number of Games',
-                        color: bs_darkGrey
+                        color: bs_darkGrey,
+                        font: {
+                            size: 18,
+                            family: 'Arial',
+                            weight: 'bold'
+                        }
                     },
                     gridLines: {
                         display: true,
@@ -71,29 +77,25 @@ function drawChart1(chartData) {
                     },
                     ticks: {
                         beginAtZero: true,
-                        maxTicksLimit: 7
+                        maxTicksLimit: 7,
+                        color: bs_darkGrey
                     }
 
-                }],
-                yAxes: [{
+                },
+                y: {
                     gridLines: {
-                        display: false,
-                        color: bs_lightGrey
-                    }
-                }]
-                /* x: {
-                    title: {
-                        display: true,
-                        text: 'Number of Games'
+                        display: false
                     },
-                    beginAtZero: true
-                } */
+                    ticks: {
+                        color: bs_darkGrey
+                    }
+                }
             }
         }
     });
 }
 
-function drawChart2() {
+/* function drawChart2() {
     // Sample Data:
     var matchData = [
         { date: '01.12.2023', remoteMatch: [15, 42, 30, 8, 68], tournamentMatch: [23] },
@@ -174,3 +176,4 @@ function drawChart2() {
 
 //drawChart1();
 drawChart2();
+ */

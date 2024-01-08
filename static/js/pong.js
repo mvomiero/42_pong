@@ -273,8 +273,7 @@ function loop() {
   }
 }
 
-// start the game
-requestAnimationFrame(loop);
+
 
 
 
@@ -305,6 +304,9 @@ function submitNameAndStartGame() {
       "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
     gameSocket = new WebSocket(connectionString);
     console.log("[WebSocket starte] connectionString: ", connectionString);
+
+    // start the game
+    requestAnimationFrame(loop);
 
     // Set the event handlers
     gameSocket.onmessage = handleWebSocketOpen;
