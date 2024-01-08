@@ -1,39 +1,28 @@
 // documentation here: https://www.notion.so/42wolfsburgberlin/Interface-Frontend-Backend-To-Do-List-eff7e8c582ff4a32b088f6aecf87b626
-// ISSUE: the animation loop shouldn't be used to drive the update of the ball, as when we switch tabs the animation pauses
-// so the reason the other player doesn't receive the ball data is because we are switched to the other tab and so the other player is sending it
-// https://discourse.threejs.org/t/animation-pause-when-change-the-browser-tab/1527
-// TODO: make sure score updates properly when ball gets past bats
-// testing on right side only for now!
-// - ghost ball appears in centre at start (not always)
-// DONE: old score is not deleted!
-// ball slows down, but when we switch to new browser tab, it speeds up again
-// ball gets past bat on other machine - this is why it's slowing down, as we are drawing two balls
-// TODO: there is a gap between bats and table
+// NOTE: there is no longer any need to send match update or end commands, as score is updated identically on both clients
+// TODO: only names of max 8 chars should be enterable
+// TODO: better font
+// TODO: rename 'player1' to 'player1name'
+// TODO: fill database on game end
+// TODO: remove scores and player names from html
+// TODO: randomise ball start direction on initBall and sync between players
+// TODO: randomise ball.z on each bat hit and send to both players
+// TODO: reinstate random ballHeight: Math.floor(Math.random() * (maxBallZ - minBallZ + 1)) + minBallZ
+// (each time a new ballZ is generated, we have to send it to the other player)
+// TODO: reintegrate pre and post scenes
+// TODO: remove gap between bats and table
+// TODO: ball sometimes gets stuck within bat
 // TODO: fix issue that ball can go inside of the bat if hit from the top
-// TODO: batcam!
-// TODO: make sure achieving max points ends the game
-// TODO: fix issue that bat gets longer on other players screen (seems ok now)
-// TODO: should bats be movable before game has started?
-// TODO: reinstate physics that changes bat speed depending on hit velocity
-// TODO: add text names alongside score (max 8 chars)
-// TODO: walls should be higher and transparent (max height ball can go)
+// TODO: fix vibrating bats
+// TODO: implmement batcam!
+// TODO: reinstate physics where bats have an increasing velocity which can change ball speed
 // TODO: corresponding bat/name should appear as each player joins the game
-// TODO: window resizing does not work
-// ball appears only when startGameButton is pressed and when both players have joined the game
-// game can be paused by pressing space bar
-// make it work with 2 players in separate browsers
-// TODO: implement sceneProperties throughout
-// reinstate random ballHeight: Math.floor(Math.random() * (maxBallZ - minBallZ + 1)) + minBallZ
+// TODO: three.js elements don't resize when browser window is resized
 
 import * as THREE from 'three';
 import {FontLoader} from 'three/FontLoader';
 import {TextGeometry} from 'three/TextGeometry';
 import {OrbitControls} from 'three/OrbitControls';
-
-// function setPlayerNames(p1Name, p2Name) {
-// 	sceneProperties.p1Name = p1Name;
-// 	sceneProperties.p1Name = p2Name;
-// }
 
 const fontLoader = new FontLoader();
 fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_serif_regular.typeface.json', function (font) {
@@ -49,8 +38,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 		renderer:renderer,
 		sceneNum:0,
 		sceneAnimating:false,
-		p1Name: 'Player 1',
-		p2Name: 'Player 2',
 		backgroundColour:0x87CEEB,
 		p1Colour:0x990000,
 		otherTextColour:0xFFFFAA,
@@ -64,22 +51,22 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 	};
 	sceneProperties.scene.background = new THREE.Color(sceneProperties.backgroundColour);
 
-	// START OF SCENE2 CODE
     var scorePlayer1 = 0, scorePlayer2 = 0;
-    const winningScore = 3000;
+    const winningScore = 3;
     const ball = {};
+    var intervalId;
     var zoomFactor = 0.027, zcw, zch;
     var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
     var ballMesh, ballSize, ballSpeed, minBallZ, maxBallZ;
     var leftPaddleMesh, rightPaddleMesh, paddleWidth, paddleHeight, paddleDepth, leftPaddleSpeed, rightPaddleSpeed;
-    var textSize, textHeight, textYpos, leftScoreXpos, rightScoreXpos;
+    var textSize, textHeight, textYpos, leftScoreXpos, rightScoreXpos, leftNameOffset, rightNameOffset;
     var scorePlayer1Mesh, scorePlayer2Mesh;
-    var namePlayer1Mesh;
+    var namePlayer1Mesh, namePlayer2Mesh;
 
     var player1 = 'Player 1'; // eventually this needs to come from main.js
     var player2 = 'Player 2'; // eventually this needs to come from main.js
 
-    var gamePaused = false;
+    // var gamePaused = false;
     var winner = "";
     // var tournament_stage = "";
     var player = 0;
@@ -98,7 +85,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       initLight();
       initTable();
       createTable();
-      sceneProperties.sceneInitialised = true;
+      renderer.render(scene, camera);
     }
 
     function initCamera() {
@@ -133,12 +120,42 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     function startGame() {
       createLeftPaddle();
       createRightPaddle();
-      // initTextScoreParams needs to be moved to here!
-      // createP1NameText();
+      initTextParams();
+      createP1ScoreText();
+      createP2ScoreText();
+      createP1NameText();
+      createP2NameText();
       initBall();
       createBall();
       sceneProperties.sceneAnimating = true;
     }
+
+    function endGame() {
+      clearInterval(intervalId);
+      removeAndDispose(ballMesh);
+      removeAndDispose(leftPaddleMesh);
+      removeAndDispose(rightPaddleMesh);
+      removeAndDispose(tableMesh);
+      removeAndDispose(tableMesh);
+      removeAndDispose(tableUpperWallMesh);
+      removeAndDispose(tableLowerWallMesh);
+      removeAndDispose(netMesh);
+      removeAndDispose(scorePlayer1Mesh);
+      removeAndDispose(scorePlayer2Mesh);
+      removeAndDispose(namePlayer1Mesh);
+      removeAndDispose(namePlayer2Mesh);
+    }
+    
+    function removeAndDispose(object) {
+      sceneProperties.scene.remove(object);
+      if (object.geometry)
+      object.geometry.dispose();
+      if (object.material) {
+          if (object.material.map)
+            object.material.map.dispose();
+          object.material.dispose();
+      }
+    }    
 
     function initTable() {
       tableWidth = zcw * 0.75;
@@ -148,40 +165,31 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
     function initBall() {
       ballSize = 0.4;
-      ballSpeed = 0.05;
-	  ball.x = 0;
-	  ball.y = 0;
+      ballSpeed = 0.1;
+	    ball.x = 0;
+	    ball.y = 0;
       ball.dirX = -1; // Math.random() < 0.5 ? 1 : -1
-      ball.dirY = 1; // Math.random() < 0.5 ? 1 : -1
+      ball.dirY = 0; // Math.random() < 0.5 ? 1 : -1
       ball.dx = ballSpeed * ball.dirX;
       ball.dy = ballSpeed * ball.dirY;
     }
 
-    function initTextScoreParams() {
+    function initTextParams() {
       textSize = zch * 0.075;
       textHeight = zch * 0.01;
       textYpos = zch * 0.38;
       leftScoreXpos = (zcw * 0.08) - (zcw / 2);
       rightScoreXpos = (zcw * 0.87) - (zcw / 2);
+      leftNameOffset = zcw * 0.08;
+      rightNameOffset = zcw * 0.04;
     }
-
-    function scene2End() {  
-      sceneProperties.scene.remove(ballMesh);
-      sceneProperties.scene.remove(leftPaddleMesh);
-      sceneProperties.scene.remove(rightPaddleMesh);
-      sceneProperties.scene.remove(tableMesh);
-      sceneProperties.scene.remove(scorePlayer1Mesh);
-      sceneProperties.scene.remove(scorePlayer2Mesh);
-    }
-
-    // game
-
+    
     function createBall() {
 		console.log("Create ball called");
         var geometry = new THREE.SphereGeometry(ballSize, 50);
         var material = new THREE.MeshPhongMaterial({color: sceneProperties.ballColour});
         ballMesh = new THREE.Mesh(geometry, material);
-        ballMesh.position.set(ball.x, ball.y, 0); // set position here or let it be set by updateBall when data received?
+        ballMesh.position.set(ball.x, ball.y, minBallZ); // set position here or let it be set by updateBall when data received?
         sceneProperties.scene.add(ballMesh);
     }
 
@@ -210,84 +218,24 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         tableMesh.position.set(0, 0, -paddleDepth/2 - tableDepth);
         sceneProperties.scene.add(tableMesh);
 
-        var tableUpperWallGeometry = new THREE.BoxGeometry(tableWidth, zch * 0.02, tableDepth * 2);
-        var tableWallsMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.tableWallsColour});    
-        tableUpperWallMesh = new THREE.Mesh(tableUpperWallGeometry, tableWallsMaterial);
-        tableUpperWallMesh.position.set(0, tableHeight/2, -paddleDepth/2 - tableDepth);
-        sceneProperties.scene.add(tableUpperWallMesh);
-
-        var tableLowerWallGeometry = new THREE.BoxGeometry(tableWidth, zch * 0.02, tableDepth * 2);
-        var tableWallsMaterial = new THREE.MeshPhongMaterial({color: sceneProperties.tableWallsColour});    
-        tableLowerWallMesh = new THREE.Mesh(tableLowerWallGeometry, tableWallsMaterial);
-        tableLowerWallMesh.position.set(0, -tableHeight/2, -paddleDepth/2 - tableDepth);
+        var tableWallGeometry = new THREE.BoxGeometry(tableWidth, zch * 0.02, minBallZ);
+        var tableWallMaterial = new THREE.MeshPhongMaterial({
+          color: sceneProperties.tableWallsColour,
+          opacity: 0.1,
+          transparent: true
+        });    
+        tableUpperWallMesh = new THREE.Mesh(tableWallGeometry, tableWallMaterial);
+        tableUpperWallMesh.position.set(0, tableHeight/2, minBallZ / 2 - paddleDepth/2);
+        sceneProperties.scene.add(tableUpperWallMesh); 
+        tableLowerWallMesh = new THREE.Mesh(tableWallGeometry, tableWallMaterial);
+        tableLowerWallMesh.position.set(0, -tableHeight/2, minBallZ / 2 - paddleDepth/2);
         sceneProperties.scene.add(tableLowerWallMesh); 
 
         var netGeometry = new THREE.BoxGeometry(zcw * 0.015, tableHeight * 0.9, tableDepth * 5);
         var netMaterial = new THREE.MeshPhongMaterial({color: 0xffffff});
-        var netMesh = new THREE.Mesh(netGeometry, netMaterial);
+        netMesh = new THREE.Mesh(netGeometry, netMaterial);
         netMesh.position.set(0, 0, 0);
         sceneProperties.scene.add(netMesh);
-    }
-
-    function checkIfBallHitTopBottomTable()
-    {
-        if (ball.y > tableHeight/2 || ball.y < -tableHeight/2) {
-          ball.dy = -ball.dy;
-        }  
-    }
-
-    function checkIfBallHitPaddle(paddleMesh)
-    {
-        if (
-            ball.x < paddleMesh.position.x + paddleWidth/2 &&
-            ball.x > paddleMesh.position.x - paddleWidth/2 &&
-            ball.y < paddleMesh.position.y + paddleHeight/2 &&
-            ball.y > paddleMesh.position.y - paddleHeight/2
-        ) {
-            ball.dx = -ball.dx;
-        }
-    }
-
-    function checkIfBallPassedPaddle() {
-      // left side belongs to p1, right side belongs to p2
-      if (ball.x > tableWidth/2 && player === 2) {
-        // initBall();
-        // sendGameData();
-        // this should be enough to update the ball position on both machines
-        // except that player 1 will still be sending their position in the animation loop
-        // who is animating?
-
-        // // increase and update the score for both players
-        // scorePlayer1++;
-        // console.log("player 2 sending Match Info Update");
-        // sendMatchInfo("update");
-        // if (scorePlayer1 === winningScore)
-        //   winner = player1;
-        //   sendMatchInfo("end");
-      }
-      // if (ball.x < -tableWidth/2 && player === 1) {
-      //   ballSpeed = 0; // prevent scoring againn whilst data gets received
-      //   scorePlayer2++;
-      //   sendMatchInfo("update");
-      //   // if (scorePlayer2 === winningScore)
-      //   //   winner = player2;
-      //   //   sendMatchInfo("end");
-      // }
-    }
-
-    function updatePaddles() {
-      let newLeftPaddleY = leftPaddleMesh.position.y + leftPaddleSpeed;
-      if (newLeftPaddleY - paddleHeight / 2 > -tableHeight / 2 && newLeftPaddleY + paddleHeight / 2 < tableHeight / 2) {
-        leftPaddleMesh.position.y = newLeftPaddleY;
-      }
-      let newRightPaddleY = rightPaddleMesh.position.y + rightPaddleSpeed;
-      if (newRightPaddleY - paddleHeight / 2 > -tableHeight / 2 && newRightPaddleY + paddleHeight / 2 < tableHeight / 2) {
-        rightPaddleMesh.position.y = newRightPaddleY;
-      }
-      if (player === 1)
-        sendLeftPaddleData();
-      if (player === 2)
-        sendRightPaddleData();
     }
 
     function createP1ScoreText() {
@@ -308,27 +256,108 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       sceneProperties.scene.add(scorePlayer2Mesh);
     }
 
-    // function createP1NameText() {
-    //   const namePlayer1Geom = new TextGeometry(scorePlayer2.toString(), {font: sceneProperties.font, size: textSize, height: textHeight});
-    //   const namePlayer1Material = new THREE.MeshPhongMaterial({color: sceneProperties.p1Colour});
-    //   namePlayer1Mesh = new THREE.Mesh(namePlayer1Geom, namePlayer1Material);
-    //   namePlayer1Mesh.position.x = leftScoreXpos;
-    //   namePlayer1Mesh.position.y = textYpos;
-    //   sceneProperties.scene.add(namePlayer1Mesh);
-    //   console.log("adding p1 name text");
-    // }
+    function createP1NameText() {
+      const namePlayer1Geom = new TextGeometry(player1, {font: sceneProperties.font, size: textSize, height: textHeight});
+      const namePlayer1Material = new THREE.MeshPhongMaterial({color: sceneProperties.p1Colour});
+      namePlayer1Mesh = new THREE.Mesh(namePlayer1Geom, namePlayer1Material);
+      namePlayer1Mesh.position.x = leftScoreXpos + leftNameOffset;
+      namePlayer1Mesh.position.y = textYpos;
+      sceneProperties.scene.add(namePlayer1Mesh);
+    }
+
+    function createP2NameText() {
+      const namePlayer2Geom = new TextGeometry(player2, {font: sceneProperties.font, size: textSize, height: textHeight});
+      const namePlayer2Material = new THREE.MeshPhongMaterial({color: sceneProperties.p2Colour});
+      namePlayer2Mesh = new THREE.Mesh(namePlayer2Geom, namePlayer2Material);
+      const boundingBox = new THREE.Box3().setFromObject(namePlayer2Mesh);
+      const lengthX = boundingBox.max.x - boundingBox.min.x;
+      namePlayer2Mesh.position.x = rightScoreXpos - rightNameOffset - lengthX;
+      namePlayer2Mesh.position.y = textYpos;
+      sceneProperties.scene.add(namePlayer2Mesh);
+    }    
+
+    function checkIfBallHitTopBottomTable()
+    {
+        if (ball.y > tableHeight/2 || ball.y < -tableHeight/2) {
+          ball.dy = -ball.dy;
+        }  
+    }
+
+    function checkIfBallHitPaddle(paddleMesh)
+    {
+        if (
+            ball.x < paddleMesh.position.x + paddleWidth/2 &&
+            ball.x > paddleMesh.position.x - paddleWidth/2 &&
+            ball.y < paddleMesh.position.y + paddleHeight/2 &&
+            ball.y > paddleMesh.position.y - paddleHeight/2
+        ) {
+            ball.dx = -ball.dx;
+        }
+    }
+
+    function checkForWin(score, thisPlayer) {
+      if (score === winningScore)
+      {
+        winner = thisPlayer;
+        // send "end" command to add gameData to database
+        endGame();
+      }  
+    }
+
+    function checkIfBallPassedPaddle() {
+      if (ball.x > tableWidth/2) {
+        scorePlayer1++;
+        sceneProperties.scene.remove(scorePlayer1Mesh);
+        createP1ScoreText();
+        initBall();
+        renderer.render(scene, camera);
+        checkForWin(scorePlayer1, player1);
+      }
+      if (ball.x < -tableWidth/2) {
+        scorePlayer2++;
+        sceneProperties.scene.remove(scorePlayer2Mesh);
+        createP2ScoreText();
+        initBall();
+        renderer.render(scene, camera);
+        checkForWin(scorePlayer2, player2);
+      }
+    }
+
+    function updatePaddles() {
+      let newLeftPaddleY = leftPaddleMesh.position.y + leftPaddleSpeed;
+      if (newLeftPaddleY - paddleHeight / 2 > -tableHeight / 2 && newLeftPaddleY + paddleHeight / 2 < tableHeight / 2) {
+        leftPaddleMesh.position.y = newLeftPaddleY;
+      }
+      let newRightPaddleY = rightPaddleMesh.position.y + rightPaddleSpeed;
+      if (newRightPaddleY - paddleHeight / 2 > -tableHeight / 2 && newRightPaddleY + paddleHeight / 2 < tableHeight / 2) {
+        rightPaddleMesh.position.y = newRightPaddleY;
+      }
+      if (player === 1)
+        sendLeftPaddleData();
+      if (player === 2)
+        sendRightPaddleData();
+    }
+
+    function updateBall() {
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+        const standardDeviation = tableWidth / 5;
+        const mean = 0;
+        const exponent = -((ball.x - mean) ** 2) / (2 * standardDeviation ** 2);
+        ball.z = minBallZ * Math.exp(exponent);
+    }
 
     // // KEYBOARD EVENTS CODE
     // // listen to keyboard events to move the paddles
     document.addEventListener("keydown", function (e) {
-      if (e.key === " ") {
-          if (player !== 0) {
-              e.preventDefault(); // Check for space bar key press
-              gamePaused = !gamePaused; // Toggle game pause state
-              sendGamePause();
-          }
-          // return;
-      }
+      // if (e.key === " ") {
+      //     if (player !== 0) {
+      //         e.preventDefault(); // Check for space bar key press
+      //         gamePaused = !gamePaused; // Toggle game pause state
+      //         sendGamePause();
+      //     }
+      //     // return;
+      // }
 
       if (player === 1) {
           if (e.key === "ArrowUp")
@@ -342,7 +371,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
             rightPaddleSpeed = -0.2;
       }
     });
-
 
     // listen to keyboard events to stop the paddle if key is released
     document.addEventListener("keyup", function (e) {
@@ -421,13 +449,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 		if (player === 0)
 		  return;
 		var ballData = {
-		  command: "update",
+		  command: "updateBall",
 		  x: ball.x,
 		  y: ball.y,
+      z: ball.z,
 		  dx: ball.dx,
-	      dy: ball.dy
+	    dy: ball.dy
 		};
-		console.log("ball.x:", ball.x);
+		// console.log("ball.x:", ball.x);
 		gameSocket.send(JSON.stringify(ballData));
 	}
 
@@ -461,38 +490,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     //   console.log("ConnectionString: ", connectionString);
     // };
 
-    setInterval(() => {
-      if (sceneProperties.sceneAnimating === true && !gamePaused)
+    intervalId = setInterval(() => {
+      if (sceneProperties.sceneAnimating === true) //  && !gamePaused
       {
-		// update ball
-        // var tempZ = ball.z;
-        ball.x += ball.dx;
-        ball.y += ball.dy;
-        // ball.z = tempZ - tempZ * Math.abs(ball.x / (tableWidth / 2));
-		ball.z = 0;
-        ballMesh.position.x = ball.x;
-        ballMesh.position.y = ball.y;
-
-		updatePaddles();
-		checkIfBallHitTopBottomTable();
-		checkIfBallHitPaddle(leftPaddleMesh);
-		checkIfBallHitPaddle(rightPaddleMesh);
-		// checkIfBallPassedPaddle();
-        if (ball.x < 0) {
-          if (player === 1) {
-            console.log("p1 sending ball data");
-            sendBallData();
-          }
-        }
-        else {
-          if (player === 2) {
-            console.log("p2 sending ball data");
-            sendBallData();
-          }
-        }
+        updateBall();
+        sendBallData();
+        updatePaddles();
       }
-	  renderer.render(scene, camera);
-    }, 10);
+    }, 20);
 
     gameSocket.onmessage = function (event) {
       try {
@@ -529,23 +534,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
             startGame();
             addLog("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");        
           }
-          // else if (data.mode === "update") {
-          //   scorePlayer1 = data.score.player1;
-          //   scorePlayer2 = data.score.player2;
-          //   initTextScoreParams();
-          //   if (scorePlayer1Mesh)
-          //     sceneProperties.scene.remove(scorePlayer1Mesh);
-          //   createP1ScoreText();
-          //   if (scorePlayer2Mesh)
-          //     sceneProperties.scene.remove(scorePlayer2Mesh);
-          //   createP2ScoreText();
-          // }
-          // else if (data.mode === "end") {
-          //   console.log("reciving game END message");
-          //   console.log("winner", data.winner);
-          //   addLog("match END!, winner is " + data.winner, "match");
-          //   scene2End();
-          // }
         }
 
         // if (data.command === "tournament_info") {
@@ -571,11 +559,21 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         // }
 
         if (data.command === "updateBall") {
-          console.log("updateBall received");
           ball.x = data.x;
           ball.y = data.y;
+          ball.z = data.z;
           ball.dx = data.dx;
           ball.dy = data.dy;
+          if (sceneProperties.sceneAnimating === true) {
+            ballMesh.position.x = ball.x;
+            ballMesh.position.y = ball.y;
+            ballMesh.position.z = ball.z;
+            checkIfBallHitTopBottomTable();
+            checkIfBallHitPaddle(leftPaddleMesh);
+            checkIfBallHitPaddle(rightPaddleMesh);
+            checkIfBallPassedPaddle();
+            renderer.render(scene, camera);
+          }
         }
 
         if (data.command === "updateLeftPaddle") {
@@ -586,9 +584,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           rightPaddleMesh.position.y = data.y;
         }
 
-        if (data.command === "gamePause") {
-          gamePaused = data.gamePaused;
-        }
+        // if (data.command === "gamePause") {
+        //   gamePaused = data.gamePaused;
+        // }
 
       } catch (error) {
         console.error("Error parsing received data:", error);
@@ -618,5 +616,4 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     };
 
 	initGame();
-	// END OF SCENE2 CODE
 });
