@@ -105,7 +105,6 @@ function initLight(sceneProperties) {
 }
 
 function startGame(sceneProperties) {
-  console.log("startGame called");
   sceneProperties.sceneStarted = true;
   createLeftPaddle(sceneProperties);
   createRightPaddle(sceneProperties);
@@ -126,13 +125,10 @@ function initTable() {
 function initBall() {
   ballSize = 0.4;
   ballSpeed = 0.05;
-  ball.dirX = 1; // Math.random() < 0.5 ? 1 : -1
-  ball.dirY = 1; // Math.random() < 0.5 ? 1 : -1
-  ball.x = 0;
-  ball.y = 0;
-  ball.dx = ballSpeed * ball.dirX,
-  ball.dy = ballSpeed * ball.dirY,  
-  ball.z = minBallZ;
+  ball.dirX = -1; // Math.random() < 0.5 ? 1 : -1
+  ball.dirY = 0; // Math.random() < 0.5 ? 1 : -1
+  ball.dx = ballSpeed * ball.dirX;
+  ball.dy = ballSpeed * ball.dirY;
 }
 
 function initTextScoreParams() {
@@ -146,7 +142,6 @@ function initTextScoreParams() {
 function animateGame(sceneProperties) {
   if (!gamePaused) {
     updatePaddles(sceneProperties);
-    updateBall(sceneProperties);
     checkIfBallHitTopBottomTable();
     checkIfBallHitPaddle(leftPaddleMesh);
     checkIfBallHitPaddle(rightPaddleMesh);
@@ -171,7 +166,7 @@ function createBall(sceneProperties) {
     var geometry = new THREE.SphereGeometry(ballSize, 50);
     var material = new THREE.MeshPhongMaterial({color: sceneProperties.ballColour});
     ballMesh = new THREE.Mesh(geometry, material);
-    ballMesh.position.set(ball.x, ball.y, ball.z);
+    ballMesh.position.set(0, 0, minBallZ); // set position here or let it be set by updateBall when data received?
     sceneProperties.scene.add(ballMesh);
 }
 
@@ -219,24 +214,6 @@ function createTable(sceneProperties) {
     sceneProperties.scene.add(netMesh);
 }
 
-function updateBall(sceneProperties) {
-  ball.x += ball.dx;
-  ball.y += ball.dy;
-  ballMesh.position.x = ball.x;
-  ballMesh.position.y = ball.y;
-  ballMesh.position.z = ball.z - ball.z * Math.abs(ball.x / (tableWidth / 2));
-  if (ball.x < 0) {
-    if (player === 1) {
-      sendBallData();
-    }
-  }
-  else {
-    if (player === 2) {
-      sendBallData();
-    } 
-  }  
-}
-
 function checkIfBallHitTopBottomTable()
 {
     if (ball.y > tableHeight/2 || ball.y < -tableHeight/2) {
@@ -259,9 +236,7 @@ function checkIfBallHitPaddle(paddleMesh)
 function checkIfBallPassedPaddle(sceneProperties) {
   // left side belongs to p1, right side belongs to p2
   if (ball.x > tableWidth/2 && player === 2) {
-    // reset the ball - p1 should be sending nothing
-    console.log("ball passed paddle - init ball");
-    initBall();
+    // initBall();
     // sendGameData();
     // this should be enough to update the ball position on both machines
     // except that player 1 will still be sending their position in the animation loop
@@ -402,7 +377,6 @@ function addLog(message, elementId) {
 function sendMatchInfo(mode) {
   if (player === 0)
     return;
-  console.log("SendMatchInfo called");
   var matchInfo = {
     command: "match_info",
     mode: mode,
@@ -416,12 +390,10 @@ function sendMatchInfo(mode) {
 }
 
 function sendGamePause() {
-  console.log("SendGamePause called");
   var gamePause = {
     command: "gamePause",
     gamePaused: gamePaused,
   };
-  console.log("Sending data:", gamePause);
   gameSocket.send(JSON.stringify(gamePause));
 }
 
@@ -429,13 +401,11 @@ function sendBallData() {
   if (player === 0)
     return;
   var ballData = {
-    command: "update",
-    ball: {
-      x: ball.x,
-      y: ball.y,
-      dx: ball.dx,
-      dy: ball.dy
-    }
+    command: "updateBall",
+    x: ball.x,
+    y: ball.y,
+    dx: ball.dx,
+    dy: ball.dy
   };
   gameSocket.send(JSON.stringify(ballData));
 }
@@ -445,11 +415,8 @@ function sendLeftPaddleData() {
     return;
   var leftPaddleData = {
     command: "updateLeftPaddle",
-    leftPaddle: {
-      y: leftPaddleMesh.position.y,
-    }
+    y: leftPaddleMesh.position.y
   };
-  console.log("updateLeftPaddle command sent");
   gameSocket.send(JSON.stringify(leftPaddleData));
 }
 
@@ -458,15 +425,13 @@ function sendRightPaddleData() {
     return;
   var rightPaddleData = {
     command: "updateRightPaddle",
-    rightPaddle: {
-      y: rightPaddleMesh.position.y,
-    }
+    y: rightPaddleMesh.position.y
   };
   gameSocket.send(JSON.stringify(rightPaddleData));
 }
 
 /*******************************************************/
-/***************** RECEIVING DATA **********************/
+/***************** RECEIVING DATA ***********play/match?&player=b***********/
 /*******************************************************/
 
 // Event handler for successful connection
@@ -474,6 +439,30 @@ gameSocket.onopen = function (event) {
   console.log("WebSocket connection opened!");
   console.log("ConnectionString: ", connectionString);
 };
+
+setInterval(() => {
+  if (globalSceneProperties.sceneAnimating === true)
+  {
+    var tempZ = ball.z;
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+    ball.z = tempZ - tempZ * Math.abs(ball.x / (tableWidth / 2));
+    ballMesh.position.x = ball.x;
+    ballMesh.position.y = ball.y;
+    if (ball.x < 0) {
+      if (player === 1) {
+        console.log("p1 sending ball data");
+        sendBallData();
+      }
+    }
+    else {
+      if (player === 2) {
+        console.log("p2 sending ball data");
+        sendBallData();
+      }
+    }
+  }
+}, 100);
 
 gameSocket.onmessage = function (event) {
   try {
@@ -489,7 +478,7 @@ gameSocket.onmessage = function (event) {
 
     if (data.command === "match_info") {
       if (data.mode === "start") {
-        console.log("data.player1, data.player2", data.player1, data.player2);
+        console.log("data.player1, data.playeplay/match?&player=br2", data.player1, data.player2);
         player1 = data.player1;
         player2 = data.player2;
         scorePlayer1 = 0;
@@ -508,7 +497,6 @@ gameSocket.onmessage = function (event) {
         }
         // console.log("STAGE: " + tournament_stage);
         startGame(globalSceneProperties);
-        console.log("startGame");
         addLog("Scores " + scorePlayer1 + " : " + scorePlayer2, "scores");        
       }
       // else if (data.mode === "update") {
@@ -553,22 +541,22 @@ gameSocket.onmessage = function (event) {
     // }
 
     if (data.command === "updateBall") {
-      ball.x = data.ball.x;
-      ball.y = data.ball.y;
-      ball.dx = data.ball.dx;
-      ball.dy = data.ball.dy;
+      console.log("updateBall received");
+      ball.x = data.x;
+      ball.y = data.y;
+      ball.dx = data.dx;
+      ball.dy = data.dy;
     }
 
     if (data.command === "updateLeftPaddle") {
-      leftPaddleMesh.position.y = data.leftPaddle.y;
+      leftPaddleMesh.position.y = data.y;
     }
     
     if (data.command === "updateRightPaddle") {
-      rightPaddleMesh.position.y = data.rightPaddle.y;
+      rightPaddleMesh.position.y = data.y;
     }
 
     if (data.command === "gamePause") {
-      console.log("Received gamePause data:", data);
       gamePaused = data.gamePaused;
     }
 
