@@ -4,8 +4,10 @@ import time
 import pytz
 from datetime import datetime
 from django.http import JsonResponse    # NEW FOR CHARTS (http response)
-from django.db.models import Count                      # NEW FOR CHARTS (database query)
+from django.db.models import Count, CharField, Sum, Max, F, Case, IntegerField, Value, When  # NEW FOR CHARTS (database query)
 from django.db.models.functions import ExtractWeekDay   # NEW FOR CHARTS (database query)
+from itertools import chain
+from collections import Counter
 
 def index(request):
 	return render(request, "pong/index.html")
@@ -115,23 +117,25 @@ def add_tournament_data(semiMatch1, semiMatch2, finalMatch, players, tend, tdur)
     tournament_data.save()
 
 
-# NEW FOR CHARTS:
+# NEW FOR DASHBOARD:
 def get_dashboard_data(request):
+    # Data for NON tournament games
+    game_data = GameData.objects.filter(is_tournament_game=False)
+
+    """ Data for the Chart """
     # Aggregate game data by day of the week and count total games
-    game_data = GameData.objects.annotate(
+    matches_per_day = game_data.annotate(
         day_of_week=ExtractWeekDay('game_end_timestamp')
     ).values('day_of_week').annotate(
         total_games=Count('id')
     ).order_by('day_of_week')
-
-    print(f'game_data={game_data}')
 
     # Prepare the data in the format expected by the frontend chart
     chart_data = {}
     day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     for day_name in day_names:
         chart_data[day_name] = 0
-    for entry in game_data:
+    for entry in matches_per_day:
         # Assuming 'day_of_week' is returned as 1 for Monday, 2 for Tuesday, etc.
         day_index = (entry['day_of_week'] + 5) % 7
         day_name = day_names[day_index]  # Adjust index to start from 0
@@ -139,7 +143,80 @@ def get_dashboard_data(request):
 
     print(f'chart_data={chart_data}')
 
+    """ Data for the Cards (Matches) """
+    player1_names = game_data.values_list('player1_name', flat=True).distinct()
+    player2_names = game_data.values_list('player2_name', flat=True).distinct()
+    nbr_unique_players = len(list(set(chain(player1_names, player2_names))))
+    print(f'nbr_unique_players={nbr_unique_players}')
+    
+    nbr_matches = game_data.count()
+    print(f'nbr_matches={nbr_matches}')
+
+    match_time = game_data.aggregate(total_match_time=Sum('game_duration_secs')).get('total_match_time', 0)
+    total_match_time = {
+        'hours': match_time // 3600,
+        'minutes': (match_time % 3600) // 60,
+        'seconds': (match_time % 3600) % 60
+    }
+
+    single_match_time = game_data.aggregate(longest_match_time=Max('game_duration_secs')).get('longest_match_time', 0)
+    longest_match_time = {
+        'minutes': single_match_time // 60,
+        'seconds': single_match_time % 60
+    }
+
+    """ Player with most wins """
+    winner_names = game_data.annotate(
+        winner_name=Case(
+            When(player1_points=11, then=F('player1_name')),
+            When(player2_points=11, then=F('player2_name')),
+            output_field=CharField(),
+        )
+    ).values_list('winner_name', flat=True)
+    succ_player = Counter(winner_names).most_common(1)
+    bestPlayer = {
+        'alias': succ_player[0][0],
+        'wins': succ_player[0][1]
+    }
+
+    """ Player with highest play time """
+    # Aggregate the total playing time for player1_name and player2_name and combine the datasets
+    player1_total_time = (
+        GameData.objects
+        .values('player1_name')
+        .annotate(total_time=Sum('game_duration_secs'))
+    )
+    player2_total_time = (
+        GameData.objects
+        .values('player2_name')
+        .annotate(total_time=Sum('game_duration_secs'))
+    )
+    combined_data = list(player1_total_time) + list(player2_total_time)
+    
+    # Merge the durations for each player
+    player_durations = {}
+    for data in combined_data:
+        player_name = data['player1_name'] if 'player1_name' in data else data['player2_name']
+        player_durations[player_name] = player_durations.get(player_name, 0) + data['total_time']
+    highest_time_player = {
+        'alias': max(player_durations, key=player_durations.get),
+        'time': {
+            'minutes': player_durations[max(player_durations, key=player_durations.get)] // 60,
+            'seconds': player_durations[max(player_durations, key=player_durations.get)] % 60
+        }
+    }
+
     # Prepare the response and return it as JSON
-    response_data = {'chart1': chart_data}
+    response_data = {
+        'chart1': chart_data,
+        'cards': {
+            'uniquePlayers': nbr_unique_players,
+            'nbrMatches': nbr_matches,
+            'totalMatchTime': total_match_time,
+            'longestMatchTime': longest_match_time,
+            'bestPlayer': bestPlayer,
+            'highestTimePlayer': highest_time_player
+        }
+    }
     return JsonResponse(response_data)
 

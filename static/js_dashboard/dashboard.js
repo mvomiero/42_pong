@@ -25,6 +25,9 @@ fetch('/dashboard', { method: 'GET', credentials: 'same-origin' }) // or specify
     // Process the retrieved data
     console.log('Data received from backend:', data);
     
+    // Update cards
+    updateCards(data.cards);
+
     // Draw charts
     drawChart1(data.chart1);
   })
@@ -33,6 +36,31 @@ fetch('/dashboard', { method: 'GET', credentials: 'same-origin' }) // or specify
     // Handle errors here
   });
 
+function updateCards(cardsData) {
+    console.log('Data for cards:', cardsData);
+
+    const playerRegistrationsElement = document.getElementById('playerRegistrations');
+    playerRegistrationsElement.textContent = cardsData.uniquePlayers;
+
+    const nbrMatchesElement = document.getElementById('nbrMatches');
+    nbrMatchesElement.textContent = cardsData.nbrMatches;
+
+    const totalMatchTimeElement = document.getElementById('totalMatchTime');
+    totalMatchTimeElement.textContent = cardsData.totalMatchTime.hours.toString() + ' h ' + cardsData.totalMatchTime.minutes.toString() + ' min ' + cardsData.totalMatchTime.seconds.toString() + ' sec';
+
+    const longestMatchTimeElement = document.getElementById('longestMatch');
+    longestMatchTimeElement.textContent = cardsData.longestMatchTime.minutes.toString() + ' min ' + cardsData.longestMatchTime.seconds.toString() + ' sec';
+
+    const bestPlayerAliasElement = document.getElementById('bestPlayerAlias');
+    bestPlayerAliasElement.textContent = cardsData.bestPlayer.alias;
+    const bestPlayerWinsElement = document.getElementById('bestPlayerWins');
+    bestPlayerWinsElement.textContent = 'is the most successfull Player (won ' + cardsData.bestPlayer.wins.toString() + ' matches).';
+
+    const highestPlayingTimeAliasElement = document.getElementById('highestPlayingTimeAlias');
+    highestPlayingTimeAliasElement.textContent = cardsData.bestPlayer.alias;
+    const highestPlayingTimeElement = document.getElementById('highestPlayingTimeTime');
+    highestPlayingTimeElement.textContent = 'has the highest playing time (' + cardsData.highestTimePlayer.time.minutes.toString() + ' min ' + cardsData.highestTimePlayer.time.seconds.toString() + ' sec).';
+}
 
 // Bar Chart Example
 function drawChart1(chartData) {
