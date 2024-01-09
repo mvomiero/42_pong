@@ -80,7 +80,7 @@
   --bs-highlight-bg: #fbf1cd;
 }
 
-:dashboardColors {
+/* :dashboardColors {
     backgroundColor: var(--bs-accordion-active-bg);
     fontColor: var(--bs-accordion-button-color);
     gridColor: var(--bs-accordion-button-bg);
@@ -93,7 +93,7 @@
     fontFamily: var(--bs-font-sans-serif);
     fontSize: var(--bs-body-font-size);
     fontStyle: var(--bs-body-font-weight);
-}
+} */
 
 *,
 *::before,
@@ -6073,12 +6073,20 @@ form-control
   width: 100%;
   height: auto;
 }
-.dashboardCanvas {
+.dashboardCanvas1 {
   background-color: rgba(var(--bs-primary-rgb)) !important;;
-  opacity: 1;
+  opacity: 0;
   max-width: 100%;
   height: auto;
 }
+.dashboardCanvas2 {
+    background-color: rgba(var(--bs-white-rgb)) !important;;
+    opacity: 1;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px; /* Adjust the value to change the roundness */
+    overflow: hidden; /* Ensures canvas doesn't protrude from rounded corners */
+  }
 
 .offcanvas, .offcanvas-xxl, .offcanvas-xl, .offcanvas-lg, .offcanvas-md, .offcanvas-sm {
   --bs-offcanvas-zindex: 1045;
@@ -10876,6 +10884,9 @@ html {
 .text-faded {
   color: rgba(255, 255, 255, 0.7);
 }
+.text-faded2 {
+    color: rgba(0, 0, 0, 0.7);
+}
 
 .scroll-to-top {
   position: fixed;
@@ -11129,7 +11140,7 @@ footer.footer .social-link:hover {
 }
 
 .service-icon {
-  background-color: #fff;
+  background-color:  #fff;
   color: #1D809F;
   height: 7rem;
   width: 7rem;
@@ -11137,4 +11148,9 @@ footer.footer .social-link:hover {
   line-height: 7.5rem;
   font-size: 2.25rem;
   box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-icon {
+    background-color:  #fff;
+    color: rgba(var(--bs-primary-rgb)); /* Specify the desired color */
 }

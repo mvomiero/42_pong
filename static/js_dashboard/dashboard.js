@@ -1,4 +1,5 @@
 // Set new default font family and font color to mimic Bootstrap's default styling
+Chart.defaults.font.family = 'Times New Roman';
 /* Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 Chart.defaults.global.defaultFontColor = '#292b2c'; */
 
@@ -23,7 +24,8 @@ fetch('/dashboard', { method: 'GET', credentials: 'same-origin' }) // or specify
   .then(data => {
     // Process the retrieved data
     console.log('Data received from backend:', data);
-    // Use the data to update your chart or perform other actions
+    
+    // Draw charts
     drawChart1(data.chart1);
   })
   .catch(error => {
@@ -67,7 +69,7 @@ function drawChart1(chartData) {
                         color: bs_darkGrey,
                         font: {
                             size: 18,
-                            family: 'Arial',
+                            /* family: 'Arial', */
                             weight: 'bold'
                         }
                     },
@@ -177,3 +179,31 @@ function drawChart1(chartData) {
 //drawChart1();
 drawChart2();
  */
+
+function setEqualHeight() {
+    var rows = $('.equal-height-row');
+    rows.each(function () {
+        var cards = $(this).find('.card');
+        var maxCardHeight = 0;
+
+        cards.each(function () {
+            var cardHeight = $(this).outerHeight();
+            if (cardHeight > maxCardHeight) {
+                maxCardHeight = cardHeight;
+            }
+        });
+
+        cards.outerHeight(maxCardHeight);
+    });
+}
+
+// Call the function when the document is ready
+$(document).ready(function () {
+    setEqualHeight();
+
+    // Optional: Recalculate heights on window resize
+    $(window).on('resize', function () {
+        setEqualHeight();
+    });
+});
+
