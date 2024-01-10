@@ -206,6 +206,11 @@ def get_dashboard_data(request):
         }
     }
 
+    """ Create a list of all players """
+    allPlayers = list(set(chain(game_data.values_list('player1_name', flat=True).distinct(), 
+                                game_data.values_list('player2_name', flat=True).distinct())))
+    print(f'allPlayers={allPlayers}')
+
     # Prepare the response and return it as JSON
     response_data = {
         'chart1': chart_data,
@@ -216,7 +221,8 @@ def get_dashboard_data(request):
             'longestMatchTime': longest_match_time,
             'bestPlayer': bestPlayer,
             'highestTimePlayer': highest_time_player
-        }
+        },
+        'playerList': allPlayers
     }
     return JsonResponse(response_data)
 

@@ -23,13 +23,16 @@ fetch('/dashboard', { method: 'GET', credentials: 'same-origin' }) // or specify
   })
   .then(data => {
     // Process the retrieved data
-    console.log('Data received from backend:', data);
+    console.log('Data received from backend: ', data);
     
     // Update cards
     updateCards(data.cards);
 
     // Draw charts
     drawChart1(data.chart1);
+
+    // Initialize DataTable
+    initializeDataTable(data.playerList);
   })
   .catch(error => {
     console.error('Fetch error:', error);
@@ -202,36 +205,192 @@ function drawChart1(chartData) {
             }
         }
     });
+} */
+
+
+// Select all the card elements
+const cardElements = [
+    document.getElementById('cardPlayerRegistrations'),
+    document.getElementById('cardNbrMatches'),
+    document.getElementById('cardTotalMatchTime'),
+    document.getElementById('cardLongestMatch'),
+    document.getElementById('cardBestPlayer'),
+    document.getElementById('cardHeighestPlayingTime'),
+];
+
+// Function to find the maximum height among the cards
+function getMaxHeight(cards) {
+    let maxHeight = 0;
+    cards.forEach(card => {
+        const height = card.getBoundingClientRect().height;
+        maxHeight = Math.max(maxHeight, height);
+    });
+    return maxHeight;
 }
 
-//drawChart1();
-drawChart2();
- */
+// Function to set the height for all cards
+function setEqualHeight(cards, height) {
+    cards.forEach(card => {
+        card.style.height = `${height}px`;
+        card.style.minHeight = `${height}px`;
+    });
+    /* cards.forEach(card => {
+        console.log('card.style.height=', card.style.height);
+        console.log('card.offsetHeight=', card.offsetHeight);
+        console.log('card.clientHeight=', card.clientHeight);
+        console.log('card bounding client height=', card.getBoundingClientRect().height);
+    }); */
+}
 
-function setEqualHeight() {
-    var rows = $('.equal-height-row');
-    rows.each(function () {
-        var cards = $(this).find('.card');
-        var maxCardHeight = 0;
+// Calculate the maximum height among the cards
+const maxHeight = getMaxHeight(cardElements);
 
-        cards.each(function () {
-            var cardHeight = $(this).outerHeight();
-            if (cardHeight > maxCardHeight) {
-                maxCardHeight = cardHeight;
+// Set the maximum height to all cards
+setEqualHeight(cardElements, maxHeight);
+
+
+/* DATATABLE */
+let datatablesSimple;
+let dataTable;
+
+window.addEventListener('DOMContentLoaded', event => {
+    const table = document.getElementById('#tablePlayers');
+    if (table) {
+        datatablesSimple = new simpleDatatables.DataTable('#tablePlayers', {
+        //dataTable = new DataTable(table, {
+            paging: true, // Enable pagination
+            perPage: 5, // Number of items per page
+            pagination: {
+                perPageSelect: false, // Hide the dropdown for selecting number of items per page
             }
         });
+        console.log('dataTableSimple: ', datatablesSimple);
+        //console.log('dataTable: ', dataTable);
 
-        cards.outerHeight(maxCardHeight);
-    });
-}
-
-// Call the function when the document is ready
-$(document).ready(function () {
-    setEqualHeight();
-
-    // Optional: Recalculate heights on window resize
-    $(window).on('resize', function () {
-        setEqualHeight();
-    });
+        const entryPerPageDropdown = document.querySelector('.datatable-dropdown');
+        if (entryPerPageDropdown) {
+            // entryPerPageDropdown.style.display = 'none';
+            // entryPerPageDropdown.style.visibility = 'hidden';
+            entryPerPageDropdown.remove();
+        }
+        const tableInfo = document.querySelector('.datatable-info');
+        if (tableInfo) {
+            tableInfo.remove();
+        }
+        const tableTop = document.querySelector('.datatable-top');
+        const tableSearch = document.querySelector('.datatable-search');
+        const tableBottom = document.querySelector('.datatable-bottom');
+        if (tableTop && tableBottom && tableSearch) {
+            tableBottom.appendChild(tableSearch);
+            tableTop.remove();
+        }
+    }
+    
+    const tableBody = document.querySelector('#tablePlayers tbody');
+    console.log('tableBody: ', tableBody);
 });
 
+function initializeDataTable(playerList) {
+    // Find a <table> element with id="myTable":
+    var table = document.getElementById("#tablePlayers");
+
+    /* // Remove the first row from the body
+    table.deleteRow(1);
+
+    let i = 0;
+    playerList.forEach(player => {        
+        // Create an empty <tr> element and add it to the 1st position of the table:
+        var row = table.insertRow(-1);
+        row.setAttribute('data-index', i);
+        i++;
+
+        // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+ 
+        // Add some text to the new cells:
+        cell1.innerHTML = player;
+        cell2.innerHTML = `<a class="btn btn-light" href="#dashboard">Choose</a>`;
+    });
+ */
+    console.log('table: ', table);
+    console.log('dataTableSimple: ', datatablesSimple);
+    //console.log('dataTable: ', dataTable);
+    console.log('simpleDatatables:', simpleDatatables);
+    /* // Later in your code, you can change the values:
+    datatablesSimple.options.perPage = 10;  // Change the number of items per page to 10
+    datatablesSimple.options.pagination.perPageSelect = true;  // Show the dropdown for selecting items per page
+
+    // Redraw the DataTable to apply the changes
+    datatablesSimple.draw(); */
+
+}
+
+/* function initializeDataTable(playerList) {
+    const datatablesSimple = document.getElementById('tablePlayers');
+    if (datatablesSimple) {
+        new simpleDatatables.DataTable(datatablesSimple, {
+            paging: true, // Enable pagination
+            perPage: 5, // Number of items per page
+            pagination: {
+                perPageSelect: false, // Hide the dropdown for selecting number of items per page
+
+            }
+        });
+        console.log('dataTableSimple: ', datatablesSimple);
+
+        const entryPerPageDropdown = document.querySelector('.datatable-dropdown');
+        if (entryPerPageDropdown) {
+            // entryPerPageDropdown.style.display = 'none';
+            // entryPerPageDropdown.style.visibility = 'hidden';
+            entryPerPageDropdown.remove();
+        }
+        const tableInfo = document.querySelector('.datatable-info');
+        if (tableInfo) {
+            tableInfo.remove();
+        }
+        const tableTop = document.querySelector('.datatable-top');
+        const tableSearch = document.querySelector('.datatable-search');
+        const tableBottom = document.querySelector('.datatable-bottom');
+        if (tableTop && tableBottom && tableSearch) {
+            tableBottom.appendChild(tableSearch);
+            tableTop.remove();
+        }
+    }
+    
+    const tableBody = document.querySelector('#tablePlayers tbody');
+    console.log('tableBody: ', tableBody);
+    const row = document.createElement('tr'); // Create a table row    
+
+
+    console.log('Data for DataTable:', playerList);
+
+    // Calculate number of pages required based on data length
+    // const numberOfPages = Math.ceil(playerList.length / datatablesSimple.options.perPage);
+
+    // Create a table row for each player
+    let i = 0;
+    playerList.forEach(player => {
+        // Create a table row
+        const row = document.createElement('tr');
+        row.setAttribute('data-index', i);
+
+        // Create cells and populate with data
+        const cell1 = document.createElement('td');
+        cell1.textContent = player;
+        const cell2 = document.createElement('td');
+        cell2.innerHTML = `<a class="btn btn-light" href="#dashboard">Choose</a>`;
+
+        // Append cells to the row
+        row.appendChild(cell1);
+        row.appendChild(cell2);
+
+        // Append row to the table body
+        tableBody.appendChild(row);
+        i++;
+    });
+
+    // const emptyRow = dataTable.row.add(['', '']).draw().node();
+    // dataTable.table().body().appendChild();
+    console.log('dataTable: ', datatablesSimple);
+} */
