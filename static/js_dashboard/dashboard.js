@@ -74,7 +74,7 @@ function drawChart1(chartData) {
     var data = Object.values(chartData);
 
     // Get the canvas element and create the chart
-    var canvas = document.getElementById('horizontalBarChart1').getContext('2d');
+    var canvas = document.getElementById('chart1').getContext('2d');
     var horizontalBarChart = new Chart(canvas, {
         type: 'bar',
         data: {
@@ -285,10 +285,119 @@ window.addEventListener('DOMContentLoaded', event => {
 function initializeDataTable(playerList) {
     let i = 0;
     playerList.forEach(player => {
-        var newRow = [player, `<a class="btn btn-light" href="#dashboard">Choose</a>`];
+        var newRow = [player, `<a class="btn btn-light" id="btnPlayerSelect" data-value="${player}">Choose</a>`];
 
         dataTable.rows.add(newRow);
     });
 
     console.log('dataTableSimple: ', dataTable);
 }
+
+/* PAGINATIONS (Match & Tournament || Charts) */
+
+// for Charts pagination
+function paginationCharts(paginationId) {
+    const paginationLinks = document.getElementById(paginationId).querySelectorAll('.page-link');
+
+    // get length of paginationLinks
+    const totalElements = paginationLinks.length;
+
+    paginationLinks.forEach((link, index) => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            // Hide all corresponding elements
+            for (let i = 1; i <= totalElements; i++) {
+                document.getElementById(`chart${i}`).style.display = 'none';
+            }
+
+            // Show the clicked element
+            document.getElementById(`chart${index + 1}`).style.display = 'block';
+        });
+    });
+}
+
+// for Dashboard pagination
+function paginationDashboard(paginationId) {
+    const paginationLinks = document.getElementById(paginationId).querySelectorAll('.page-link');
+    
+    // get length of paginationLinks
+    const totalElements = paginationLinks.length;
+
+    paginationLinks.forEach((link, index) => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            // Retrieve the href value from the clicked link
+            const hrefValue = this.getAttribute('href');
+            console.log('hrefValue: ', hrefValue);
+
+            // Hide all elements
+            document.getElementById('dashboardMatch').style.display = 'none';
+            document.getElementById('dashboardTournament').style.display = 'none';
+
+            // Show the element associated with the clicked link's href
+            const targetElement = document.getElementById(hrefValue.slice(1)); // Remove the leading '#'
+            console.log('targetElement: ', targetElement);
+            if (targetElement) {
+                targetElement.style.display = 'block';
+            }
+        });
+    });
+}
+
+// Initialize toggle functions
+paginationCharts('pagCharts');
+paginationDashboard('pagMatchTournament');
+
+
+
+/* DASHBOARD FOR PLAYER */
+// Button to go back to the player selection
+document.getElementById('btnCloseDashboardPlayer').addEventListener('click', function () {
+    document.getElementById('dashboardChoosePlayer').style.display = 'block';
+    document.getElementById('dashboardPlayer').style.display = 'none';
+});
+
+// Extract CSRF token from the HTML
+const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+
+function fetchPlayerDashboard(playerAlias) {
+    fetch('/dashboardPlayer/', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken  // Include the CSRF token here
+        },
+        body: JSON.stringify({ playerAlias: playerAlias })
+    })
+      .then(response => {
+        if (!response.ok) {
+          console.log('Network response was not ok');
+          // throw new Error('Network response was not ok');
+        }
+        return response.json(); // assuming the backend responds with JSON data
+      })
+      .then(data => {
+        // Process the retrieved data
+        console.log('[playerDashboard] Data received from backend: ', data);
+        playerDashboard(playerAlias, data);
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
+        // Handle errors here
+      });
+}
+
+function playerDashboard(playerAlias, data) {
+    document.getElementById('dashboardChoosePlayer').style.display = 'none';
+    document.getElementById('dashboardPlayer').style.display = 'block';
+
+}
+
+document.addEventListener('click', function (event) {
+    if (event.target && event.target.id === 'btnPlayerSelect') {
+        fetchPlayerDashboard(event.target.getAttribute('data-value'));
+    }
+});

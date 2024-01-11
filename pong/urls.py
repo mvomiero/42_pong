@@ -1,7 +1,7 @@
 # pong/urls.py
 
 from django.urls import path, include
-from pong.views import index, pong, dashboard, room, play_local, play_remote, pong_local, error_full, error_duplicate, error_disconnection, get_dashboard_data
+from pong.views import index, pong, dashboard, room, play_local, play_remote, pong_local, error_full, error_duplicate, error_disconnection, get_dashboard_data, get_dashboard_data_player
 
 urlpatterns = [
 	path('', index, name='index'),
@@ -17,6 +17,7 @@ urlpatterns = [
     path('error/duplicate/', error_duplicate, name='error_duplicate'),
     path('error/disconnection/', error_disconnection, name='error_disconnection'),
 
-    # NEW FOR CHARTS:
-	path('dashboard/', get_dashboard_data, name='dashboard-date')
+    # NEW FOR DASHBOARDS:
+	path('dashboard/', get_dashboard_data, name='dashboard-data'),
+    path('dashboardPlayer/', get_dashboard_data_player, name='dashboard-data-player')
 ]

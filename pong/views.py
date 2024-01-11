@@ -8,6 +8,7 @@ from django.db.models import Count, CharField, Sum, Max, F, Case, IntegerField, 
 from django.db.models.functions import ExtractWeekDay   # NEW FOR CHARTS (database query)
 from itertools import chain
 from collections import Counter
+import json
 
 def index(request):
 	return render(request, "pong/index.html")
@@ -226,3 +227,8 @@ def get_dashboard_data(request):
     }
     return JsonResponse(response_data)
 
+def get_dashboard_data_player(request):
+    playerAlias = json.loads(request.body.decode('utf-8')).get('playerAlias')
+    print(f'request: {playerAlias}')
+    # data_player = GameData.objects.filter(is_tournament_game=False)
+    return JsonResponse({"message": "Data received successfully"})
