@@ -118,12 +118,11 @@
                 </nav>
 
                 <!-- First row -->
-                <div class="row mb-5 text-start g-1" id="dashboardMatch">
+                <div class="row mb-5 text-start g-1" id="dashboardMatch" style='display: "";'>
                     <!-- First column with different widths for different screen sizes -->
                     <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-12 text-center mb-2">
                         <div class="card d-flex flex-column h-100">
                             <div class="card-body flex-fill">
-                                <h4 class="text-dark mb-0">Matches and Players per Day</h4>
                                 <canvas class="dashboardCanvas2" id="chart1" width="100%" height="80"></canvas>
                                 <canvas class="dashboardCanvas2" id="chart2" width="100%" height="80" style="display: none;"></canvas>
                             </div>
@@ -206,9 +205,110 @@
                                             <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
                                                 <i class="bi bi-clock display-3 display-md-4 display-lg-3 display-xl-2 display-xxl-2 dashboard-icon" ></i>
                                             </div>
+                                        </div>
                                         <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
                                             <h5 class="text-dark mb-0" id="highestPlayingTimeAlias">Loading...</h5>
                                             <p class="text-dark mb-0" id="highestPlayingTimeTime"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-5 text-start g-1" id="dashboardTournament" style="display: none;">
+                    <!-- First column with different widths for different screen sizes -->
+                    <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-12 text-center mb-2">
+                        <div class="card d-flex flex-column h-100">
+                            <div class="card-body flex-fill">
+                                <h4 class="text-dark mb-0">Matches and Players per Day</h4>
+                                <canvas class="dashboardCanvas2" id="tn-chart1" width="100%" height="80"></canvas>
+                                <canvas class="dashboardCanvas2" id="tn-chart2" width="100%" height="80" style="display: none;"></canvas>
+                            </div>
+                            <nav>
+                                <ul class="pagination justify-content-center" id="tn-pagCharts">
+                                    <li class="page-item"><a class="page-link" href="#chart1">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#chart2">2</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <!-- Second column with different widths for different screen sizes -->
+                    <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2">
+                        <!-- Content for the second column -->
+                        <div class="row mb-1 g-1 equal-height-row">
+                            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                                <!-- Content for the first column -->
+                                <div class="card d-flex flex-column h-100" id="tn-cardPlayerRegistrations">
+                                    <div class="card-body flex-fill">
+                                        <h5 class="text-dark mb-0">Loading...  </h5>
+                                        <p class="text-dark mb-0">Player registrations</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                                <!-- Content for the first column -->
+                                <div class="card d-flex flex-column h-100" id="tn-cardNbrMatches">
+                                    <div class="card-body flex-fill">
+                                        <h5 class="text-dark mb-0" id="tn-nbrMatches">Loading...</h5>
+                                        <p class="text-dark mb-0">Matches played</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-1 g-1 equal-height-row">
+                            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                                <!-- Content for the first column -->
+                                <div class="card d-flex flex-column h-100" id="tn-cardTotalMatchTime">
+                                    <div class="card-body flex-fill">
+                                        <h5 class="text-dark mb-0" id="tn-totalMatchTime">Loading...</h5>
+                                        <p class="text-dark mb-0">Total Match Time</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                                <!-- Content for the first column -->
+                                <div class="card d-flex flex-column h-100" id="tn-cardLongestMatch">
+                                    <div class="card-body flex-fill">
+                                        <h5 class="text-dark mb-0" id="tn-longestMatch">Loading...</h5>
+                                        <p class="text-dark mb-0">Longest Match</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-1 g-1 equal-height-row">
+                            <!-- Content for the first column -->
+                            <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="card d-flex flex-column h-100" id="tn-cardBestPlayer">
+                                    <div class="card-body flex-fill">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                                                <i class="bi bi-award-fill display-3 display-md-4 display-lg-3 display-xl-2 display-xxl-2 dashboard-icon"></i>
+                                            </div>
+                                            <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
+                                                <h5 class="text-dark mb-0" id="tn-bestPlayerAlias">Loading...</h5>
+                                                <p class="text-dark mb-0" id="tn-bestPlayerWins">.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-1 equal-height-row">
+                            <!-- Content for the first column -->
+                            <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="card d-flex flex-column h-100" id="tn-cardHeighestPlayingTime">
+                                    <div class="card-body flex-fill">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                                                <i class="bi bi-clock display-3 display-md-4 display-lg-3 display-xl-2 display-xxl-2 dashboard-icon" ></i>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
+                                            <h5 class="text-dark mb-0" id="tn-highestPlayingTimeAlias">Loading...</h5>
+                                            <p class="text-dark mb-0" id="tn-highestPlayingTimeTime"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -247,14 +347,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card d-flex flex-column h-100">
-                            <div class="card-body flex-fill">
-                                <h5 class="text-dark mb-0">Second Column (4/12 on xxl, xl, lg, md | 12/12 on sm)</h5>
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
+            
             </div>
         </section>
         <!-- Team-->
@@ -400,6 +494,10 @@
         <script type="text/javascript" src ="{% static 'js/webSocket.js' %}"></script>
         
         <!-- Dashboard -->
+        <script type="text/javascript" src ="{% static 'js_dashboard/fetchData.js' %}"></script>
+        <script type="text/javascript" src ="{% static 'js_dashboard/drawCharts.js' %}"></script>
+        <script type="text/javascript" src ="{% static 'js_dashboard/updateCards.js' %}"></script>
+        <script type="text/javascript" src ="{% static 'js_dashboard/pagination.js' %}"></script>
         <script type="text/javascript" src ="{% static 'js_dashboard/dashboard.js' %}"></script>
     </body>
 </html>

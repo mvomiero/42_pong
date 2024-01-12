@@ -207,11 +207,6 @@ def get_dashboard_data(request):
         }
     }
 
-    """ Create a list of all players """
-    allPlayers = list(set(chain(game_data.values_list('player1_name', flat=True).distinct(), 
-                                game_data.values_list('player2_name', flat=True).distinct())))
-    print(f'allPlayers={allPlayers}')
-
     # Prepare the response and return it as JSON
     response_data = {
         'chart1': chart_data,
@@ -223,10 +218,26 @@ def get_dashboard_data(request):
             'bestPlayer': bestPlayer,
             'highestTimePlayer': highest_time_player
         },
+    }
+    return JsonResponse(response_data)
+
+# GET request for list of all players
+def get_dashboardPlayer_list(request):
+    # Data for NON tournament games
+    db_data = GameData.objects
+
+    # Create a list of all players
+    allPlayers = list(set(chain(db_data.values_list('player1_name', flat=True).distinct(), 
+                                db_data.values_list('player2_name', flat=True).distinct())))
+    print(f'allPlayers={allPlayers}')
+    
+    # Prepare the response and return it as JSON
+    response_data = {
         'playerList': allPlayers
     }
     return JsonResponse(response_data)
 
+# POST request for player specific dashboard
 def get_dashboard_data_player(request):
     playerAlias = json.loads(request.body.decode('utf-8')).get('playerAlias')
     print(f'request: {playerAlias}')
