@@ -26,8 +26,36 @@ function fetchMatchDashboard() {
         // Draw charts
         drawChart1(data.chart1);
 
-/*         // Initialize DataTable
-        initializeDataTable(data.playerList); */
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
+        // Handle errors here
+      });
+}
+
+/***************************************************/
+/*********** DASHBOARD FOR TOURNAMENTS *************/
+/***************************************************/
+
+function fetchTournamentDashboard() {
+    fetch('/dashboardTournaments', { method: 'GET', credentials: 'same-origin' }) // or specify 'same-origin' or 'include' for credentials
+      .then(response => {
+        if (!response.ok) {
+          console.log('Network response was not ok');
+          // throw new Error('Network response was not ok');
+        }
+        return response.json(); // assuming the backend responds with JSON data
+      })
+      .then(data => {
+        // Process the retrieved data
+        console.log('Data received from backend: ', data);
+        
+        // Update cards
+        updateCardsTournament(data.cards);
+
+        // Draw charts
+        //drawChart1(data.chart1);
+
       })
       .catch(error => {
         console.error('Fetch error:', error);

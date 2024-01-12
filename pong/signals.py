@@ -70,12 +70,22 @@ def generate_random_tournament(database_end, time_diff, size_TournamentData):
     finalMatch['players'][0] = semiMatch1['players'][0] if semiMatch1['score'][0] > semiMatch1['score'][1] else semiMatch1['players'][1]
     finalMatch['players'][1] = semiMatch2['players'][0] if semiMatch2['score'][0] > semiMatch2['score'][1] else semiMatch2['players'][1]
     
-    # set the players and the end time and duration of the tournament
-    players = [semiMatch1['players'][0], semiMatch1['players'][1], semiMatch2['players'][0], semiMatch2['players'][1]]
+    # set the players rank
+    playersRank = []
+    if finalMatch['score'][0] > finalMatch['score'][1]:
+        playersRank.append(finalMatch['players'][0])
+        playersRank.append(finalMatch['players'][1])
+    else:
+        playersRank.append(finalMatch['players'][1])
+        playersRank.append(finalMatch['players'][0])
+    playersRank.append(semiMatch1['players'][0]) if semiMatch1['score'][0] > semiMatch1['score'][1] else playersRank.append(semiMatch1['players'][1])
+    playersRank.append(semiMatch2['players'][0]) if semiMatch2['score'][0] > semiMatch2['score'][1] else playersRank.append(semiMatch2['players'][1])
+    
+    # set the end time and duration of the tournament
     tdur = finalMatch['endTime'] - min(semiMatch1['startTime'], semiMatch2['startTime'])
     tend = datetime.fromtimestamp(finalMatch['endTime'])
 
-    return semiMatch1, semiMatch2, finalMatch, players, tend, tdur
+    return semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur
 
 
 def match_to_list(p1n, p1s, p2n, p2s, gend, gdur, itg):

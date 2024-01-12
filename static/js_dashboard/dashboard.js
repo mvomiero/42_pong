@@ -1,22 +1,10 @@
 
-/***************************************************/
-/**************** GET CSS VARIABLES ****************/
-/***************************************************/
-
-const rootStyles = getComputedStyle(document.documentElement);
-bs_primary = rootStyles.getPropertyValue('--bs-primary');
-bs_secondary = rootStyles.getPropertyValue('--bs-secondary');
-bs_white = rootStyles.getPropertyValue('--bs-white');
-bs_darkGrey = rootStyles.getPropertyValue('--bs-gray-900');
-bs_lightGrey = rootStyles.getPropertyValue('--bs-gray-750');
-bs_dark = rootStyles.getPropertyValue('--bs-dark');
-bs_fontFamily = rootStyles.getPropertyValue('--bs-font-charts');
-
 
 /***************************************************/
 /**************** INITIALATION DATA ****************/
 /***************************************************/
 fetchMatchDashboard();
+fetchTournamentDashboard();
 fetchPlayerDashboardList();
 
 

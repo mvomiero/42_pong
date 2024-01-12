@@ -63,6 +63,7 @@
                 <a class="btn btn-primary btn-xl" href="#game">Play Pong</a>
             </div>
         </header>
+        
         <!-- Pong Game-->
         <section class="content-section bg-light" id="game">
             <div class="container px-4 px-lg-5 text-center">
@@ -117,7 +118,7 @@
                     </ul>
                 </nav>
 
-                <!-- First row -->
+                <!-- First row (Matches) -->
                 <div class="row mb-5 text-start g-1" id="dashboardMatch" style='display: "";'>
                     <!-- First column with different widths for different screen sizes -->
                     <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-12 text-center mb-2">
@@ -143,8 +144,8 @@
                                 <!-- Content for the first column -->
                                 <div class="card d-flex flex-column h-100" id="cardPlayerRegistrations">
                                     <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="playerRegistrations">Loading...  </h5>
-                                        <p class="text-dark mb-0">Player registrations</p>
+                                        <h5 class="text-dark mb-0" id="ma-playerRegistrations">Loading...  </h5>
+                                        <p class="text-dark mb-0">different Players participated</p>
                                     </div>
                                 </div>
                             </div>
@@ -152,7 +153,7 @@
                                 <!-- Content for the first column -->
                                 <div class="card d-flex flex-column h-100" id="cardNbrMatches">
                                     <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="nbrMatches">Loading...</h5>
+                                        <h5 class="text-dark mb-0" id="ma-nbrPlayed">Loading...</h5>
                                         <p class="text-dark mb-0">Matches played</p>
                                     </div>
                                 </div>
@@ -163,7 +164,7 @@
                                 <!-- Content for the first column -->
                                 <div class="card d-flex flex-column h-100" id="cardTotalMatchTime">
                                     <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="totalMatchTime">Loading...</h5>
+                                        <h5 class="text-dark mb-0" id="ma-totalTime">Loading...</h5>
                                         <p class="text-dark mb-0">Total Match Time</p>
                                     </div>
                                 </div>
@@ -172,7 +173,7 @@
                                 <!-- Content for the first column -->
                                 <div class="card d-flex flex-column h-100" id="cardLongestMatch">
                                     <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="longestMatch">Loading...</h5>
+                                        <h5 class="text-dark mb-0" id="ma-longest">Loading...</h5>
                                         <p class="text-dark mb-0">Longest Match</p>
                                     </div>
                                 </div>
@@ -188,8 +189,8 @@
                                                 <i class="bi bi-award-fill display-3 display-md-4 display-lg-3 display-xl-2 display-xxl-2 dashboard-icon"></i>
                                             </div>
                                             <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
-                                                <h5 class="text-dark mb-0" id="bestPlayerAlias">Loading...</h5>
-                                                <p class="text-dark mb-0" id="bestPlayerWins">.</p>
+                                                <h5 class="text-dark mb-0" id="ma-bestPlayerAlias">Loading...</h5>
+                                                <p class="text-dark mb-0" id="ma-bestPlayerWins">.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -205,10 +206,10 @@
                                             <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
                                                 <i class="bi bi-clock display-3 display-md-4 display-lg-3 display-xl-2 display-xxl-2 dashboard-icon" ></i>
                                             </div>
-                                        </div>
-                                        <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
-                                            <h5 class="text-dark mb-0" id="highestPlayingTimeAlias">Loading...</h5>
-                                            <p class="text-dark mb-0" id="highestPlayingTimeTime"></p>
+                                            <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
+                                                <h5 class="text-dark mb-0" id="ma-highestPlayingTimeAlias">Loading...</h5>
+                                                <p class="text-dark mb-0" id="ma-highestPlayingTimeTime"></p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -216,7 +217,7 @@
                         </div>
                     </div>
                 </div>
-                
+                <!-- First row (Tournaments) -->
                 <div class="row mb-5 text-start g-1" id="dashboardTournament" style="display: none;">
                     <!-- First column with different widths for different screen sizes -->
                     <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-12 text-center mb-2">
@@ -241,19 +242,19 @@
                         <div class="row mb-1 g-1 equal-height-row">
                             <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                 <!-- Content for the first column -->
-                                <div class="card d-flex flex-column h-100" id="tn-cardPlayerRegistrations">
+                                <div class="card d-flex flex-column h-100" id="cardPlayerRegistrations">
                                     <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0">Loading...  </h5>
-                                        <p class="text-dark mb-0">Player registrations</p>
+                                        <h5 class="text-dark mb-0" id="tn-playerRegistrations">Loading...  </h5>
+                                        <p class="text-dark mb-0">different Players participated</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                 <!-- Content for the first column -->
-                                <div class="card d-flex flex-column h-100" id="tn-cardNbrMatches">
+                                <div class="card d-flex flex-column h-100" id="cardNbrMatches">
                                     <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="tn-nbrMatches">Loading...</h5>
-                                        <p class="text-dark mb-0">Matches played</p>
+                                        <h5 class="text-dark mb-0" id="tn-nbrPlayed">Loading...</h5>
+                                        <p class="text-dark mb-0">Tournaments played</p>
                                     </div>
                                 </div>
                             </div>
@@ -261,19 +262,19 @@
                         <div class="row mb-1 g-1 equal-height-row">
                             <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                 <!-- Content for the first column -->
-                                <div class="card d-flex flex-column h-100" id="tn-cardTotalMatchTime">
+                                <div class="card d-flex flex-column h-100" id="cardTotalMatchTime">
                                     <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="tn-totalMatchTime">Loading...</h5>
-                                        <p class="text-dark mb-0">Total Match Time</p>
+                                        <h5 class="text-dark mb-0" id="tn-totalTime">Loading...</h5>
+                                        <p class="text-dark mb-0">Total Tournament Time</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                 <!-- Content for the first column -->
-                                <div class="card d-flex flex-column h-100" id="tn-cardLongestMatch">
+                                <div class="card d-flex flex-column h-100" id="cardLongestMatch">
                                     <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="tn-longestMatch">Loading...</h5>
-                                        <p class="text-dark mb-0">Longest Match</p>
+                                        <h5 class="text-dark mb-0" id="tn-longest">Loading...</h5>
+                                        <p class="text-dark mb-0">Longest Tournament</p>
                                     </div>
                                 </div>
                             </div>
@@ -281,7 +282,7 @@
                         <div class="row mb-1 g-1 equal-height-row">
                             <!-- Content for the first column -->
                             <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
-                                <div class="card d-flex flex-column h-100" id="tn-cardBestPlayer">
+                                <div class="card d-flex flex-column h-100" id="cardBestPlayer">
                                     <div class="card-body flex-fill">
                                         <div class="d-flex align-items-center mb-3">
                                             <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
@@ -299,16 +300,16 @@
                         <div class="row g-1 equal-height-row">
                             <!-- Content for the first column -->
                             <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
-                                <div class="card d-flex flex-column h-100" id="tn-cardHeighestPlayingTime">
+                                <div class="card d-flex flex-column h-100" id="cardHeighestPlayingTime">
                                     <div class="card-body flex-fill">
                                         <div class="d-flex align-items-center mb-3">
                                             <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
                                                 <i class="bi bi-clock display-3 display-md-4 display-lg-3 display-xl-2 display-xxl-2 dashboard-icon" ></i>
                                             </div>
-                                        </div>
-                                        <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
-                                            <h5 class="text-dark mb-0" id="tn-highestPlayingTimeAlias">Loading...</h5>
-                                            <p class="text-dark mb-0" id="tn-highestPlayingTimeTime"></p>
+                                            <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
+                                                <h5 class="text-dark mb-0" id="tn-highestPlayingTimeAlias">Loading...</h5>
+                                                <p class="text-dark mb-0" id="tn-highestPlayingTimeTime"></p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -351,6 +352,7 @@
             
             </div>
         </section>
+
         <!-- Team-->
         <section class="callout" id="team">
             <div class="container px-4 px-lg-5 text-center">
@@ -403,6 +405,7 @@
                 </a>
             </div>
         </section>
+        
         <!-- Portfolio-->
         <section class="content-section" id="portfolio">
             <div class="container px-4 px-lg-5">
@@ -458,6 +461,7 @@
                 </div>
             </div>
         </section>
+        
         <!-- Call to Action-->
         <section class="content-section bg-primary text-white">
             <div class="container px-4 px-lg-5 text-center">

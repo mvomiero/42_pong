@@ -71,6 +71,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'group_name':  ['tournament_1'],
                     #     'startTime':   <timestamp>,
                     #     'endTime':     None,          # None if not started yet
+                    #     'playersRank': ['player3', 'player1', 'player2', 'player4'],
                     # },
                     # 'id2': {
                     #     'players':     ['player5', 'player6'],
@@ -79,6 +80,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'group_name':  ['tournament_2'],
                     #     'startTime':   <timestamp>,
                     #     'endTime':     <timestamp>,
+                    #     'playersRank': [None, None, None, None],
                     # },
 
 
@@ -366,11 +368,11 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         semiMatch1 = self.set_matches[tournament['matchesSemi'][0]]
         semiMatch2 = self.set_matches[tournament['matchesSemi'][1]]
         finalMatch = self.set_matches[tournament['matchFinal']]
-        players = tournament['players']
+        playersRank = tournament['playersRank']
         tdur = tournament['endTime'] - tournament['startTime']
         tend = datetime.fromtimestamp(tournament['endTime'])
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, lambda: add_tournament_data(semiMatch1, semiMatch2, finalMatch, players, tend, tdur))
+        await loop.run_in_executor(None, lambda: add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur))
 
 
     """ Delete a player from connected_users and close connection """
@@ -516,7 +518,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
             # [match_info for Final]
             elif self.match_id == tournament['matchFinal']:
-                finalRank = await self.get_finalRankTournament(self.tournament_id)
+                self.set_tournaments[self.tournament_id]['playersRank'] = await self.get_finalRankTournament(self.tournament_id)
                 self.match_id = None
                 self.discard_playerFromGroup(self.group_name_match)
                 self.group_name_match = None

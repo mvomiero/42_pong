@@ -97,7 +97,7 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     games (e.g. match['endTime']) = floating point number / POSIX timestamp (e.g. time.time())
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
-def add_tournament_data(semiMatch1, semiMatch2, finalMatch, players, tend, tdur):
+def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur):
     gend = datetime.fromtimestamp(semiMatch1['endTime'])
     gdur = semiMatch1['endTime'] - semiMatch1['startTime']
     matchIdSemi1 = add_game_data(semiMatch1['players'][0], semiMatch1['score'][0], semiMatch1['players'][1], semiMatch1['score'][1], gend, gdur, True)
@@ -114,12 +114,15 @@ def add_tournament_data(semiMatch1, semiMatch2, finalMatch, players, tend, tdur)
         match_id_final=matchIdFinal,
         tournament_end_timestamp=tend,
         tournament_duration_secs=tdur,
+        player_ranking = playersRank
     )
     tournament_data.save()
 
 
 # NEW FOR DASHBOARD:
-def get_dashboard_data(request):
+    
+# GET request for dashboard 'Match' data
+def get_dashboardMatch_data(request):
     # Data for NON tournament games
     game_data = GameData.objects.filter(is_tournament_game=False)
 
@@ -148,10 +151,8 @@ def get_dashboard_data(request):
     player1_names = game_data.values_list('player1_name', flat=True).distinct()
     player2_names = game_data.values_list('player2_name', flat=True).distinct()
     nbr_unique_players = len(list(set(chain(player1_names, player2_names))))
-    print(f'nbr_unique_players={nbr_unique_players}')
     
     nbr_matches = game_data.count()
-    print(f'nbr_matches={nbr_matches}')
 
     match_time = game_data.aggregate(total_match_time=Sum('game_duration_secs')).get('total_match_time', 0)
     total_match_time = {
@@ -183,12 +184,12 @@ def get_dashboard_data(request):
     """ Player with highest play time """
     # Aggregate the total playing time for player1_name and player2_name and combine the datasets
     player1_total_time = (
-        GameData.objects
+        game_data
         .values('player1_name')
         .annotate(total_time=Sum('game_duration_secs'))
     )
     player2_total_time = (
-        GameData.objects
+        game_data
         .values('player2_name')
         .annotate(total_time=Sum('game_duration_secs'))
     )
@@ -221,6 +222,111 @@ def get_dashboard_data(request):
     }
     return JsonResponse(response_data)
 
+
+# GET request for dashboard 'Tournament' data
+def get_dashboardTournament_data(request):
+    # Data for tournament games
+    game_data = GameData.objects.filter(is_tournament_game=True)
+    tournament_data = TournamentData.objects
+
+    """ Data for the Cards (Tournaments) """
+    # "different Players participated"
+    players_query = tournament_data.values_list('player_ranking', flat=True)
+    all_players = [player for sublist in players_query for player in sublist]
+    print(f'all_players={all_players}')
+    players = len(list(set(all_players)))
+    print(f'nbr_unique_players={players}')
+
+    player1_names = game_data.values_list('player1_name', flat=True).distinct()
+    player2_names = game_data.values_list('player2_name', flat=True).distinct()
+    print(f'player1_names={player1_names}')
+    print(f'player2_names={player2_names}')
+    nbr_unique_players = len(list(set(chain(player1_names, player2_names))))
+    print(f'nbr_unique_players={nbr_unique_players}')
+    
+    # "Tournaments played"
+    nbr_tournaments = tournament_data.count()
+    print(f'nbr_tournaments={nbr_tournaments}')
+
+    # "Total Tournament Time"
+    match_time = tournament_data.aggregate(total_match_time=Sum('tournament_duration_secs')).get('total_match_time', 0)
+    total_tournament_time = {
+        'hours': match_time // 3600,
+        'minutes': (match_time % 3600) // 60,
+        'seconds': (match_time % 3600) % 60
+    }
+
+    # "Longest Tournament"
+    single_match_time = tournament_data.aggregate(longest_match_time=Max('tournament_duration_secs')).get('longest_match_time', 0)
+    longest_tournament_time = {
+        'minutes': single_match_time // 60,
+        'seconds': single_match_time % 60
+    }
+
+    # "Player with most wins"
+    finals_tournament = tournament_data.values_list('match_id_final', flat=True)
+    print(f'finals_tournament={finals_tournament}')
+    finals_games = game_data.filter(id__in=finals_tournament)
+    print(f'finals_games={finals_games}')
+
+    winner_names = finals_games.annotate(
+        winner_name=Case(
+            When(player1_points=11, then=F('player1_name')),
+            When(player2_points=11, then=F('player2_name')),
+            output_field=CharField(),
+        )
+    ).values_list('winner_name', flat=True)
+    print(f'winner_names={winner_names}')
+
+    succ_player = Counter(winner_names).most_common(1)
+    print(f'succ_player={succ_player}')
+    bestPlayer = {
+        'alias': succ_player[0][0],
+        'wins': succ_player[0][1]
+    }
+
+    # "Player with highest play time"
+    # Aggregate the total playing time for player1_name and player2_name and combine the datasets
+    player1_total_time = (
+        game_data
+        .values('player1_name')
+        .annotate(total_time=Sum('game_duration_secs'))
+    )
+    player2_total_time = (
+        game_data
+        .values('player2_name')
+        .annotate(total_time=Sum('game_duration_secs'))
+    )
+    combined_data = list(player1_total_time) + list(player2_total_time)
+    
+    # Merge the durations for each player
+    player_durations = {}
+    for data in combined_data:
+        player_name = data['player1_name'] if 'player1_name' in data else data['player2_name']
+        player_durations[player_name] = player_durations.get(player_name, 0) + data['total_time']
+    highest_time_player = {
+        'alias': max(player_durations, key=player_durations.get),
+        'time': {
+            'minutes': player_durations[max(player_durations, key=player_durations.get)] // 60,
+            'seconds': player_durations[max(player_durations, key=player_durations.get)] % 60
+        }
+    }
+
+    # Prepare the response and return it as JSON
+    response_data = {
+        #'chart1': chart_data,
+        'cards': {
+            'uniquePlayers': nbr_unique_players,
+            'nbrMatches': nbr_tournaments,
+            'totalMatchTime': total_tournament_time,
+            'longestMatchTime': longest_tournament_time,
+            'bestPlayer': bestPlayer,
+            'highestTimePlayer': highest_time_player
+        },
+    }
+    return JsonResponse(response_data)
+
+
 # GET request for list of all players
 def get_dashboardPlayer_list(request):
     # Data for NON tournament games
@@ -229,13 +335,13 @@ def get_dashboardPlayer_list(request):
     # Create a list of all players
     allPlayers = list(set(chain(db_data.values_list('player1_name', flat=True).distinct(), 
                                 db_data.values_list('player2_name', flat=True).distinct())))
-    print(f'allPlayers={allPlayers}')
     
     # Prepare the response and return it as JSON
     response_data = {
         'playerList': allPlayers
     }
     return JsonResponse(response_data)
+
 
 # POST request for player specific dashboard
 def get_dashboard_data_player(request):

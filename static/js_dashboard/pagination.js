@@ -31,18 +31,18 @@ function paginationDashboard(paginationId) {
         link.addEventListener('click', function (event) {
             event.preventDefault();
 
-            // Retrieve the href value from the clicked link
-            const hrefValue = this.getAttribute('href');
-            console.log('hrefValue: ', hrefValue);
-
-            // Hide all elements
-            document.getElementById('dashboardMatch').style.display = 'none';
-            document.getElementById('dashboardTournament').style.display = 'none';
+            // Retrieve the href value and targetElement from the clicked link
+            const hrefValue = this.getAttribute('href').slice(1);    // Remove the leading '#'
+            const targetElement = document.getElementById(hrefValue);
+            console.log('targetElement: ', targetElement);
 
             // Show the element associated with the clicked link's href
-            const targetElement = document.getElementById(hrefValue.slice(1)); // Remove the leading '#'
-            console.log('targetElement: ', targetElement);
-            if (targetElement) {
+            if (targetElement && hrefValue === 'dashboardMatch') {
+                document.getElementById('dashboardTournament').style.display = 'none';
+                targetElement.style.display = "";
+            }
+            else if (targetElement && hrefValue === 'dashboardTournament') {
+                document.getElementById('dashboardMatch').style.display = 'none';
                 targetElement.style.display = "";
             }
         });
