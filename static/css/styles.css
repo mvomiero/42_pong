@@ -35,8 +35,8 @@
   --bs-gray-750: #424649;
   --bs-gray-800: #343a40;
   --bs-gray-900: #212529;
-  --bs-primary: #1D809F;
-  --bs-secondary: #ecb807;
+  --bs-primary: #1c00f0;
+  --bs-secondary: #ca4000;
   --bs-success: #198754;
   --bs-info: #0dcaf0;
   --bs-warning: #ecb807;
@@ -11082,7 +11082,7 @@ footer.footer .social-link:hover {
   height: auto;
   padding-top: 8rem;
   padding-bottom: 8rem;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%), url("../assets/img/landscape.png");
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%), url("../assets/img/landscape.png"), url("../assets/img/galaxy.jpg");
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
