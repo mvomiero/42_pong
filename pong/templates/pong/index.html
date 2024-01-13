@@ -17,6 +17,8 @@
         <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
         <!-- STYLE: added font family -->
         <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,700&display=swap" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Press+Start+2P:300,400,700&display=swap" rel="stylesheet" type="text/css" />
+
 
         
         <!-- Include Chart.js library -->
@@ -35,6 +37,7 @@
 
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+        <link href="{% static 'css/styles_vaporwave.css' %}" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     </head>
     <body id="page-top">
@@ -42,7 +45,7 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
             <div class="container">
-                <a class="navbar-brand" href="#page-top"><img src="{% static 'assets/ultimate-pong.svg' %}" alt="..." style="height: 1.5em; fill: white;" /></a>
+                <a class="navbar-brand" href="#page-top"><img src="{% static 'assets/icon.svg' %}" alt="..." class="icon-svg" /></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     Menu
                     <i class="fas fa-bars ms-1"></i>
@@ -61,8 +64,9 @@
         <!-- Header-->
         <header class="masthead d-flex align-items-center">
             <div class="container px-4 px-lg-5 text-center">
-                <h1 class="mb-1">Ultimate Pong</h1>
-                <h3 class="mb-5"><em>A free Pong Game with nice Stats.</em></h3>
+                <a class="navbar-brand"><img src="{% static 'assets/title.svg' %}" alt="..." class="title-svg" /></a>
+                <!-- <h1 class="mb-1">Ultimate Pong</h1> -->
+                <h3 class="lead mb-5">A free Pong Game with nice Stats.</h3>
                 <a class="btn btn-primary btn-xl" href="#game">Play Pong</a>
             </div>
         </header>

@@ -63,7 +63,7 @@
   --bs-body-font-size: 1rem;
   --bs-body-font-weight: 400;
   --bs-body-line-height: 1.5;
-  --bs-body-color: #212529;
+  --bs-body-color: #cbcbcb;
   --bs-body-bg: #280247;
   --bs-border-width: 1px;
   --bs-border-style: solid;
@@ -7714,7 +7714,8 @@ form-control
 }
 
 .mb-1 {
-  margin-bottom: 0.25rem !important;
+  margin-bottom: 4rem !important;
+  /* font-family: 'Press Start 2P', cursive !important; */
 }
 
 .mb-2 {
@@ -11072,6 +11073,7 @@ footer.footer .social-link:hover {
     height: 75%;
   }
 }
+
 .masthead {
   min-height: 30rem;
   position: relative;
@@ -11080,7 +11082,7 @@ footer.footer .social-link:hover {
   height: auto;
   padding-top: 8rem;
   padding-bottom: 8rem;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%), url("../assets/img/cloud.png");
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%), url("../assets/img/landscape.png");
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
