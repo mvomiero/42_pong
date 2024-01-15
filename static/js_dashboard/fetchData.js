@@ -112,8 +112,9 @@ function fetchPlayerDashboard(playerAlias) {
         // Process the retrieved data
         console.log('[playerDashboard] Data received from backend: ', data);
         
-        // initialize player specific dashboard
-        playerDashboard(playerAlias, data);
+        initializePlayerCards(data.cards);
+        drawPiePlayers(data.pieWin);//, 'chartPiePlayer1', bs_success);
+        
       })
       .catch(error => {
         console.error('Fetch error:', error);

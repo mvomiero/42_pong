@@ -4,7 +4,7 @@ import time
 import pytz
 from datetime import datetime
 from django.http import JsonResponse    # NEW FOR CHARTS (http response)
-from django.db.models import Count, CharField, Sum, Max, F, Case, IntegerField, Value, When  # NEW FOR CHARTS (database query)
+from django.db.models import Count, CharField, Sum, Max, Q, F, Case, IntegerField, Value, When  # NEW FOR CHARTS (database query)
 from django.db.models.functions import ExtractWeekDay   # NEW FOR CHARTS (database query)
 from itertools import chain
 from collections import Counter
@@ -226,24 +226,16 @@ def get_dashboardMatch_data(request):
 # GET request for dashboard 'Tournament' data
 def get_dashboardTournament_data(request):
     # Data for tournament games
-    game_data = GameData.objects.filter(is_tournament_game=True)
-    tournament_data = TournamentData.objects
+    game_data = GameData.objects.all().filter(is_tournament_game=True)
+    tournament_data = TournamentData.objects.all()
 
     """ Data for the Cards (Tournaments) """
     # "different Players participated"
     players_query = tournament_data.values_list('player_ranking', flat=True)
     all_players = [player for sublist in players_query for player in sublist]
-    print(f'all_players={all_players}')
-    players = len(list(set(all_players)))
-    print(f'nbr_unique_players={players}')
+    # print(f'all_players={all_players}')
+    nbr_unique_players = len(list(set(all_players)))
 
-    player1_names = game_data.values_list('player1_name', flat=True).distinct()
-    player2_names = game_data.values_list('player2_name', flat=True).distinct()
-    print(f'player1_names={player1_names}')
-    print(f'player2_names={player2_names}')
-    nbr_unique_players = len(list(set(chain(player1_names, player2_names))))
-    print(f'nbr_unique_players={nbr_unique_players}')
-    
     # "Tournaments played"
     nbr_tournaments = tournament_data.count()
     print(f'nbr_tournaments={nbr_tournaments}')
@@ -264,51 +256,31 @@ def get_dashboardTournament_data(request):
     }
 
     # "Player with most wins"
-    finals_tournament = tournament_data.values_list('match_id_final', flat=True)
-    print(f'finals_tournament={finals_tournament}')
-    finals_games = game_data.filter(id__in=finals_tournament)
-    print(f'finals_games={finals_games}')
-
-    winner_names = finals_games.annotate(
-        winner_name=Case(
-            When(player1_points=11, then=F('player1_name')),
-            When(player2_points=11, then=F('player2_name')),
-            output_field=CharField(),
-        )
-    ).values_list('winner_name', flat=True)
-    print(f'winner_names={winner_names}')
-
-    succ_player = Counter(winner_names).most_common(1)
-    print(f'succ_player={succ_player}')
+    first_players = [players[0] for players in tournament_data.values_list('player_ranking', flat=True)]
+    player_counts = Counter(first_players).most_common(1)[0]
     bestPlayer = {
-        'alias': succ_player[0][0],
-        'wins': succ_player[0][1]
+        'alias': player_counts[0],
+        'wins': player_counts[1]
     }
 
     # "Player with highest play time"
-    # Aggregate the total playing time for player1_name and player2_name and combine the datasets
-    player1_total_time = (
-        game_data
-        .values('player1_name')
-        .annotate(total_time=Sum('game_duration_secs'))
+    aggreagted_duration = (
+        tournament_data
+        .values('player_ranking')
+        .annotate(total_time=F('tournament_duration_secs'))
     )
-    player2_total_time = (
-        game_data
-        .values('player2_name')
-        .annotate(total_time=Sum('game_duration_secs'))
-    )
-    combined_data = list(player1_total_time) + list(player2_total_time)
-    
-    # Merge the durations for each player
-    player_durations = {}
-    for data in combined_data:
-        player_name = data['player1_name'] if 'player1_name' in data else data['player2_name']
-        player_durations[player_name] = player_durations.get(player_name, 0) + data['total_time']
+    player_duration = {}
+    for data in aggreagted_duration:
+        for player in data['player_ranking']:
+            player_duration[player] = player_duration.get(player, 0) + data['total_time']
+    max_player = max(player_duration, key=player_duration.get)
+    print(f'max_player={max_player}')
+
     highest_time_player = {
-        'alias': max(player_durations, key=player_durations.get),
+        'alias': max(player_duration, key=player_duration.get),
         'time': {
-            'minutes': player_durations[max(player_durations, key=player_durations.get)] // 60,
-            'seconds': player_durations[max(player_durations, key=player_durations.get)] % 60
+            'minutes': player_duration[max(player_duration, key=player_duration.get)] // 60,
+            'seconds': player_duration[max(player_duration, key=player_duration.get)] % 60
         }
     }
 
@@ -345,7 +317,120 @@ def get_dashboardPlayer_list(request):
 
 # POST request for player specific dashboard
 def get_dashboard_data_player(request):
+    # Retrieve player alias from POST request
     playerAlias = json.loads(request.body.decode('utf-8')).get('playerAlias')
-    print(f'request: {playerAlias}')
-    # data_player = GameData.objects.filter(is_tournament_game=False)
-    return JsonResponse({"message": "Data received successfully"})
+    print(f'playerAlias={playerAlias}')
+
+    # Data for player
+    player_matches = GameData.objects.filter(Q(player1_name=playerAlias) | Q(player2_name=playerAlias))
+    print(f'player_matches={player_matches}')
+    player_tournaments = TournamentData.objects.filter(Q(player_ranking__icontains=[playerAlias]))
+    print(f'player_tournaments={player_tournaments}')
+    
+
+    """ Data for the Chart """
+    player_wins = player_matches.annotate(
+        winner_name=Case(
+            When(player1_points=11, then=F('player1_name')),
+            When(player2_points=11, then=F('player2_name')),
+            output_field=CharField(),
+        )
+    ).values_list('winner_name', flat=True)
+    nbr_wins = player_wins.filter(winner_name=playerAlias).count()
+    nbr_losses = player_wins.exclude(winner_name=playerAlias).count()
+
+    percentage_wins = nbr_wins / player_matches.count() * 100
+    percentage_losses = nbr_losses / player_matches.count() * 100
+
+    chart_pieWin = {
+        'Wins': percentage_wins, 
+        'Losses': percentage_losses,
+    }
+    chart_pieLoss = [percentage_losses, percentage_wins]
+
+    """ Data for Tournament Ranks """
+    tournament_ranks = {
+        'first': TournamentData.objects.filter(player_ranking__0=playerAlias).count(),
+        'second': TournamentData.objects.filter(player_ranking__1=playerAlias).count(),
+        'third': TournamentData.objects.filter(player_ranking__2=playerAlias).count(),
+        'fourth': TournamentData.objects.filter(player_ranking__3=playerAlias).count(),
+        'finals': TournamentData.objects.filter(Q(player_ranking__0=playerAlias) | Q(player_ranking__1=playerAlias)).count(),
+    }
+
+    """ Data for number of matches """
+    nbr_matches = player_matches.count()
+
+    """ Data for average points """
+    totalPoints = (
+        player_matches
+        .aggregate(
+            total_points=Sum(
+                Case(
+                    When(player1_name=playerAlias, then=F('player1_points')),
+                    When(player2_name=playerAlias, then=F('player2_points')),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            )
+        )
+    )['total_points']
+    avg_points = totalPoints / player_matches.count()
+
+    """ Data for number of perfect matches """
+    nbr_perfect_matches = player_matches.filter(
+        Q(player1_points=11, player2_points=0, player1_name=playerAlias) | Q(player1_points=0, player2_points=11, player2_name=playerAlias)
+    ).count()
+
+    """ Data for number of tournaments """
+    nbr_tournaments = player_tournaments.count()
+
+    """ Data for longest match """
+    longest_game = GameData.objects.order_by('-game_duration_secs').first()
+    print(f'longest_duration_game={longest_game}')
+    longest_match = {}
+    if longest_game:
+        longest_match = {
+            'oponent': longest_game.player1_name if longest_game.player1_name != playerAlias else longest_game.player2_name,
+            'duration': {
+                'minutes': longest_game.game_duration_secs // 60,
+                'seconds': longest_game.game_duration_secs % 60
+            },
+            'score': {
+                'player': longest_game.player1_points if longest_game.player1_name == playerAlias else longest_game.player2_points,
+                'oponent': longest_game.player2_points if longest_game.player1_name == playerAlias else longest_game.player1_points,
+            }
+        }
+
+    """ Data for shortest match """
+    shortest_game = GameData.objects.order_by('-game_duration_secs').last()
+    shortest_match = {}
+    if shortest_game:
+        shortest_match = {
+            'oponent': shortest_game.player1_name if shortest_game.player1_name != playerAlias else shortest_game.player2_name,
+            'duration': {
+                'minutes': shortest_game.game_duration_secs // 60,
+                'seconds': shortest_game.game_duration_secs % 60
+            },
+            'score': {
+                'player': shortest_game.player1_points if shortest_game.player1_name == playerAlias else shortest_game.player2_points,
+                'oponent': shortest_game.player2_points if shortest_game.player1_name == playerAlias else shortest_game.player1_points,
+            }
+        }
+
+    # Prepare the response and return it as JSON
+    response_data = {
+        'pieWin': chart_pieWin,
+        'pieLoss': chart_pieLoss,
+        'cards': {
+            'nbrWins': nbr_wins,
+            'tournamentRanks': tournament_ranks,
+            'nbrMatches': nbr_matches,
+            'avgPoints': avg_points,
+            'nbrPerfectMatches': nbr_perfect_matches,
+            'nbrTournaments': nbr_tournaments,
+            'longestMatch': longest_match,
+            'shortestMatch': shortest_match,
+        },
+    }
+    print(f'response_data={response_data}')
+    return JsonResponse(response_data)

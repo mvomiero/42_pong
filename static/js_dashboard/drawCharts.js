@@ -10,6 +10,10 @@ bs_white = rootStyles.getPropertyValue('--bs-white');
 bs_darkGrey = rootStyles.getPropertyValue('--bs-gray-900');
 bs_lightGrey = rootStyles.getPropertyValue('--bs-gray-750');
 bs_dark = rootStyles.getPropertyValue('--bs-dark');
+bs_success = rootStyles.getPropertyValue('--bs-success');
+bs_info = rootStyles.getPropertyValue('--bs-info');
+bs_warning = rootStyles.getPropertyValue('--bs-warning');
+bs_danger = rootStyles.getPropertyValue('--bs-danger');
 bs_fontFamily = rootStyles.getPropertyValue('--bs-font-charts');
 
 

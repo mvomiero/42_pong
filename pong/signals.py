@@ -66,6 +66,10 @@ def generate_random_tournament(database_end, time_diff, size_TournamentData):
     semiMatch1 = match_to_list(*generate_random_match(finalMatch['endTime'], 1000, True, size_TournamentData))
     semiMatch2 = match_to_list(*generate_random_match(finalMatch['endTime'], 1000, True, size_TournamentData))
     
+    # ensure unique players
+    while semiMatch1['players'][0] == semiMatch2['players'][0] or semiMatch1['players'][0] == semiMatch2['players'][1] or semiMatch1['players'][1] == semiMatch2['players'][0] or semiMatch1['players'][1] == semiMatch2['players'][1]:
+        semiMatch2 = match_to_list(*generate_random_match(finalMatch['endTime'], 1000, True, size_TournamentData))
+
     # set the winners of the semi finals as players of the final
     finalMatch['players'][0] = semiMatch1['players'][0] if semiMatch1['score'][0] > semiMatch1['score'][1] else semiMatch1['players'][1]
     finalMatch['players'][1] = semiMatch2['players'][0] if semiMatch2['score'][0] > semiMatch2['score'][1] else semiMatch2['players'][1]
@@ -78,9 +82,10 @@ def generate_random_tournament(database_end, time_diff, size_TournamentData):
     else:
         playersRank.append(finalMatch['players'][1])
         playersRank.append(finalMatch['players'][0])
-    playersRank.append(semiMatch1['players'][0]) if semiMatch1['score'][0] > semiMatch1['score'][1] else playersRank.append(semiMatch1['players'][1])
-    playersRank.append(semiMatch2['players'][0]) if semiMatch2['score'][0] > semiMatch2['score'][1] else playersRank.append(semiMatch2['players'][1])
-    
+    playersRank.append(semiMatch1['players'][0]) if semiMatch1['score'][1] > semiMatch1['score'][0] else playersRank.append(semiMatch1['players'][1])
+    playersRank.append(semiMatch2['players'][0]) if semiMatch2['score'][1] > semiMatch2['score'][0] else playersRank.append(semiMatch2['players'][1])
+    print(f'playersRank: {playersRank}')
+
     # set the end time and duration of the tournament
     tdur = finalMatch['endTime'] - min(semiMatch1['startTime'], semiMatch2['startTime'])
     tend = datetime.fromtimestamp(finalMatch['endTime'])
