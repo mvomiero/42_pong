@@ -115,11 +115,15 @@ function fetchPlayerDashboard(playerAlias) {
         initializePlayerCards(data.cards, playerAlias);
         drawPiePlayers(data.pieWin, 'chartPiePlayer1', [bs_success, bs_gray200], 'Wins of Player');
         drawPiePlayers(data.pieLoss, 'chartPiePlayer2', [bs_danger, bs_gray200], 'Losses of Player');
-        drawPiePlayers(data.pieTournamentRank, 'chartPiePlayer3', [bs_success, bs_warning, bs_gray200], 'Tournaments of Player');
+        console.log('data.pieTournamentRank: ', data.pieTournamentRank);
+        // check if data.pieTournamentRank is empty
+        if (Object.keys(data.pieTournamentRank).length === 0) {
+            
+        } else {
+            drawPiePlayers(data.pieTournamentRank, 'chartPiePlayer3', [bs_success, bs_warning, bs_gray200], 'Tournaments of Player');
+        }
+        
 
-        /* drawPiePlayers(chart1, Object.keys(data.pieWin), Object.values(data.pieWin), [bs_success, bs_gray200], '45 %')
-        drawPiePlayers(chart2, Object.keys(data.pieLoss), Object.values(data.pieLoss), [bs_success, bs_gray200], '40 %')
-        drawPiePlayers(chart3, Object.keys(data.pieTournamentRank), Object.values(data.pieTournamentRank), [bs_success, bs_warning, bs_gray200], '65 %') */
       })
       .catch(error => {
         console.error('Fetch error:', error);

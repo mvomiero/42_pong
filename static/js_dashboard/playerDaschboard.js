@@ -124,25 +124,6 @@ function drawPiePlayers(chartData, chartId, color, titleTxt) {
         }]
     };
 
-    // Register Plugin for text inside chart
-    Chart.register({
-        id: 'textInside',
-        afterDatasetsDraw: function (chart, _) {
-            const ctx = chart.ctx;
-            const width = chart.width;
-            const height = chart.height;
-            const fontSize = 26;
-            ctx.font = fontSize + 'px Arial';
-            ctx.fillStyle = bs_dark;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            var text = options.plugins.textInside.text;
-            const textX = Math.round(width / 2);
-            const textY = Math.round(height / 2) + fontSize / 10;
-            ctx.fillText(text, textX, textY);
-        }
-    });
-
     // define options for chart
     let options = {
         plugins: {
@@ -165,12 +146,6 @@ function drawPiePlayers(chartData, chartId, color, titleTxt) {
                     boxWidth: 20,
                     padding: 20
                 }
-            },
-            textInside: {
-                display: true,
-                text: (Number.isInteger(Object.values(chartData)[0]) ? Object.values(chartData)[0] : Object.values(chartData)[0].toFixed(1)).toString() + ' %',
-                color: bs_dark,
-                fontSize: 26
             },
         },
         maintainAspectRatio: false,

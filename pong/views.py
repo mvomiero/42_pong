@@ -352,11 +352,16 @@ def get_dashboard_data_player(request):
     }
 
     """ Data for Tournament Ranks """
-    tournament_ranks = {
-        'Wins': player_tournaments.filter(player_ranking__0=playerAlias).count(),
-        'Finals': player_tournaments.filter(player_ranking__1=playerAlias).count(),
-        'Other': player_tournaments.filter(Q(player_ranking__2=playerAlias) | Q(player_ranking__3=playerAlias)).count(),
-    }
+    chart_pieRanks = {}
+    if player_tournaments.count() > 0:
+        wins = player_tournaments.filter(player_ranking__0=playerAlias).count() / player_tournaments.count() * 100
+        finals = player_tournaments.filter(player_ranking__1=playerAlias).count() / player_tournaments.count() * 100
+        other = player_tournaments.filter(Q(player_ranking__2=playerAlias) | Q(player_ranking__3=playerAlias)).count() / player_tournaments.count() * 100
+        chart_pieRanks = {
+            'Wins': wins,
+            'Finals': finals,
+            'Other': other,
+        }
 
     """ Data for number of matches """
     nbr_matches = player_matches.count()
@@ -421,7 +426,7 @@ def get_dashboard_data_player(request):
     response_data = {
         'pieWin': chart_pieWin,
         'pieLoss': chart_pieLoss,
-        'pieTournamentRank': tournament_ranks,
+        'pieTournamentRank': chart_pieRanks,
         'cards': {
             'nbrWins': nbr_wins,
             'nbrMatches': nbr_matches,
