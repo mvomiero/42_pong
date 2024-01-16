@@ -56,13 +56,14 @@ document.getElementById('btnCloseDashboardPlayer').addEventListener('click', fun
     document.getElementById('dashboardPlayer').style.display = 'none';
 });
 
-function playerDashboard(playerAlias, data) {
+function playerDashboard() {
     document.getElementById('dashboardChoosePlayer').style.display = 'none';
     document.getElementById('dashboardPlayer').style.display = 'block';
 }
 
 document.addEventListener('click', function (event) {
     if (event.target && event.target.id === 'btnPlayerSelect') {
+        playerDashboard();
         fetchPlayerDashboard(event.target.getAttribute('data-value'));
     }
 });

@@ -344,9 +344,18 @@
                                     <button id="btnCloseDashboardPlayer" class="btn btn-outline-secondary btn-sm" style="position: absolute; top: 10px; right: 10px;">Close</button>
                                     <div class="row mb-0 mt-5 text-center g-1">
                                         <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-12 col-sm-12">
-                                            <p class="text-dark mb-0">col-xxl-3 col-xl-3 col-lg-3 col-md-12 col-sm-12</p>
+                                            <div class="row mb-5 text-center g-1">
+                                                <h2 class="text-dark mb-1 bold" id="pl-tournaments">Loading...</h2>
+                                                <p class="text-dark text-uppercase mb-0">Tournaments</p>
+                                            </div>
+                                            <div class="row mb-5 text-center g-1">
+                                                <canvas class="dashboardCanvas2" id="chartPiePlayer3" width="100%" height="100%"></canvas>
+                                            </div>
                                         </div>
                                         <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-12 col-sm-12">
+                                            <div class="row mb-5 text-center g-1">
+                                                <h1 class="text-dark mb-1 bold" id="pl-alias">Loading...</h2>
+                                            </div>
                                             <div class="row mb-5 text-center g-1">
                                                 <h1 class="text-dark mb-1 bold" id="pl-wins">Loading...</h2>
                                                 <p class="text-dark text-uppercase mb-0">Wins</p>
@@ -368,9 +377,11 @@
                                         </div>
                                         <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-12 col-sm-12">
                                             <div class="row mb-5 text-center g-1">
-                                                <canvas class="dashboardCanvas2" id="chartPiePlayer1" width="100%" height="80"></canvas>
+                                                <canvas class="dashboardCanvas2" id="chartPiePlayer1" width="100%" height="100%"></canvas>
                                             </div>
-                                            <p class="text-dark mb-0">col-xxl-3 col-xl-3 col-lg-3 col-md-12 col-sm-12</p>
+                                            <div class="row mb-5 text-center g-1">
+                                                <canvas class="dashboardCanvas2" id="chartPiePlayer2" width="100%" height="100%"></canvas>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

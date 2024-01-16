@@ -319,12 +319,12 @@ def get_dashboardPlayer_list(request):
 def get_dashboard_data_player(request):
     # Retrieve player alias from POST request
     playerAlias = json.loads(request.body.decode('utf-8')).get('playerAlias')
-    print(f'playerAlias={playerAlias}')
+    print(f'\n\nplayerAlias={playerAlias}')
 
     # Data for player
     player_matches = GameData.objects.filter(Q(player1_name=playerAlias) | Q(player2_name=playerAlias))
     print(f'player_matches={player_matches}')
-    player_tournaments = TournamentData.objects.filter(Q(player_ranking__icontains=[playerAlias]))
+    player_tournaments = TournamentData.objects.filter(Q(player_ranking__icontains=playerAlias))
     print(f'player_tournaments={player_tournaments}')
     
 
@@ -346,15 +346,16 @@ def get_dashboard_data_player(request):
         'Wins': percentage_wins, 
         'Losses': percentage_losses,
     }
-    chart_pieLoss = [percentage_losses, percentage_wins]
+    chart_pieLoss = {
+        'Losses': percentage_losses, 
+        'Wins': percentage_wins,
+    }
 
     """ Data for Tournament Ranks """
     tournament_ranks = {
-        'first': TournamentData.objects.filter(player_ranking__0=playerAlias).count(),
-        'second': TournamentData.objects.filter(player_ranking__1=playerAlias).count(),
-        'third': TournamentData.objects.filter(player_ranking__2=playerAlias).count(),
-        'fourth': TournamentData.objects.filter(player_ranking__3=playerAlias).count(),
-        'finals': TournamentData.objects.filter(Q(player_ranking__0=playerAlias) | Q(player_ranking__1=playerAlias)).count(),
+        'Wins': player_tournaments.filter(player_ranking__0=playerAlias).count(),
+        'Finals': player_tournaments.filter(player_ranking__1=playerAlias).count(),
+        'Other': player_tournaments.filter(Q(player_ranking__2=playerAlias) | Q(player_ranking__3=playerAlias)).count(),
     }
 
     """ Data for number of matches """
@@ -386,7 +387,6 @@ def get_dashboard_data_player(request):
 
     """ Data for longest match """
     longest_game = GameData.objects.order_by('-game_duration_secs').first()
-    print(f'longest_duration_game={longest_game}')
     longest_match = {}
     if longest_game:
         longest_match = {
@@ -421,9 +421,9 @@ def get_dashboard_data_player(request):
     response_data = {
         'pieWin': chart_pieWin,
         'pieLoss': chart_pieLoss,
+        'pieTournamentRank': tournament_ranks,
         'cards': {
             'nbrWins': nbr_wins,
-            'tournamentRanks': tournament_ranks,
             'nbrMatches': nbr_matches,
             'avgPoints': avg_points,
             'nbrPerfectMatches': nbr_perfect_matches,
