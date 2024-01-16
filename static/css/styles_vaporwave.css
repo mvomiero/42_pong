@@ -117,6 +117,10 @@
   background-color: var(--bs-btn-submit-bg);
 }
 
+.btn-margin {
+  margin-bottom: 4rem;
+}
+
 .icon-42-svg {
   width: 18px; /* Adjust the width as needed */
   height: 18px; /* Adjust the height as needed */
