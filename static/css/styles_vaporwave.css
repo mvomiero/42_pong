@@ -4,9 +4,9 @@
 
 .custom-heading {
     color: magenta;
-    font-family: 'Press Start 2P', cursive; /* Assuming 'Press Start 2P' is the font name */
+    font-family: 'Press Start 2P', cursive;
     font-size: 2em !important;
-    /* Add any other styling properties you want to apply */
+    text-shadow: 4px 4px 0px #001aff; /* Adjust the values as needed */
 }
 
 .bg-vaporwave {
