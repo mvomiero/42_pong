@@ -99,11 +99,7 @@
     fontStyle: var(--bs-body-font-weight);
 } */
 
-/* Apply a border to all elements 
-    just to render the different elements*/
-* {
-  border: 1px solid #ff0000;
-}
+
 
 *,
 *::before,
