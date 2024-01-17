@@ -81,7 +81,8 @@
 
 
 .smaller-image.yy:hover {
-    content: url("../assets/img/landscape_pool.png");
+    content: url("../assets/img/team/yy1.png");
+    filter: brightness(100%) saturate(100%) hue-rotate(150deg); /* Adjust values for the desired blue tint */
     /* transform: scale(1.2); */ /* Optional: Enlarge the image on hover */
 }
 
