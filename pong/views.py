@@ -4,11 +4,15 @@ import time
 import pytz
 from datetime import datetime
 from django.http import JsonResponse    # NEW FOR CHARTS (http response)
-from django.db.models import Count, CharField, Sum, Max, Q, F, Case, IntegerField, Value, When  # NEW FOR CHARTS (database query)
-from django.db.models.functions import ExtractWeekDay   # NEW FOR CHARTS (database query)
+from django.db.models import Count, CharField, Case, F, FloatField, IntegerField, Max, Q, Sum, Value, When  # NEW FOR CHARTS (database query)
+from django.db.models.functions import ExtractWeekDay, TruncHour   # NEW FOR CHARTS (database query)
 from itertools import chain
 from collections import Counter
 import json
+
+from itertools import groupby
+from operator import itemgetter
+from django.db.models import Subquery, OuterRef
 
 def index(request):
 	return render(request, "pong/index.html")
@@ -135,17 +139,52 @@ def get_dashboardMatch_data(request):
     ).order_by('day_of_week')
 
     # Prepare the data in the format expected by the frontend chart
-    chart_data = {}
+    bar_chart_data = {}
     day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     for day_name in day_names:
-        chart_data[day_name] = 0
+        bar_chart_data[day_name] = 0
     for entry in matches_per_day:
         # Assuming 'day_of_week' is returned as 1 for Monday, 2 for Tuesday, etc.
         day_index = (entry['day_of_week'] + 5) % 7
         day_name = day_names[day_index]  # Adjust index to start from 0
-        chart_data[day_name] = entry['total_games']
+        bar_chart_data[day_name] = entry['total_games']
 
-    print(f'chart_data={chart_data}')
+
+    """ Data for the Area Chart """
+    # Use the annotate function to calculate the total game duration for each day
+    daily_playing_time = game_data.values('game_end_timestamp__date').annotate(
+        total_duration=Sum('game_duration_secs')
+    )
+    # Create a dictionary with date as key and total duration as value
+    area_chart_data = {entry['game_end_timestamp__date'].strftime('%d.%m.%Y'): entry['total_duration'] / 60.0 for entry in daily_playing_time}
+    
+
+    """ Data for the Line Chart """
+    line_chart_data = {}
+    for hour in range(0, 24):
+        line_chart_data[f'{hour:02d}:00'] = 0
+    for entry in game_data:
+        line_chart_data[entry.game_end_timestamp.strftime('%H:00')] += 1
+    
+
+    """ Data for the Scattered Chart """
+    # Query to get individual game durations for a specific date
+    games_by_day = (
+        GameData.objects
+        .values('game_end_timestamp__date', 'game_duration_secs')
+    )
+    print(f'\ngames_by_day={games_by_day}')
+
+    # Convert queryset to dictionary with date as key and list of durations as value
+    scattered_chart_data = [
+        {'x': game['game_end_timestamp__date'].strftime('%d.%m.%Y'), 'y': game['game_duration_secs']}
+        for game in games_by_day
+    ]
+    """ i = 0
+    for j in scattered_chart_data:
+        j['x'] = i
+        i += 1 """
+
 
     """ Data for the Cards (Matches) """
     player1_names = game_data.values_list('player1_name', flat=True).distinct()
@@ -210,7 +249,10 @@ def get_dashboardMatch_data(request):
 
     # Prepare the response and return it as JSON
     response_data = {
-        'chart1': chart_data,
+        'barChart1': bar_chart_data,
+        'areaChart1': area_chart_data,
+        'lineChart1': line_chart_data,
+        'scatteredChart1': scattered_chart_data,
         'cards': {
             'uniquePlayers': nbr_unique_players,
             'nbrMatches': nbr_matches,

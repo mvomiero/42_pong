@@ -7,8 +7,8 @@ const rootStyles = getComputedStyle(document.documentElement);
 bs_primary = rootStyles.getPropertyValue('--bs-primary');
 bs_secondary = rootStyles.getPropertyValue('--bs-secondary');
 bs_white = rootStyles.getPropertyValue('--bs-white');
-bs_darkGrey = rootStyles.getPropertyValue('--bs-gray-900');
-bs_lightGrey = rootStyles.getPropertyValue('--bs-gray-750');
+bs_darkGray = rootStyles.getPropertyValue('--bs-gray-900');
+bs_lightGray = rootStyles.getPropertyValue('--bs-gray-750');
 bs_gray200 = rootStyles.getPropertyValue('--bs-gray-200');
 bs_gray400 = rootStyles.getPropertyValue('--bs-gray-400');
 bs_dark = rootStyles.getPropertyValue('--bs-dark');
@@ -23,157 +23,325 @@ bs_fontFamily = rootStyles.getPropertyValue('--bs-font-charts');
 /************ GLOBAL VARIABLES CHARTS **************/
 /***************************************************/
 Chart.defaults.font.family = bs_fontFamily;
-/* Chart.defaults.global.defaultFontColor = '#292b2c'; */
 
 
-// Bar Chart Example
-function drawChart1(chartData) {
-    console.log('Data for chart:', chartData);
+/***************************************************/
+/*************** GENERIC SETTINGS ******************/
+/***************************************************/
+function createChartTitle(titleText) {
+    return {
+        display: true,
+        text: titleText,
+        font: {
+            size: 24,
+            weight: 'bold'
+        },
+        color: bs_dark,
+        align: 'center',
+        position: 'top'
+    };
+}
 
-    // Extracting data for chart
-    var labels = Object.keys(chartData);
-    var data = Object.values(chartData);
+function createAxisTitle(titleText) {
+    return {
+        display: true,
+        text: titleText,
+        font: {
+            size: 18,
+            weight: 'bold'
+        },
+        color: bs_darkGray
+    };
+}
 
-    // Get the canvas element and create the chart
-    var canvas = document.getElementById('chart1').getContext('2d');
-    var horizontalBarChart = new Chart(canvas, {
-        type: 'bar',
-        data: {
-            labels: labels,
+function createAxisGrid(displayBool) {
+    return {
+        display: displayBool,
+        color: bs_gray200
+    };
+}
+
+function createAxisTicks(maxTicksLimit) {
+    if (maxTicksLimit > 0) {
+        return {
+            maxTicksLimit: maxTicksLimit,
+            color: bs_darkGray
+        };
+    }
+    else {
+        return {
+            color: bs_darkGray
+        };
+    }
+}
+
+function deleteOldChart(chartId) {
+    var existingChart = Chart.getChart(chartId);
+    if (existingChart) {
+        existingChart.destroy();
+    }
+}
+
+/***************************************************/
+/***************** DRAWING CHARTS ******************/
+/***************************************************/
+
+// Horizontal Bar Chart
+function drawChart1(chartData, chartId) {
+    
+    // Delete old chart if it exists
+    deleteOldChart(chartId);
+
+    // define data for chart
+    var data = {
+        labels: Object.keys(chartData),
             datasets: [{
                 label: 'Number of Games',
-                data: data,
+                data: Object.values(chartData),
                 backgroundColor: bs_secondary
             }]
-        },
-        options: {
-            indexAxis: 'y',
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Matches and Players per Day',
-                    font: {
-                        size: 24,
-                        weight: 'bold'
-                    },
-                    color: bs_dark,
-                    align: 'center',
-                    position: 'top'
-                },
-                legend: {
-                    display: false  // Hides the legend specifically for horizontal bar chart
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Number of Games',
-                        color: bs_darkGrey,
-                        font: {
-                            size: 18,
-                            weight: 'bold'
-                        }
-                    },
-                    gridLines: {
-                        display: true,
-                        color: bs_lightGrey
-                    },
-                    ticks: {
-                        beginAtZero: true,
-                        maxTicksLimit: 7,
-                        color: bs_darkGrey
-                    }
+    };
 
-                },
-                y: {
-                    gridLines: {
-                        display: false
-                    },
-                    ticks: {
-                        color: bs_darkGrey
-                    }
-                }
+    // define options for chart
+    var options = {
+        indexAxis: 'y',
+        plugins: {
+            title: createChartTitle('Matches and Players per Day'),
+            legend: {
+                display: false  // Hides the legend specifically for horizontal bar chart
             }
-        }
+        },
+        scales: {
+            x: {
+                title: createAxisTitle('Number of Games'),
+                grid: createAxisGrid(true),
+                ticks: createAxisTicks(8),
+                beginAtZero: true,
+            },
+            y: {
+                grid: createAxisGrid(false),
+                ticks: createAxisTicks(-1),
+            }
+        },
+        maintainAspectRatio: true,
+        responsive: true,
+    };
+
+    // Get the canvas element and create the chart
+    var canvas = document.getElementById(chartId).getContext('2d');
+    var horizontalBarChart = new Chart(canvas, {
+        type: 'bar',
+        data: data,
+        options: options
     });
 }
 
-/* function drawChart2() {
-    // Sample Data:
-    var matchData = [
-        { date: '01.12.2023', remoteMatch: [15, 42, 30, 8, 68], tournamentMatch: [23] },
-        { date: '02.12.2023', remoteMatch: [], tournamentMatch: [10, 20, 15] },
-        { date: '03.12.2023', remoteMatch: [35, 81, 16], tournamentMatch: [14, 29, 115, 21] },
-        { date: '04.12.2023', remoteMatch: [54, 19], tournamentMatch: [] },
-        { date: '05.12.2023', remoteMatch: [92, 43, 94, 44, 60, 31], tournamentMatch: [90, 14, 15] },
-    ];
+function drawAreaChart(chartData, chartId) {
 
-    // Convert data to a format compatible with Chart.js
-    var scatterData = matchData.reduce((acc, curr) => {
-        var date = curr.date;
-        var remoteMatch = curr.remoteMatch.map(duration => ({ x: date, y: duration }));
-        var tournamentMatch = curr.tournamentMatch.map(duration => ({ x: date, y: duration }));
+    // Delete old chart if it exists
+    deleteOldChart(chartId);
 
-        acc[0].data = acc[0].data.concat(remoteMatch);
-        acc[1].data = acc[1].data.concat(tournamentMatch);
+    // define data for chart
+    var data = {
+        labels: Object.keys(chartData),
+        datasets: [{
+            label: 'playing time',
+            fill: true,
+            data: Object.values(chartData),
+            backgroundColor: bs_secondary,
+            borderWidth: 0,
+            pointBorderWidth: 1,
+            pointBorderColor: bs_lightGray,
+            pointBackgroundColor: bs_secondary,
+            pointStyle: 'circle',
+            tension: 0.3,
+            hoverOffset: 4
+        }]
+    };
 
-        return acc;
-    }, [
-        { label: 'Remote Matches', data: [], backgroundColor: 'rgba(255, 99, 132, 1)' },
-        { label: 'Tournament Matches', data: [], backgroundColor: 'rgba(54, 162, 235, 1)' }
-    ]);
-
-    var canvas = document.getElementById('scatteredChart').getContext('2d');
-    var scatteredChart = new Chart(canvas, {
-        type: 'scatter',
-        data: {
-            datasets: scatterData
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            // Customize additional options as needed
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Match Duration',// for remote and tournament matches',
-                    font: {
-                        size: 18,
-                        color: '#333',
-                        family: 'Arial'
-                    },
-                    align: 'center',
-                    position: 'top'
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                }
+    // define options for chart
+    var options = {
+        plugins: {
+            legend: {
+                display: false
             },
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        parser: 'dd.mm.yyyy', // Format of your date'
-                        // tooltipFormat: 'll', // Tooltip format
-                        unit: 'day', // Adjust unit as needed
-                        displayFormats: {
-                            day: 'dd.mm.yyyy' // Display format for the x-axis
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Match Duration'
-                    }
-                }
+            title: createChartTitle('Accumulated Match Time'),
+        },
+        scales: {
+            x: {
+                grid: createAxisGrid(true),
+                ticks: createAxisTicks(20),
+            },
+            y: {
+                title: createAxisTitle('Time (min)'),
+                grid: createAxisGrid(true),
+                ticks: createAxisTicks(-1),
+                beginAtZero: true
             }
-        }
+        },
+        maintainAspectRatio: true,
+        responsive: true,
+    };
+
+    // Get the canvas element and create the chart
+    const ctx = document.getElementById(chartId).getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: options
     });
-} */
+
+}
+
+function drawLineChart(chartData, chartId) {
+    
+    // Delete old chart if it exists
+    deleteOldChart(chartId);
+
+    // define data for chart
+    var data = {
+        labels: Object.keys(chartData),
+        datasets: [{
+            label: 'nbr games',
+            fill: false,
+            data: Object.values(chartData),
+            //backgroundColor: bs_secondary,
+            borderColor: bs_secondary,
+            //borderWidth: 2,
+            pointBorderWidth: 1,
+            pointBorderColor: bs_lightGray,
+            pointBackgroundColor: bs_secondary,
+            pointStyle: 'circle',
+            tension: 0.1,
+            /* hoverOffset: 4 */
+        }]
+    };
+
+    // define options for chart
+    var options = {
+        plugins: {
+            legend: {
+                display: false
+            },
+            title: createChartTitle('Matches per Time of Day'),
+        },
+        scales: {
+            x: {
+                grid: createAxisGrid(true),
+                ticks: createAxisTicks(-1),
+            },
+            y: {
+                title: createAxisTitle('Number of Matches'),
+                grid: createAxisGrid(true),
+                ticks: createAxisTicks(-1),
+                beginAtZero: true
+            }
+        },
+        maintainAspectRatio: true,
+        //responsive: false,
+    };
+
+    // Get the canvas element and create the chart
+    const ctx = document.getElementById(chartId).getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: options
+    });
+    
+}
+
+function drawScatteredChart(chartData, chartId) {
+
+    // Delete old chart if it exists
+    deleteOldChart(chartId);
+
+    // define data for chart
+    var data = {
+        datasets: [{
+          label: 'Scatter Dataset',
+          data: chartData,
+          /* data: [{
+            x: -10,
+            y: 0
+          }, {
+            x: 0,
+            y: 9
+          }, {
+            x: 0,
+            y: 10
+          }, {
+            x: 10,
+            y: 5
+          }, {
+            x: 0.5,
+            y: 5.5
+          }], */
+          backgroundColor: bs_secondary
+        }],
+        /* labels: Object.keys(chartData),
+        datasets: {
+            label: 'nbr games',
+            fill: false,
+            data: Object.values(chartData),
+            //backgroundColor: bs_secondary,
+            borderColor: bs_secondary,
+            //borderWidth: 2,
+            pointBorderWidth: 1,
+            pointBorderColor: bs_lightGray,
+            pointBackgroundColor: bs_secondary,
+            pointStyle: 'circle',
+            tension: 0.1,
+            // hoverOffset: 4
+        } */
+    };
+
+    // define options for chart
+    var options = {
+        plugins: {
+            legend: {
+                display: false
+            },
+            title: createChartTitle('Match Duration'),
+        },
+        scales: {
+            /* xAxes: [{
+                type: 'time',
+                time: {
+                  displayFormats: {
+                     'millisecond': 'MMM DD',
+                     'second': 'MMM DD',
+                     'minute': 'MMM DD',
+                     'hour': 'MMM DD',
+                     'day': 'MMM DD',
+                     'week': 'MMM DD',
+                     'month': 'MMM DD',
+                     'quarter': 'MMM DD',
+                     'year': 'MMM DD',
+                  }
+                }
+              }], */
+            x: {
+                grid: createAxisGrid(true),
+                ticks: createAxisTicks(-1),
+            },
+            y: {
+                title: createAxisTitle('time (sec)'),
+                grid: createAxisGrid(true),
+                ticks: createAxisTicks(-1),
+                beginAtZero: true
+            }
+        },
+        maintainAspectRatio: true,
+        //responsive: false,
+    };
+
+    // Get the canvas element and create the chart
+    const ctx = document.getElementById(chartId).getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'scatter',
+        data: data,
+        options: options
+    });
+    
+}

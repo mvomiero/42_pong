@@ -18,13 +18,16 @@ function fetchMatchDashboard() {
       })
       .then(data => {
         // Process the retrieved data
-        console.log('Data received from backend: ', data);
+        console.log('[Match] Data received from backend: ', data);
         
         // Update cards
         updateCardsMatch(data.cards);
 
         // Draw charts
-        drawChart1(data.chart1);
+        drawChart1(data.barChart1, 'chart1');
+        drawLineChart(data.lineChart1, 'chart2');
+        drawAreaChart(data.areaChart1, 'chart3');
+        drawScatteredChart(data.scatteredChart1, 'chart4');
 
       })
       .catch(error => {
@@ -48,7 +51,7 @@ function fetchTournamentDashboard() {
       })
       .then(data => {
         // Process the retrieved data
-        console.log('Data received from backend: ', data);
+        console.log('[Tournament] Data received from backend: ', data);
         
         // Update cards
         updateCardsTournament(data.cards);
@@ -79,7 +82,7 @@ function fetchPlayerDashboardList() {
       })
       .then(data => {
         // Process the retrieved data
-        console.log('Data received from backend (player List): ', data);
+        console.log('[Player] Data received from backend (player List): ', data);
         
         // Initialize DataTable
         initializeDataTable(data.playerList);
@@ -110,12 +113,11 @@ function fetchPlayerDashboard(playerAlias) {
       })
       .then(data => {
         // Process the retrieved data
-        console.log('[playerDashboard] Data received from backend: ', data);
+        console.log('[playerDashboard] Data (individual) received from backend: ', data);
         
         initializePlayerCards(data.cards, playerAlias);
         drawPiePlayers(data.pieWin, 'chartPiePlayer1', [bs_success, bs_gray200], 'Wins of Player');
         drawPiePlayers(data.pieLoss, 'chartPiePlayer2', [bs_danger, bs_gray200], 'Losses of Player');
-        console.log('data.pieTournamentRank: ', data.pieTournamentRank);
         // check if data.pieTournamentRank is empty
         if (Object.keys(data.pieTournamentRank).length === 0) {
             

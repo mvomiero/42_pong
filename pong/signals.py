@@ -23,7 +23,7 @@ def initialize_database(sender, **kwargs):
 
     # add entries to have 100 matches in database
     size_GameData = GameData.objects.count()
-    while size_GameData < 100:
+    while size_GameData < 200:
         add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
         size_GameData += 1
         #size_GameData = GameData.objects.count()
@@ -31,7 +31,7 @@ def initialize_database(sender, **kwargs):
     
     # add entries to have 10 tournaments in database
     size_TournamentData = TournamentData.objects.count()
-    while size_TournamentData < 10:
+    while size_TournamentData < 20:
         add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData))
         size_TournamentData += 1
         #size_TournamentData = TournamentData.objects.count()
@@ -43,8 +43,10 @@ def initialize_database(sender, **kwargs):
 def generate_random_match(database_end, time_diff, is_tournament, size_GameData):
     pts_to_win = 11
     
-    p1n = f"Player {random.randint(0, size_GameData + 9)}"
-    p2n = f"Player {random.randint(size_GameData + 10, size_GameData + 40)}"
+    p1n = f"Player {random.randint(0, round(size_GameData / 2) + 15)}"
+    p2n = f"Player {random.randint(0, round(size_GameData / 2) + 15)}"
+    while p1n == p2n:
+        p2n = f"Player {random.randint(0, round(size_GameData / 2) + 15)}"
     if random.randint(0, 1) == 0:
         p1s = pts_to_win
         p2s = random.randint(0, pts_to_win - 1)
@@ -84,8 +86,7 @@ def generate_random_tournament(database_end, time_diff, size_TournamentData):
         playersRank.append(finalMatch['players'][0])
     playersRank.append(semiMatch1['players'][0]) if semiMatch1['score'][1] > semiMatch1['score'][0] else playersRank.append(semiMatch1['players'][1])
     playersRank.append(semiMatch2['players'][0]) if semiMatch2['score'][1] > semiMatch2['score'][0] else playersRank.append(semiMatch2['players'][1])
-    print(f'playersRank: {playersRank}')
-
+    
     # set the end time and duration of the tournament
     tdur = finalMatch['endTime'] - min(semiMatch1['startTime'], semiMatch2['startTime'])
     tend = datetime.fromtimestamp(finalMatch['endTime'])

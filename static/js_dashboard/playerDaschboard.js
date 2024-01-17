@@ -113,7 +113,6 @@ function drawPiePlayers(chartData, chartId, color, titleTxt) {
     }
     
     // define data for chart
-    console.log('Data for chart:', chartData);
     var data = {
         labels: Object.keys(chartData),
         datasets: [{
@@ -150,7 +149,6 @@ function drawPiePlayers(chartData, chartId, color, titleTxt) {
         },
         maintainAspectRatio: false,
     };
-    console.log('Options for chart:', options);
 
     // Get the canvas element and create the chart
     var canvas = document.getElementById(chartId).getContext('2d');
