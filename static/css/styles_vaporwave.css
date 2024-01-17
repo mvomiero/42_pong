@@ -75,11 +75,13 @@
 
 .smaller-image:hover {
     border-color: #0114c2;
+    transition: transform 0.3s ease;
+    
 }
 
 
 .smaller-image.yy:hover {
-    content: url("../assets/img/landscape_pool.png");;
+    content: url("../assets/img/landscape_pool.png");
     /* transform: scale(1.2); */ /* Optional: Enlarge the image on hover */
 }
 
