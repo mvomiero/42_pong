@@ -16,7 +16,10 @@ bs_success = rootStyles.getPropertyValue('--bs-success');
 bs_info = rootStyles.getPropertyValue('--bs-info');
 bs_warning = rootStyles.getPropertyValue('--bs-warning');
 bs_danger = rootStyles.getPropertyValue('--bs-danger');
-bs_fontFamily = rootStyles.getPropertyValue('--bs-font-charts');
+bs_color = rootStyles.getPropertyValue('--btn-color');
+bs_magenta = '#ff00ff';
+bs_body_color = rootStyles.getPropertyValue('--bs-body-color');
+bs_fontFamily = rootStyles.getPropertyValue('--bs-body-font-family');
 
 
 /***************************************************/
@@ -33,10 +36,10 @@ function createChartTitle(titleText) {
         display: true,
         text: titleText,
         font: {
-            size: 24,
+            size: 30,
             weight: 'bold'
         },
-        color: bs_dark,
+        color: bs_magenta,
         align: 'center',
         position: 'top'
     };
@@ -50,14 +53,14 @@ function createAxisTitle(titleText) {
             size: 18,
             weight: 'bold'
         },
-        color: bs_darkGray
+        color: bs_white
     };
 }
 
 function createAxisGrid(displayBool) {
     return {
         display: displayBool,
-        color: bs_gray200
+        color: bs_body_color
     };
 }
 
@@ -65,12 +68,12 @@ function createAxisTicks(maxTicksLimit) {
     if (maxTicksLimit > 0) {
         return {
             maxTicksLimit: maxTicksLimit,
-            color: bs_darkGray
+            color: bs_body_color
         };
     }
     else {
         return {
-            color: bs_darkGray
+            color: bs_body_color
         };
     }
 }

@@ -36,7 +36,7 @@ window.addEventListener('DOMContentLoaded', event => {
 function initializeDataTable(playerList) {
     let i = 0;
     playerList.forEach(player => {
-        var newRow = [player, `<a class="btn btn-light" id="btnPlayerSelect" data-value="${player}">Choose</a>`];
+        var newRow = [player, `<a class="btn btn-vaporwave btn-choose" id="btnPlayerSelect" data-value="${player}">✔</a>`];
 
         dataTable.rows.add(newRow);
     });
