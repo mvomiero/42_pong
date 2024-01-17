@@ -1,122 +1,143 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>Transcendence Pong</title>
-        <!-- Favicon-->
-        <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
-        <!-- Font Awesome icons (free version)-->
-        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-        <!-- Simple line icons-->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css" rel="stylesheet" />
-        <!-- Google fonts-->
-        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
-        
-        <!-- Include Chart.js library -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script> -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.js" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.js"></script>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script> -->
-        <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script> -->
-        <!-- For Datatables -->
-        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.3.0/dist/umd/simple-datatables.js" crossorigin="anonymous"></script>
-        <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.3.0/dist/style.min.css" rel="stylesheet" />
-        <!-- <script src="https://cdn.jsdelivr.net/npm/datatables@1/media/js/jquery.dataTables.min.js"></script>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Transcendence Pong</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Simple line icons-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css"
+        rel="stylesheet" />
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic"
+        rel="stylesheet" type="text/css" />
+    <!-- STYLE: added font family -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,700&display=swap" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P:300,400,700&display=swap" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=DotGothic16:300,400,700&display=swap" rel="stylesheet"
+        type="text/css" />
+
+
+
+    <!-- Include Chart.js library -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <!-- For Datatables -->
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.3.0/dist/umd/simple-datatables.js"
+        crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.3.0/dist/style.min.css" rel="stylesheet" />
+    <!-- <script src="https://cdn.jsdelivr.net/npm/datatables@1/media/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script> -->
 
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
-        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    </head>
-    <body id="page-top">
-        {% csrf_token %}
-        <!-- Navigation-->
-        <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
-            <div class="container">
-                <a class="navbar-brand" href="#page-top"><img src="{% static 'assets/atari-pong-logo-png-transparent-png.png' %}" alt="..." style="height: 2em;" /></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                    Menu
-                    <i class="fas fa-bars ms-1"></i>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="#page-top">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#game">Pong</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#dashboard">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-                    </ul>
-                </div>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/styles_vaporwave.css' %}" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+
+<body id="page-top">
+    {% csrf_token %}
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-background" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="#page-top"><img src="{% static 'assets/icon.svg' %}" alt="..."
+                    class="icon-svg" /></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars ms-1"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+                    <li class="nav-item nav-vaporwave"><a class="nav-link" href="#page-top">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#game">Pong</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#credits">Credits</a></li>
+                </ul>
             </div>
-        </nav>
-        <!-- Header-->
-        <header class="masthead d-flex align-items-center">
-            <div class="container px-4 px-lg-5 text-center">
-                <h1 class="mb-1">Ultimate Pong</h1>
-                <h3 class="mb-5"><em>A free Pong Game with nice Stats.</em></h3>
-                <a class="btn btn-primary btn-xl" href="#game">Play Pong</a>
-            </div>
-        </header>
-        
-        <!-- Pong Game-->
-        <section class="content-section bg-light" id="game">
-            <div class="container px-4 px-lg-5 text-center">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-lg-10">
-                        <h2 class="mx-auto mb-5">
-                            Ultimate Pong Game
-                        </h2>
-                        <p class="lead mb-5">
-                            Here you can play Pong against your friends or against the computer. You can also play in a tournament against other players.
-                        </p>
+        </div>
+    </nav>
+    
+    <!-- Header-->
+    <header class="masthead d-flex align-items-center">
+        <div class="container px-4 px-lg-5 text-center">
+            <!-- <a class="navbar-brand"><img src="{% static 'assets/title.svg' %}" alt="..." class="title-svg" /></a> -->
+            <h3 class="lead mb-5">A free Pong Game with nice Stats.</h3>
+            <h2 class="mx-auto mb-5 custom-heading animation">ULTIMATE >>> PONG</h2>
+            <!-- <a class="btn btn-dark btn-xl" href="#game">Play</a> -->
+            <a class="btn-vaporwave btn-margin" href="#game">Play</a>
+        </div>
+    </header>
 
-                        <div>
-                            <!-- Buttons to start the game -->
-                            <button id="startRemoteGameButton" class="btn btn-dark btn-xl">Start Remote Game</button>
-                        </div>
+    <!-- Pong Game-->
+    <section class="content-section pong-section" id="game">
+        <div class="container px-4 px-lg-5 text-center">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-10">
+                    <h2 class="mx-auto mb-5 custom-heading">
+                        PLAY
+                    </h2>
+                    <p class="lead mb-5">
+                        Here you can play Pong against your friends or against your enemies. You can also play in a
+                        tournament against other players.
+                    </p>
 
-                        <!-- Name input field and Submit Button -->
-                        <div id="nameInputSection" style="display: none;">
-                            <!-- <input type="text" id="playerName" placeholder="Enter your name"> -->
-                            <input class="form-control" type="text" id="playerName" placeholder="Enter your name">
-                            <select form="form-select form-select-lg" for="game_type" name="game_type" id="room_code">
-                                <option value="match">Match</option>
-                                <option value="tournament">Tournament</option>
-                            </select>
-                            <button id="submitNameButton" class="btn btn-dark btn-lg">Submit</button>
-                        </div>
-
-                        <!-- Canvas initially hidden -->
-                        <div id="game_board" room_code="match" char_choice="player_alias" style="display: none;">
-                            <canvas class="pongCanvas" width="750" height="485" id="gameCanvas"></canvas>
-                        </div>
-
-                        <a class="btn btn-dark btn-xl" href="#dashboard">Our Dashboard</a>
+                    <div>
+                        <!-- Buttons to start the game -->
+                        <button id="startRemoteGameButton" class="btn-vaporwave">Start Remote Game</button>
                     </div>
+
+                    <!-- Name input field and Submit Button -->
+                    <div id="nameInputSection" style="display: none;">
+                        <!-- <input type="text" id="playerName" placeholder="Enter your name"> -->
+                        <input class="btn-vaporwave" type="text" id="playerName" placeholder="Enter your name">
+                        <select form="form-select form-select-lg" for="game_type" name="game_type" id="room_code"
+                            class="btn-vaporwave">
+                            <option value="match">Match</option>
+                            <option value="tournament">Tournament</option>
+                        </select>
+                        <button id="submitNameButton" class="btn-vaporwave btn-vaporwave-submit">Submit</button>
+                    </div>
+
+                    <!-- Canvas initially hidden -->
+                    <div id="game_board" room_code="match" char_choice="player_alias" style="display: none;">
+                        <canvas class="pongCanvas" width="750" height="485" id="gameCanvas"></canvas>
+                    </div>
+
+                    <a class="btn-vaporwave" href="#dashboard">Our Dashboard</a>
                 </div>
             </div>
-        </section>
-        <!-- Dashboard-->
-        <section class="content-section bg-primary text-white text-center" id="dashboard">
-            <div class="container px-4 px-lg-5">
-                <div class="content-section-heading text-center">
-                    <h2 class="text-secondary mb-0">Dashboard</h2>
-                    <h3 class="mb-5">Overview of some faboulous statistics of the Ultimate Pong Game</h3>
-                </div>
+        </div>
+    </section>
+    <!-- Dashboard-->
+    <section class="content-section bg-primary text-center" id="dashboard">
+        <div class="container px-4 px-lg-5">
+            <div class="content-section-heading text-center">
+                <h2 class="mx-auto mb-5 custom-heading">DASHBOARD</h2>
+                <p class="lead mb-5">Overview of some faboulous statistics of the Ultimate Pong Game</p>
+            </div>
 
-                <!-- Pagination to switch between Match and Tournament -->
-                <nav>
-                    <ul class="pagination justify-content-center" id="pagMatchTournament">
-                        <li class="page-item"><a class="page-link" href="#dashboardMatch">Match</a></li>
-                        <li class="page-item"><a class="page-link" href="#dashboardTournament">Tournament</a></li>
-                    </ul>
-                </nav>
+            <!-- Pagination to switch between Match and Tournament -->
+            <nav>
+                <ul class="pagination justify-content-center" id="pagMatchTournament">
+                    <li class="page-item"><a class="page-link" href="#dashboardMatch">Match</a></li>
+                    <li class="page-item"><a class="page-link" href="#dashboardTournament">Tournament</a></li>
+                </ul>
+            </nav>
 
                 <!-- First row (Matches) -->
                 <div class="row mb-5 text-start g-1" id="dashboardMatch" style='display: "";'>
@@ -240,80 +261,81 @@
                         </div>
                     </div>
 
-                    <!-- Second column with different widths for different screen sizes -->
-                    <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2">
-                        <!-- Content for the second column -->
-                        <div class="row mb-1 g-1 equal-height-row">
-                            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <!-- Content for the first column -->
-                                <div class="card d-flex flex-column h-100" id="cardPlayerRegistrations">
-                                    <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="tn-playerRegistrations">Loading...  </h5>
-                                        <p class="text-dark mb-0">different Players participated</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <!-- Content for the first column -->
-                                <div class="card d-flex flex-column h-100" id="cardNbrMatches">
-                                    <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="tn-nbrPlayed">Loading...</h5>
-                                        <p class="text-dark mb-0">Tournaments played</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mb-1 g-1 equal-height-row">
-                            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <!-- Content for the first column -->
-                                <div class="card d-flex flex-column h-100" id="cardTotalMatchTime">
-                                    <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="tn-totalTime">Loading...</h5>
-                                        <p class="text-dark mb-0">Total Tournament Time</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <!-- Content for the first column -->
-                                <div class="card d-flex flex-column h-100" id="cardLongestMatch">
-                                    <div class="card-body flex-fill">
-                                        <h5 class="text-dark mb-0" id="tn-longest">Loading...</h5>
-                                        <p class="text-dark mb-0">Longest Tournament</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mb-1 g-1 equal-height-row">
+                <!-- Second column with different widths for different screen sizes -->
+                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2">
+                    <!-- Content for the second column -->
+                    <div class="row mb-1 g-1 equal-height-row">
+                        <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
                             <!-- Content for the first column -->
-                            <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
-                                <div class="card d-flex flex-column h-100" id="cardBestPlayer">
-                                    <div class="card-body flex-fill">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
-                                                <i class="bi bi-award-fill display-3 display-md-4 display-lg-3 display-xl-2 display-xxl-2 dashboard-icon"></i>
-                                            </div>
-                                            <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
-                                                <h5 class="text-dark mb-0" id="tn-bestPlayerAlias">Loading...</h5>
-                                                <p class="text-dark mb-0" id="tn-bestPlayerWins">.</p>
-                                            </div>
+                            <div class="card d-flex flex-column h-100" id="cardPlayerRegistrations">
+                                <div class="card-body flex-fill">
+                                    <h5 class="text-dark mb-0" id="tn-playerRegistrations">Loading... </h5>
+                                    <p class="text-dark mb-0">different Players participated</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                            <!-- Content for the first column -->
+                            <div class="card d-flex flex-column h-100" id="cardNbrMatches">
+                                <div class="card-body flex-fill">
+                                    <h5 class="text-dark mb-0" id="tn-nbrPlayed">Loading...</h5>
+                                    <p class="text-dark mb-0">Tournaments played</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-1 g-1 equal-height-row">
+                        <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                            <!-- Content for the first column -->
+                            <div class="card d-flex flex-column h-100" id="cardTotalMatchTime">
+                                <div class="card-body flex-fill">
+                                    <h5 class="text-dark mb-0" id="tn-totalTime">Loading...</h5>
+                                    <p class="text-dark mb-0">Total Tournament Time</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                            <!-- Content for the first column -->
+                            <div class="card d-flex flex-column h-100" id="cardLongestMatch">
+                                <div class="card-body flex-fill">
+                                    <h5 class="text-dark mb-0" id="tn-longest">Loading...</h5>
+                                    <p class="text-dark mb-0">Longest Tournament</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-1 g-1 equal-height-row">
+                        <!-- Content for the first column -->
+                        <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                            <div class="card d-flex flex-column h-100" id="cardBestPlayer">
+                                <div class="card-body flex-fill">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                                            <i
+                                                class="bi bi-award-fill display-3 display-md-4 display-lg-3 display-xl-2 display-xxl-2 dashboard-icon"></i>
+                                        </div>
+                                        <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
+                                            <h5 class="text-dark mb-0" id="tn-bestPlayerAlias">Loading...</h5>
+                                            <p class="text-dark mb-0" id="tn-bestPlayerWins">.</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row g-1 equal-height-row">
-                            <!-- Content for the first column -->
-                            <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
-                                <div class="card d-flex flex-column h-100" id="cardHeighestPlayingTime">
-                                    <div class="card-body flex-fill">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
-                                                <i class="bi bi-clock display-3 display-md-4 display-lg-3 display-xl-2 display-xxl-2 dashboard-icon" ></i>
-                                            </div>
-                                            <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
-                                                <h5 class="text-dark mb-0" id="tn-highestPlayingTimeAlias">Loading...</h5>
-                                                <p class="text-dark mb-0" id="tn-highestPlayingTimeTime"></p>
-                                            </div>
+                    </div>
+                    <div class="row g-1 equal-height-row">
+                        <!-- Content for the first column -->
+                        <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                            <div class="card d-flex flex-column h-100" id="cardHeighestPlayingTime">
+                                <div class="card-body flex-fill">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                                            <i
+                                                class="bi bi-clock display-3 display-md-4 display-lg-3 display-xl-2 display-xxl-2 dashboard-icon"></i>
+                                        </div>
+                                        <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-8">
+                                            <h5 class="text-dark mb-0" id="tn-highestPlayingTimeAlias">Loading...</h5>
+                                            <p class="text-dark mb-0" id="tn-highestPlayingTimeTime"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -321,6 +343,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
                 <!-- Second row -->
                 <div class="row mb-5 text-center g-1" id="dashboardSectionPlayer" style="display: block;">
@@ -397,144 +420,140 @@
             </div>
         </section>
 
-        <!-- Team-->
-        <section class="callout" id="team">
-            <div class="container px-4 px-lg-5 text-center">
-                <h2 class="mx-auto mb-5">
-                    ++++++++++++++++++ ADD THE TEAM HERE ++++++++++++++++++ 
-                </h2>
+    <!-- Team-->
+    <section class="callout" id="team">
+        <div class="container px-4 px-lg-5 text-center">
+            <div class="content-section-heading text-center">
+                <h2 class="mx-auto mb-5 custom-heading">TEAM</h2>
+                <p class="lead mb-5">Our wonderful team:</p>
+            </div>
+            <div class="row text-center">
 
-                <div class="text-center">
-                    <h2 class="mx-auto mb-5">Our Amazing Team</h2>
-                    <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="team-member">
-                            <img class="mx-auto rounded-circle" src="{% static 'assets/img/team/1.jpg' %}" alt="..." />
-                            <h4>Parveen Anand</h4>
-                            <p class="text-muted">Lead Designer</p>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Parveen Anand Twitter Profile"><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Parveen Anand Facebook Profile"><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Parveen Anand LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
+                <!-- YY -->
+                <div class="col-lg-4 col-md-6 mx-auto mb-4">
+                    <div class="team-member">
+                        <img class="mx-auto rounded-circle smaller-image yy" src="{% static 'assets/img/team/yy1.png' %}" alt="..." />
+                        <h4>YY</h4>
+                        <p class="text-muted">Crypto and security demiurge</p>
+                        <a class="btn btn-dark btn-social mx-2" href="https://profile.intra.42.fr/users/yli" aria-label="Your Custom Profile" target="_blank">
+                            <img class="icon-42-svg" src="{% static 'assets/img/42_Logo.svg' %}" alt="Your Custom Icon">
+                        </a>
+                        <a class="btn btn-dark btn-social mx-2" href="https://github.com/YYBer" aria-label="Profile" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="LinkedIn Profile" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="team-member">
-                            <img class="mx-auto rounded-circle" src="{% static 'assets/img/team/2.jpg' %}" alt="..." />
-                            <h4>Diana Petersen</h4>
-                            <p class="text-muted">Lead Marketer</p>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Diana Petersen Twitter Profile"><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Diana Petersen Facebook Profile"><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Diana Petersen LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="team-member">
-                            <img class="mx-auto rounded-circle" src="{% static 'assets/img/team/3.jpg' %}" alt="..." />
-                            <h4>Larry Parker</h4>
-                            <p class="text-muted">Lead Developer</p>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Larry Parker Twitter Profile"><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Larry Parker Facebook Profile"><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Larry Parker LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-8 mx-auto text-center"><p class="large text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut eaque, laboriosam veritatis, quos non quis ad perspiciatis, totam corporis ea, alias ut unde.</p></div>
                 </div>
 
-                <a class="btn btn-dark btn-xl" href="https://startbootstrap.com/theme/stylish-portfolio/">
-                    <i class="fab fa-github fa-2x" style="color: #fcf9f9;"></i>
-                </a>
-            </div>
-        </section>
-        
-        <!-- Portfolio-->
-        <section class="content-section" id="portfolio">
-            <div class="container px-4 px-lg-5">
-                <div class="content-section-heading text-center">
-                    <h3 class="text-secondary mb-0">Portfolio</h3>
-                    <h2 class="mb-5">Recent Projects</h2>
-                </div>
-                <div class="row gx-0">
-                    <div class="col-lg-6">
-                        <a class="portfolio-item" href="#!">
-                            <div class="caption">
-                                <div class="caption-content">
-                                    <div class="h2">Stationary</div>
-                                    <p class="mb-0">A yellow pencil with envelopes on a clean, blue backdrop!</p>
-                                </div>
-                            </div>
-                            <img class="img-fluid" src="{% static 'assets/img/portfolio-1.jpg' %}" alt="..." />
+                <!-- Flo -->
+                <div class="col-lg-4 col-md-6 mx-auto mb-4">
+                    <div class="team-member">
+                        <img class="mx-auto rounded-circle smaller-image flo" src="{% static 'assets/img/team/flo1.png' %}" alt="..." />
+                        <h4>Flo</h4>
+                        <p class="text-muted">APIs orchestrator</p>
+                        <a class="btn btn-dark btn-social mx-2" href="https://profile.intra.42.fr/users/fbecht" aria-label="Your Custom Profile" target="_blank">
+                            <img class="icon-42-svg" src="{% static 'assets/img/42_Logo.svg' %}" alt="Your Custom Icon">
                         </a>
-                    </div>
-                    <div class="col-lg-6">
-                        <a class="portfolio-item" href="#!">
-                            <div class="caption">
-                                <div class="caption-content">
-                                    <div class="h2">Ice Cream</div>
-                                    <p class="mb-0">A dark blue background with a colored pencil, a clip, and a tiny ice cream cone!</p>
-                                </div>
-                            </div>
-                            <img class="img-fluid" src="{% static 'assets/img/portfolio-2.jpg' %}" alt="..." />
+                        <a class="btn btn-dark btn-social mx-2" href="https://github.com/flo-12" aria-label="Profile" target="_blank">
+                            <i class="fab fa-github"></i>
                         </a>
-                    </div>
-                    <div class="col-lg-6">
-                        <a class="portfolio-item" href="#!">
-                            <div class="caption">
-                                <div class="caption-content">
-                                    <div class="h2">Strawberries</div>
-                                    <p class="mb-0">Strawberries are such a tasty snack, especially with a little sugar on top!</p>
-                                </div>
-                            </div>
-                            <img class="img-fluid" src="{% static 'assets/img/portfolio-3.jpg' %}" alt="..." />
-                        </a>
-                    </div>
-                    <div class="col-lg-6">
-                        <a class="portfolio-item" href="#!">
-                            <div class="caption">
-                                <div class="caption-content">
-                                    <div class="h2">Workspace</div>
-                                    <p class="mb-0">A yellow workspace with some scissors, pencils, and other objects.</p>
-                                </div>
-                            </div>
-                            <img class="img-fluid" src="{% static 'assets/img/portfolio-4.jpg' %}" alt="..." />
+                        <a class="btn btn-dark btn-social mx-2" href="https://www.linkedin.com/in/florian-becht-a1241b123/" aria-label="LinkedIn Profile" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
                         </a>
                     </div>
                 </div>
-            </div>
-        </section>
-        
-        <!-- Call to Action-->
-        <section class="content-section bg-primary text-white">
-            <div class="container px-4 px-lg-5 text-center">
-                <h2 class="mb-4">The buttons below are impossible to resist...</h2>
-                <a class="btn btn-xl btn-light me-4" href="#!">Click Me!</a>
-                <a class="btn btn-xl btn-dark" href="#!">Look at Me!</a>
-            </div>
-        </section>
-        <!-- Footer-->
-        <footer class="footer text-center">
-            <div class="container px-4 px-lg-5">
-                <h2 class="mb-4">++++++++++++++ ADD LICENCES ++++++++++++++</h2>
-                <ul class="list-inline mb-5">
-                    <li class="list-inline-item">
-                        <a class="social-link rounded-circle text-white mr-3" href="#!"><i class="icon-social-facebook"></i></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a class="social-link rounded-circle text-white mr-3" href="#!"><i class="icon-social-twitter"></i></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a class="social-link rounded-circle text-white" href="#!"><i class="icon-social-github"></i></a>
-                    </li>
-                </ul>
-                <p class="text-muted small mb-0">Copyright &copy; Your Website 2023</p>
-            </div>
-        </footer>
 
-         <!-- Scroll to Top Button-->
-         <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
+                <!-- Marco -->
+                <div class="col-lg-4 col-md-6 mx-auto mb-4">
+                    <div class="team-member">
+                        <img class="mx-auto rounded-circle smaller-image mv" src="{% static 'assets/img/team/mv1.png' %}" alt="..." />
+                        <h4>Marco</h4>
+                        <p class="text-muted">Code ready-mader, stylist</p>
+                        <a class="btn btn-dark btn-social mx-2" href="https://profile.intra.42.fr/users/mvomiero" aria-label="Your Custom Profile" target="_blank">
+                            <img class="icon-42-svg" src="{% static 'assets/img/42_Logo.svg' %}" alt="Your Custom Icon">
+                        </a>
+                        <a class="btn btn-dark btn-social mx-2" href="https://github.com/mvomiero" aria-label="Profile" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a class="btn btn-dark btn-social mx-2" href="https://www.linkedin.com/in/marco-vomiero/" aria-label="LinkedIn Profile" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Graham -->
+                <div class="col-lg-4 col-md-6 mx-auto mb-4">
+                    <div class="team-member">
+                        <img class="mx-auto rounded-circle smaller-image gb" src="{% static 'assets/img/team/gb1.png' %}" alt="..." />
+                        <h4>Graham</h4>
+                        <p class="text-muted">3D factotum</p>
+                        <a class="btn btn-dark btn-social mx-2" href="https://profile.intra.42.fr/users/gbooth" aria-label="Your Custom Profile" target="_blank">
+                            <img class="icon-42-svg" src="{% static 'assets/img/42_Logo.svg' %}" alt="Your Custom Icon">
+                        </a>
+                        <a class="btn btn-dark btn-social mx-2" href="https://github.com/sidechained" aria-label="Profile" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a class="btn btn-dark btn-social mx-2" href="https://www.linkedin.com/in/marco-vomiero/" aria-label="LinkedIn Profile" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- PA -->
+                <div class="col-lg-4 col-md-6 mx-auto mb-4">
+                    <div class="team-member">
+                        <img class="mx-auto rounded-circle smaller-image pa" src="{% static 'assets/img/team/pa1.png' %}" alt="..." />
+                        <h4>PA</h4>
+                        <p class="text-muted">ELK fairy</p>
+                        <a class="btn btn-dark btn-social mx-2" href="https://profile.intra.42.fr/users/pdelanno" aria-label="Your Custom Profile" target="_blank">
+                            <img class="icon-42-svg" src="{% static 'assets/img/42_Logo.svg' %}" alt="Your Custom Icon">
+                        </a>
+                        <a class="btn btn-dark btn-social mx-2" href="https://github.com/dubmix" aria-label="Profile" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a class="btn btn-dark btn-social mx-2" href="https://www.linkedin.com/in/pdelanno42/" aria-label="LinkedIn Profile" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <p class="large text-muted project-description">ULTIMATE >>> PONG is the final project of 42 school core curriculum. 42 Berlin.</p>
+                </div>
+            </div>
+
+            <a class="btn btn-dark btn-xl" href="https://github.com/mvomiero/42_pong" target="_blank">
+                <i class="fab fa-github fa-2x" style="color: #fcf9f9;"></i>
+            </a>
+        </div>
+    </section>
+
+
+    <!-- Footer-->
+    <footer class="footer text-center bg-primary" id="credits">
+        <div class="container px-4 px-lg-5">
+            <div class="content-section-heading text-center">
+                <h2 class="mx-auto mb-5 custom-heading">CREDITS</h2>
+                <p class="lead mb-5">Thanks - Danke - Grazie - Merci - 谢谢</p>
+            </div>
+            <p class="text-muted small mb-0">Template bootstrap website in MIT License</p>
+            <ul class="list-inline mb-3 mt-3">
+                <li class="list-inline-item">
+                    <a class="social-link rounded-circle text-white" href="https://github.com/startbootstrap/startbootstrap-stylish-portfolio" target="_blank"><i class="icon-social-github"></i></a>
+                </li>
+            </ul>
+            <a class="text-muted small mb-0" href="https://www.mit.edu/~amini/LICENSE.md" target="_blank">MIT License</a>
+            <p class="text-muted small mb-0">Copyright &copy; Ultimate >>> Pong 2024</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
 
         <!-- Pong Game-->
         <script type="text/javascript" src="{% static 'js/pong.js' %}"></script>

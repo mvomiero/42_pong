@@ -35,23 +35,23 @@
   --bs-gray-750: #424649;
   --bs-gray-800: #343a40;
   --bs-gray-900: #212529;
-  --bs-primary: #1D809F;
-  --bs-secondary: #ecb807;
+  --bs-primary: #4200bd;
+  --bs-secondary: #00a8eb;
   --bs-success: #198754;
   --bs-info: #0dcaf0;
   --bs-warning: #ecb807;
   --bs-danger: #dc3545;
   --bs-light: #f8f9fa;
   --bs-dark: #212529;
-  --bs-primary-rgb: 29, 128, 159;
-  --bs-secondary-rgb: 236, 184, 7;
+  --bs-primary-rgb: 66, 0, 189;
+  --bs-secondary-rgb: 0, 168, 235;
   --bs-success-rgb: 25, 135, 84;
   --bs-info-rgb: 13, 202, 240;
   --bs-warning-rgb: 236, 184, 7;
   --bs-danger-rgb: 220, 53, 69;
   --bs-light-rgb: 248, 249, 250;
-  --bs-dark-rgb: 33, 37, 41;
-  --bs-white-rgb: 255, 255, 255;
+  --bs-dark-rgb: 248, 249, 250;
+  --bs-white-rgb: 66, 0, 189;
   --bs-black-rgb: 0, 0, 0;
   --bs-body-color-rgb: 33, 37, 41;
   --bs-body-bg-rgb: 255, 255, 255;
@@ -59,12 +59,12 @@
   --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --bs-font-charts: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
-  --bs-body-font-family: Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  --bs-body-font-family: "Roboto Mono", Source Sans Pro, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
   --bs-body-font-size: 1rem;
   --bs-body-font-weight: 400;
   --bs-body-line-height: 1.5;
-  --bs-body-color: #212529;
-  --bs-body-bg: #fff;
+  --bs-body-color: #e4e4e4;
+  --bs-body-bg: #000000;
   --bs-border-width: 1px;
   --bs-border-style: solid;
   --bs-border-color: #dee2e6;
@@ -79,6 +79,9 @@
   --bs-link-hover-color: #17667f;
   --bs-code-color: #d63384;
   --bs-highlight-bg: #fbf1cd;
+  --btn-color: #b8008a;
+  --btn-hover-color: #0073ff;
+  --bs-btn-submit-bg: #270084;
 }
 
 /* :dashboardColors {
@@ -95,6 +98,8 @@
     fontSize: var(--bs-body-font-size);
     fontStyle: var(--bs-body-font-weight);
 } */
+
+
 
 *,
 *::before,
@@ -2811,13 +2816,13 @@ form-control
   --bs-btn-padding-y: 0.375rem;
   --bs-btn-font-family: ;
   --bs-btn-font-size: 1rem;
-  --bs-btn-font-weight: 400;
+  --bs-btn-font-weight: 800;
   --bs-btn-line-height: 1.5;
   --bs-btn-color: #212529;
   --bs-btn-bg: transparent;
-  --bs-btn-border-width: 1px;
-  --bs-btn-border-color: transparent;
-  --bs-btn-border-radius: 0.375rem;
+  --bs-btn-border-width: 4px;
+  --bs-btn-border-color: white;
+  --bs-btn-border-radius: 0rem;
   --bs-btn-hover-border-color: transparent;
   --bs-btn-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
   --bs-btn-disabled-opacity: 0.65;
@@ -3005,11 +3010,13 @@ form-control
 
 .btn-dark {
   --bs-btn-color: #fff;
-  --bs-btn-bg: #212529;
-  --bs-btn-border-color: #212529;
+  --bs-btn-shadow: 6px 6px 0px var(--btn-color);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: #ffffff;
   --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: #424649;
-  --bs-btn-hover-border-color: #373b3e;
+  --bs-btn-hover-bg: #000000;
+  --bs-btn-hover-border-color: var(--btn-hover-color);
+  --bs-btn-hover-color: var(--btn-hover-color);
   --bs-btn-focus-shadow-rgb: 66, 70, 73;
   --bs-btn-active-color: #fff;
   --bs-btn-active-bg: #4d5154;
@@ -3018,6 +3025,9 @@ form-control
   --bs-btn-disabled-color: #fff;
   --bs-btn-disabled-bg: #212529;
   --bs-btn-disabled-border-color: #212529;
+
+  text-shadow: 2px 2px 0px var(--btn-color);
+  box-shadow: var(--bs-btn-shadow);
 }
 
 .btn-outline-primary {
@@ -3674,7 +3684,7 @@ form-control
   }
 }
 .nav-link:hover, .nav-link:focus {
-  color: var(--bs-nav-link-hover-color);
+  color: var(--btn-color);
 }
 .nav-link.disabled {
   color: var(--bs-nav-link-disabled-color);
@@ -4204,7 +4214,7 @@ form-control
   --bs-card-cap-color: ;
   --bs-card-height: ;
   --bs-card-color: ;
-  --bs-card-bg: #fff;
+  --bs-card-bg: #1d0232;
   --bs-card-img-overlay-padding: 1rem;
   --bs-card-group-margin: 0.75rem;
   position: relative;
@@ -7714,7 +7724,8 @@ form-control
 }
 
 .mb-1 {
-  margin-bottom: 0.25rem !important;
+  margin-bottom: 4rem !important;
+  /* font-family: 'Press Start 2P', cursive !important; */
 }
 
 .mb-2 {
@@ -11020,12 +11031,13 @@ html {
 }
 
 .btn-xl {
-  padding: 1.25rem 2.5rem;
+  padding: 1rem 2.25rem;
+  margin: 0.5rem;
 }
 
 .callout {
-  padding: 15rem 0;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%), url("../assets/img/bg-callout.jpg");
+  padding: 7.5rem 0;
+  /* background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%), url("../assets/img/bg-callout.jpg"); */
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -11072,6 +11084,7 @@ footer.footer .social-link:hover {
     height: 75%;
   }
 }
+
 .masthead {
   min-height: 30rem;
   position: relative;
@@ -11079,8 +11092,10 @@ footer.footer .social-link:hover {
   width: 100%;
   height: auto;
   padding-top: 8rem;
-  padding-bottom: 8rem;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%), url("../assets/img/bg-masthead.jpg");
+  padding-bottom: 20rem;
+  background: /* linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%), */
+              url("../assets/img/landscape_pool.png");
+              /* url("../assets/img/galaxy.jpg"); */
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
