@@ -71,6 +71,7 @@
     border: var(--bs-btn-border-width) solid var(--btn-color);
     margin-top: 2rem;
     margin-bottom: 3rem;
+    
 }
 
 .smaller-image:hover {
@@ -81,9 +82,10 @@
 
 
 .smaller-image.yy:hover {
-    content: url("../assets/img/team/yy1.png");
-    filter: brightness(100%) saturate(100%) hue-rotate(150deg); /* Adjust values for the desired blue tint */
-    /* transform: scale(1.2); */ /* Optional: Enlarge the image on hover */
+    content: url("../assets/img/team/yy2.png");
+}
+.smaller-image.flo:hover {
+    content: url("../assets/img/team/flo2.png");
 }
 
 .btn-vaporwave {
