@@ -87,6 +87,15 @@
 .smaller-image.flo:hover {
     content: url("../assets/img/team/flo2.png");
 }
+.smaller-image.mv:hover {
+    content: url("../assets/img/team/mv2.png");
+}
+.smaller-image.gb:hover {
+    content: url("../assets/img/team/gb2.png");
+}
+.smaller-image.pa:hover {
+    content: url("../assets/img/team/pa2.png");
+}
 
 .btn-vaporwave {
   --bs-btn-font-size: 1rem;
@@ -159,3 +168,7 @@
   min-height: 100vh;
 }
 
+.project-description {
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+}
