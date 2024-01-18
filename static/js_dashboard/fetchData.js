@@ -3,15 +3,16 @@
 const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
 
 
+
 /***************************************************/
 /************* DASHBOARD FOR MATCHES ***************/
 /***************************************************/
 
 function fetchMatchDashboard() {
-    fetch('/dashboardMatches', { method: 'GET', credentials: 'same-origin' }) // or specify 'same-origin' or 'include' for credentials
+    return fetch('/dashboardMatches', { method: 'GET', credentials: 'same-origin' }) // or specify 'same-origin' or 'include' for credentials
       .then(response => {
         if (!response.ok) {
-          console.log('Network response was not ok');
+          console.log('[/dashboardMatches] Network response was not ok');
           // throw new Error('Network response was not ok');
         }
         return response.json(); // assuming the backend responds with JSON data
@@ -20,14 +21,16 @@ function fetchMatchDashboard() {
         // Process the retrieved data
         console.log('[Match] Data received from backend: ', data);
         
-        // Update cards
+        /* // Update cards
         updateCardsMatch(data.cards);
 
         // Draw charts
         drawChart1(data.barChart1, 'chart1');
         drawLineChart(data.lineChart1, 'chart2');
         drawAreaChart(data.areaChart1, 'chart3');
-        drawScatteredChart(data.scatteredChart1, 'chart4');
+        drawScatteredChart(data.scatteredChart1, data.lineChart2, 'chart4'); */
+
+        return data;
 
       })
       .catch(error => {
@@ -41,10 +44,10 @@ function fetchMatchDashboard() {
 /***************************************************/
 
 function fetchTournamentDashboard() {
-    fetch('/dashboardTournaments', { method: 'GET', credentials: 'same-origin' }) // or specify 'same-origin' or 'include' for credentials
+    return fetch('/dashboardTournaments', { method: 'GET', credentials: 'same-origin' }) // or specify 'same-origin' or 'include' for credentials
       .then(response => {
         if (!response.ok) {
-          console.log('Network response was not ok');
+          console.log('[/dashboardTournaments] Network response was not ok');
           // throw new Error('Network response was not ok');
         }
         return response.json(); // assuming the backend responds with JSON data
@@ -53,11 +56,16 @@ function fetchTournamentDashboard() {
         // Process the retrieved data
         console.log('[Tournament] Data received from backend: ', data);
         
-        // Update cards
+        /* // Update cards
         updateCardsTournament(data.cards);
 
         // Draw charts
-        //drawChart1(data.chart1);
+        drawChart1(data.barChart1, 'chart1');
+        drawLineChart(data.lineChart1, 'chart2');
+        drawAreaChart(data.areaChart1, 'chart3');
+        drawScatteredChart(data.scatteredChart1, data.lineChart2, 'chart4'); */
+
+        return data;
 
       })
       .catch(error => {
@@ -75,7 +83,7 @@ function fetchPlayerDashboardList() {
     fetch('/dashboardPlayerList', { method: 'GET', credentials: 'same-origin' }) // or specify 'same-origin' or 'include' for credentials
       .then(response => {
         if (!response.ok) {
-          console.log('Network response was not ok');
+          console.log('[/dashboardPlayerList] Network response was not ok');
           // throw new Error('Network response was not ok');
         }
         return response.json(); // assuming the backend responds with JSON data
@@ -106,7 +114,7 @@ function fetchPlayerDashboard(playerAlias) {
     })
       .then(response => {
         if (!response.ok) {
-          console.log('Network response was not ok');
+          console.log('[/dashboardPlayer/] Network response was not ok');
           // throw new Error('Network response was not ok');
         }
         return response.json(); // assuming the backend responds with JSON data
@@ -118,14 +126,8 @@ function fetchPlayerDashboard(playerAlias) {
         initializePlayerCards(data.cards, playerAlias);
         drawPiePlayers(data.pieWin, 'chartPiePlayer1', [bs_success, bs_gray200], 'Wins of Player');
         drawPiePlayers(data.pieLoss, 'chartPiePlayer2', [bs_danger, bs_gray200], 'Losses of Player');
-        // check if data.pieTournamentRank is empty
-        if (Object.keys(data.pieTournamentRank).length === 0) {
-            
-        } else {
-            drawPiePlayers(data.pieTournamentRank, 'chartPiePlayer3', [bs_success, bs_warning, bs_gray200], 'Tournaments of Player');
-        }
+        drawPiePlayers(data.pieTournamentRank, 'chartPiePlayer3', [bs_success, bs_warning, bs_gray200], 'Tournaments of Player');
         
-
       })
       .catch(error => {
         console.error('Fetch error:', error);

@@ -42,7 +42,7 @@ setEqualHeight(cardElements, maxHeight);
 /************** UPDATE VALUES MATCH ****************/
 /***************************************************/
 function updateCardsMatch(cardsData) {
-    console.log('Data for cards (Matches):', cardsData);
+    // console.log('Data for cards (Matches):', cardsData);
 
     const playerRegistrationsElement = document.getElementById('ma-playerRegistrations');
     playerRegistrationsElement.textContent = cardsData.uniquePlayers;
@@ -72,7 +72,7 @@ function updateCardsMatch(cardsData) {
 /*********** UPDATE VALUES TOURNAMENTS *************/
 /***************************************************/
 function updateCardsTournament(cardsData) {
-    console.log('Data for cards (Tournaments):', cardsData);
+    // console.log('Data for cards (Tournaments):', cardsData);
 
     const playerRegistrationsElement = document.getElementById('tn-playerRegistrations');
     playerRegistrationsElement.textContent = cardsData.uniquePlayers;

@@ -3,9 +3,44 @@
 /***************************************************/
 /**************** INITIALATION DATA ****************/
 /***************************************************/
-fetchMatchDashboard();
-fetchTournamentDashboard();
+let globalMatchData;
+fetchMatchDashboard().then(data => {
+    globalMatchData = data;
+    createMatchDashboard();
+});
+let globalTournamentData;
+fetchTournamentDashboard().then(data => {
+    globalTournamentData = data;
+});
 fetchPlayerDashboardList();
+
+
+/***************************************************/
+/*************** CREATING DASHBOARD ****************/
+/*************** MATCH / TOURNAMENT ****************/
+/***************************************************/
+
+function createMatchDashboard() {
+    // Update cards
+    updateCardsMatch(globalMatchData.cards);
+
+    // Draw charts
+    drawChart1(globalMatchData.barChart1, 'match-chart1', 'Matches per Day');
+    drawLineChart(globalMatchData.lineChart1, 'match-chart2', 'Matches per Hour');
+    drawAreaChart(globalMatchData.areaChart1, 'match-chart3', 'Accumulated Playing Time');
+    drawScatteredChart(globalMatchData.scatteredChart1, globalMatchData.lineChart2, 'match-chart4', 'Match Duration (Average & Seperately)');
+}
+
+function createTournamentDashboard() {
+    // Update cards
+    updateCardsTournament(globalTournamentData.cards);
+
+    // Draw charts
+    drawChart1(globalTournamentData.barChart1, 'tournament-chart1', 'Tournaments per Day');
+    drawLineChart(globalTournamentData.lineChart1, 'tournament-chart2', 'Tournaments per Hour');
+    drawAreaChart(globalTournamentData.areaChart1, 'tournament-chart3', 'Accumulated Playing Time');
+    drawScatteredChart(globalTournamentData.scatteredChart1, globalTournamentData.lineChart2, 'tournament-chart4', 'Tournament Duration (Average & Seperately)');
+}
 
 
 /***************************************************/
@@ -29,7 +64,7 @@ window.addEventListener('DOMContentLoaded', event => {
             truncatePager: true,    // Truncate the page links to prevent overflow with large datasets.
             pagerDelta: 1,          // Number of page links to display before and after the current page
         });
-        console.log('dataTableSimple: ', dataTable);
+        // console.log('dataTableSimple: ', dataTable);
     }
 });
 
@@ -41,7 +76,7 @@ function initializeDataTable(playerList) {
         dataTable.rows.add(newRow);
     });
 
-    console.log('dataTableSimple: ', dataTable);
+    // console.log('dataTableSimple: ', dataTable);
 }
 
 

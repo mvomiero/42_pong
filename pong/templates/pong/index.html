@@ -145,17 +145,17 @@
                 <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-12 text-center mb-2">
                     <div class="card d-flex flex-column h-100">
                         <div class="card-body flex-fill">
-                            <canvas class="dashboardCanvas2" id="chart1" width="100%" height="70%"></canvas>
-                            <canvas class="dashboardCanvas2" id="chart2" width="100%" height="70%" style="display: none;"></canvas>
-                            <canvas class="dashboardCanvas2" id="chart3" width="100%" height="70%" style="display: none;"></canvas>
-                            <canvas class="dashboardCanvas2" id="chart4" width="100%" height="70%" style="display: none;"></canvas>
+                            <canvas class="dashboardCanvas2" id="match-chart1" width="100%" height="70%"></canvas>
+                            <canvas class="dashboardCanvas2" id="match-chart2" width="100%" height="70%" style="display: none;"></canvas>
+                            <canvas class="dashboardCanvas2" id="match-chart3" width="100%" height="70%" style="display: none;"></canvas>
+                            <canvas class="dashboardCanvas2" id="match-chart4" width="100%" height="70%" style="display: none;"></canvas>
                         </div>
                         <nav>
-                            <ul class="pagination justify-content-center" id="pagCharts">
-                                <li class="page-item"><a class="page-link" href="#chart1">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#chart2">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#chart3">3</a></li>
-                                <li class="page-item"><a class="page-link" href="#chart4">4</a></li>
+                            <ul class="pagination justify-content-center" id="pagChartsMatch">
+                                <li class="page-item"><a class="page-link" href="#match-chart1">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#match-chart2">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#match-chart3">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#match-chart4">4</a></li>
                             </ul>
                         </nav>
                     </div>
@@ -248,14 +248,22 @@
                 <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-8 col-sm-12 text-center mb-2">
                     <div class="card d-flex flex-column h-100">
                         <div class="card-body flex-fill">
-                            <h4 class="text-dark mb-0">Matches and Players per Day</h4>
+                            <canvas class="dashboardCanvas2" id="tournament-chart1" width="100%" height="70%"></canvas>
+                            <canvas class="dashboardCanvas2" id="tournament-chart2" width="100%" height="70%" style="display: none;"></canvas>
+                            <canvas class="dashboardCanvas2" id="tournament-chart3" width="100%" height="70%" style="display: none;"></canvas>
+                            <canvas class="dashboardCanvas2" id="tournament-chart4" width="100%" height="70%" style="display: none;"></canvas>
+                            <!-- <h4 class="text-dark mb-0">Matches and Players per Day</h4>
                             <canvas class="dashboardCanvas2" id="tn-chart1" width="100%" height="80"></canvas>
-                            <canvas class="dashboardCanvas2" id="tn-AreaChart1" width="100%" height="80%" style="display: none;"></canvas>
+                            <canvas class="dashboardCanvas2" id="tn-AreaChart1" width="100%" height="80%" style="display: none;"></canvas> -->
                         </div>
                         <nav>
-                            <ul class="pagination justify-content-center" id="tn-pagCharts">
-                                <li class="page-item"><a class="page-link" href="#tn-chart1">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#tn-AreaChart1">2</a></li>
+                            <ul class="pagination justify-content-center" id="pagChartsTournament">
+                                <li class="page-item"><a class="page-link" href="#tournament-chart1">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#tournament-chart2">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#tournament-chart3">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#tournament-chart4">4</a></li>
+                                <!-- <li class="page-item"><a class="page-link" href="#tn-chart1">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#tn-AreaChart1">2</a></li> -->
                             </ul>
                         </nav>
                     </div>

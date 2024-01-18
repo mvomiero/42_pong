@@ -90,7 +90,7 @@ function deleteOldChart(chartId) {
 /***************************************************/
 
 // Horizontal Bar Chart
-function drawChart1(chartData, chartId) {
+function drawChart1(chartData, chartId, titleText) {
     
     // Delete old chart if it exists
     deleteOldChart(chartId);
@@ -99,7 +99,7 @@ function drawChart1(chartData, chartId) {
     var data = {
         labels: Object.keys(chartData),
             datasets: [{
-                label: 'Number of Games',
+                label: 'Amount',
                 data: Object.values(chartData),
                 backgroundColor: bs_secondary
             }]
@@ -109,14 +109,14 @@ function drawChart1(chartData, chartId) {
     var options = {
         indexAxis: 'y',
         plugins: {
-            title: createChartTitle('Matches and Players per Day'),
+            title: createChartTitle(titleText),
             legend: {
                 display: false  // Hides the legend specifically for horizontal bar chart
             }
         },
         scales: {
             x: {
-                title: createAxisTitle('Number of Games'),
+                title: createAxisTitle('Number'),
                 grid: createAxisGrid(true),
                 ticks: createAxisTicks(8),
                 beginAtZero: true,
@@ -139,7 +139,7 @@ function drawChart1(chartData, chartId) {
     });
 }
 
-function drawAreaChart(chartData, chartId) {
+function drawAreaChart(chartData, chartId, titleText) {
 
     // Delete old chart if it exists
     deleteOldChart(chartId);
@@ -148,7 +148,7 @@ function drawAreaChart(chartData, chartId) {
     var data = {
         labels: Object.keys(chartData),
         datasets: [{
-            label: 'playing time',
+            label: 'Playing Time',
             fill: true,
             data: Object.values(chartData),
             backgroundColor: bs_secondary,
@@ -168,7 +168,7 @@ function drawAreaChart(chartData, chartId) {
             legend: {
                 display: false
             },
-            title: createChartTitle('Accumulated Match Time'),
+            title: createChartTitle(titleText),
         },
         scales: {
             x: {
@@ -196,7 +196,7 @@ function drawAreaChart(chartData, chartId) {
 
 }
 
-function drawLineChart(chartData, chartId) {
+function drawLineChart(chartData, chartId, titleText) {
     
     // Delete old chart if it exists
     deleteOldChart(chartId);
@@ -205,7 +205,7 @@ function drawLineChart(chartData, chartId) {
     var data = {
         labels: Object.keys(chartData),
         datasets: [{
-            label: 'nbr games',
+            label: 'Amount',
             fill: false,
             data: Object.values(chartData),
             //backgroundColor: bs_secondary,
@@ -226,7 +226,7 @@ function drawLineChart(chartData, chartId) {
             legend: {
                 display: false
             },
-            title: createChartTitle('Matches per Time of Day'),
+            title: createChartTitle(titleText),
         },
         scales: {
             x: {
@@ -234,7 +234,7 @@ function drawLineChart(chartData, chartId) {
                 ticks: createAxisTicks(-1),
             },
             y: {
-                title: createAxisTitle('Number of Matches'),
+                title: createAxisTitle('Number'),
                 grid: createAxisGrid(true),
                 ticks: createAxisTicks(-1),
                 beginAtZero: true
@@ -254,7 +254,7 @@ function drawLineChart(chartData, chartId) {
     
 }
 
-function drawScatteredChart(chartData, chartId) {
+function drawScatteredChart(dataScattered, dataLine, chartId, titleText) {
 
     // Delete old chart if it exists
     deleteOldChart(chartId);
@@ -262,74 +262,57 @@ function drawScatteredChart(chartData, chartId) {
     // define data for chart
     var data = {
         datasets: [{
-          label: 'Scatter Dataset',
-          data: chartData,
-          /* data: [{
-            x: -10,
-            y: 0
-          }, {
-            x: 0,
-            y: 9
-          }, {
-            x: 0,
-            y: 10
-          }, {
-            x: 10,
-            y: 5
-          }, {
-            x: 0.5,
-            y: 5.5
-          }], */
-          backgroundColor: bs_secondary
-        }],
-        /* labels: Object.keys(chartData),
-        datasets: {
-            label: 'nbr games',
+            type: 'line',
+            label: 'avg duration',
+            data: Object.values(dataLine),
             fill: false,
-            data: Object.values(chartData),
             //backgroundColor: bs_secondary,
             borderColor: bs_secondary,
-            //borderWidth: 2,
+            borderWidth: 1,
             pointBorderWidth: 1,
             pointBorderColor: bs_lightGray,
             pointBackgroundColor: bs_secondary,
             pointStyle: 'circle',
             tension: 0.1,
             // hoverOffset: 4
-        } */
+        }, {
+            type: 'scatter',
+            label: 'match duration',
+            data: Object.values(dataScattered),
+            fill: false,
+            //backgroundColor: bs_secondary,
+            borderColor: bs_secondary,
+            borderWidth: 2,
+            pointBorderWidth: 2,
+            pointBorderColor: bs_secondary,
+            pointBackgroundColor: bs_secondary,
+            pointStyle: 'crossRot',
+            tension: 0.1,
+            // hoverOffset: 4
+        }],
+        labels: Object.keys(dataLine)
     };
 
     // define options for chart
     var options = {
+        scales: {
+            y: {
+              beginAtZero: true
+            }
+        },
         plugins: {
             legend: {
                 display: false
             },
-            title: createChartTitle('Match Duration'),
+            title: createChartTitle(titleText),
         },
         scales: {
-            /* xAxes: [{
-                type: 'time',
-                time: {
-                  displayFormats: {
-                     'millisecond': 'MMM DD',
-                     'second': 'MMM DD',
-                     'minute': 'MMM DD',
-                     'hour': 'MMM DD',
-                     'day': 'MMM DD',
-                     'week': 'MMM DD',
-                     'month': 'MMM DD',
-                     'quarter': 'MMM DD',
-                     'year': 'MMM DD',
-                  }
-                }
-              }], */
             x: {
                 grid: createAxisGrid(true),
-                ticks: createAxisTicks(-1),
+                ticks: createAxisTicks(15),
             },
             y: {
-                title: createAxisTitle('time (sec)'),
+                title: createAxisTitle('Time (sec)'),
                 grid: createAxisGrid(true),
                 ticks: createAxisTicks(-1),
                 beginAtZero: true
@@ -341,10 +324,9 @@ function drawScatteredChart(chartData, chartId) {
 
     // Get the canvas element and create the chart
     const ctx = document.getElementById(chartId).getContext('2d');
-    const myChart = new Chart(ctx, {
-        type: 'scatter',
+    const mixedChart = new Chart(ctx, {
         data: data,
         options: options
     });
-    
+
 }

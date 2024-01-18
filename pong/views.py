@@ -4,7 +4,7 @@ import time
 import pytz
 from datetime import datetime
 from django.http import JsonResponse    # NEW FOR CHARTS (http response)
-from django.db.models import Count, CharField, Case, F, FloatField, IntegerField, Max, Q, Sum, Value, When  # NEW FOR CHARTS (database query)
+from django.db.models import Avg, Count, CharField, Case, F, FloatField, IntegerField, Max, Q, Sum, Value, When  # NEW FOR CHARTS (database query)
 from django.db.models.functions import ExtractWeekDay, TruncHour   # NEW FOR CHARTS (database query)
 from itertools import chain
 from collections import Counter
@@ -125,66 +125,113 @@ def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, t
 
 # NEW FOR DASHBOARD:
     
+# Chart Data: Number of Entries per Day
+def chart_entriesPerDay(data, end_timestamp):
+    # Aggregate game data by day of the week and count amount
+    matches_per_day = data.annotate(
+        day_of_week=ExtractWeekDay(end_timestamp)
+    ).values('day_of_week').annotate(
+        total_games=Count('id')
+    ).order_by('day_of_week')
+
+    # Prepare the data for the chart / response
+    chart_data = {}
+    day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    for day_name in day_names:
+        chart_data[day_name] = 0
+    for entry in matches_per_day:
+        # Assuming 'day_of_week' is returned as 1 for Monday, 2 for Tuesday, etc.
+        day_index = (entry['day_of_week'] + 5) % 7
+        day_name = day_names[day_index]  # Adjust index to start from 0
+        chart_data[day_name] = entry['total_games']
+    
+    return chart_data
+
+
+# Chart Data: Accumulated Playing Time per timestamp/day
+def chart_accumulatedPlayingTime(data, end_timestamp, duration_secs):
+    # Calculate the total duration for each day
+    daily_playing_time = data.values(end_timestamp + '__date').annotate(
+        total_duration=Sum(duration_secs)
+    )
+
+    # Create a dictionary with date as key and total duration as value
+    chart_data = {entry[end_timestamp + '__date'].strftime('%d.%m.%Y'): entry['total_duration'] / 60.0 for entry in daily_playing_time}
+    
+    return chart_data
+
+
+# Chart Data: Number of Entries per Hour (0-24)
+def chart_EntriesPerHour(data, end_timestamp):
+    chart_data = {}
+    for hour in range(0, 24):
+        chart_data[f'{hour:02d}:00'] = 0
+    for entry in data:
+        timestamp_value = getattr(entry, end_timestamp).strftime('%H:00')
+        chart_data[timestamp_value] += 1
+
+    return chart_data
+
+
+# Chart Data: All Durations for Scatter Chart
+def chart_allDurations(data, end_timestamp, duration_secs):
+    # Query to get individual game durations for a specific date
+    games_by_day = (
+        data
+        .values(end_timestamp + '__date', duration_secs)
+    )
+    
+    # Convert queryset to dictionary with date as key and list of durations as value
+    chart_data = []
+    for entry in games_by_day:
+        date_key = entry[end_timestamp + '__date'].strftime('%d.%m.%Y')
+        duration_value = entry[duration_secs]
+        chart_data.append({'x': date_key, 'y': duration_value})
+    
+    return chart_data
+
+
+# Chart Data: Average Duration per timestamp/day
+def chart_avgDuration(data, end_timestamp, duration_secs):
+    # Query to get individual game durations for a specific date
+    games_by_day = (
+        data
+        .values(end_timestamp + '__date', duration_secs)
+    )
+
+    # Annotate average game duration for each day
+    average_duration_by_day = games_by_day.values(end_timestamp + '__date').annotate(avg_duration=Avg(duration_secs))
+
+    # Store into a dictionary
+    chart_data = {entry[end_timestamp + '__date'].strftime('%d.%m.%Y'): entry['avg_duration'] for entry in list(average_duration_by_day)}
+
+    return chart_data
+
+
 # GET request for dashboard 'Match' data
 def get_dashboardMatch_data(request):
     # Data for NON tournament games
     game_data = GameData.objects.filter(is_tournament_game=False)
 
-    """ Data for the Chart """
-    # Aggregate game data by day of the week and count total games
-    matches_per_day = game_data.annotate(
-        day_of_week=ExtractWeekDay('game_end_timestamp')
-    ).values('day_of_week').annotate(
-        total_games=Count('id')
-    ).order_by('day_of_week')
-
-    # Prepare the data in the format expected by the frontend chart
-    bar_chart_data = {}
-    day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    for day_name in day_names:
-        bar_chart_data[day_name] = 0
-    for entry in matches_per_day:
-        # Assuming 'day_of_week' is returned as 1 for Monday, 2 for Tuesday, etc.
-        day_index = (entry['day_of_week'] + 5) % 7
-        day_name = day_names[day_index]  # Adjust index to start from 0
-        bar_chart_data[day_name] = entry['total_games']
-
-
-    """ Data for the Area Chart """
-    # Use the annotate function to calculate the total game duration for each day
-    daily_playing_time = game_data.values('game_end_timestamp__date').annotate(
-        total_duration=Sum('game_duration_secs')
-    )
-    # Create a dictionary with date as key and total duration as value
-    area_chart_data = {entry['game_end_timestamp__date'].strftime('%d.%m.%Y'): entry['total_duration'] / 60.0 for entry in daily_playing_time}
+    """ Chart data: Matches per Day """
+    bar_chart_data = chart_entriesPerDay(game_data, 'game_end_timestamp')
     
 
-    """ Data for the Line Chart """
-    line_chart_data = {}
-    for hour in range(0, 24):
-        line_chart_data[f'{hour:02d}:00'] = 0
-    for entry in game_data:
-        line_chart_data[entry.game_end_timestamp.strftime('%H:00')] += 1
+    """ Chart Data: Accumulated Playing Time per timestamp/day """
+    area_chart_data = chart_accumulatedPlayingTime(game_data, 'game_end_timestamp', 'game_duration_secs')
     
 
-    """ Data for the Scattered Chart """
-    # Query to get individual game durations for a specific date
-    games_by_day = (
-        GameData.objects
-        .values('game_end_timestamp__date', 'game_duration_secs')
-    )
-    print(f'\ngames_by_day={games_by_day}')
+    """ Chart Data: Number of Matches per Hour """
+    line_chart_data = chart_EntriesPerHour(game_data, 'game_end_timestamp')
+    
 
-    # Convert queryset to dictionary with date as key and list of durations as value
-    scattered_chart_data = [
-        {'x': game['game_end_timestamp__date'].strftime('%d.%m.%Y'), 'y': game['game_duration_secs']}
-        for game in games_by_day
-    ]
-    """ i = 0
-    for j in scattered_chart_data:
-        j['x'] = i
-        i += 1 """
+    """ Chart Data: listing of all matches and their duration """
+    scattered_chart_data = chart_allDurations(game_data, 'game_end_timestamp', 'game_duration_secs')
+    
 
+    """ Chart Data: Average Duration of matches per day) """
+    line_chart_data2 = chart_avgDuration(game_data, 'game_end_timestamp', 'game_duration_secs')
+    
 
     """ Data for the Cards (Matches) """
     player1_names = game_data.values_list('player1_name', flat=True).distinct()
@@ -253,6 +300,7 @@ def get_dashboardMatch_data(request):
         'areaChart1': area_chart_data,
         'lineChart1': line_chart_data,
         'scatteredChart1': scattered_chart_data,
+        'lineChart2': line_chart_data2,
         'cards': {
             'uniquePlayers': nbr_unique_players,
             'nbrMatches': nbr_matches,
@@ -270,6 +318,27 @@ def get_dashboardTournament_data(request):
     # Data for tournament games
     game_data = GameData.objects.all().filter(is_tournament_game=True)
     tournament_data = TournamentData.objects.all()
+
+
+    """ Chart data: Tournaments per Day """
+    chart_TournamentsPerDay = chart_entriesPerDay(tournament_data, 'tournament_end_timestamp')
+
+
+    """ Chart Data: Accumulated Playing Time per timestamp/day """
+    chart_AccPlayingTime = chart_accumulatedPlayingTime(tournament_data, 'tournament_end_timestamp', 'tournament_duration_secs')
+    
+
+    """ Chart Data: Number of Tournaments per Hour """
+    chart_TournamentsPerHour = chart_EntriesPerHour(tournament_data, 'tournament_end_timestamp')
+
+
+    """ Chart Data: listing of all tournaments and their duration """
+    chart_allTournamentDurations = chart_allDurations(tournament_data, 'tournament_end_timestamp', 'tournament_duration_secs')
+
+
+    """ Chart Data: average duration of tournaments per day """
+    chart_avgTournamentDurations = chart_avgDuration(tournament_data, 'tournament_end_timestamp', 'tournament_duration_secs')
+
 
     """ Data for the Cards (Tournaments) """
     # "different Players participated"
@@ -328,7 +397,11 @@ def get_dashboardTournament_data(request):
 
     # Prepare the response and return it as JSON
     response_data = {
-        #'chart1': chart_data,
+        'barChart1': chart_TournamentsPerDay,
+        'areaChart1': chart_AccPlayingTime,
+        'lineChart1': chart_TournamentsPerHour,
+        'scatteredChart1': chart_allTournamentDurations,
+        'lineChart2': chart_avgTournamentDurations,
         'cards': {
             'uniquePlayers': nbr_unique_players,
             'nbrMatches': nbr_tournaments,
