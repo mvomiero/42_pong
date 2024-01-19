@@ -6123,6 +6123,15 @@ form-control
     overflow: hidden; /* Ensures canvas doesn't protrude from rounded corners */
   }
 
+.dashboardDiv2  {
+  background-color: rgba(var(--bs-white-rgb)) !important;;
+  opacity: 1;
+  /* max-width: 100%;
+  height: auto; */
+  border-radius: 10px; /* Adjust the value to change the roundness */
+  overflow: hidden; /* Ensures canvas doesn't protrude from rounded corners */
+}
+
 .offcanvas, .offcanvas-xxl, .offcanvas-xl, .offcanvas-lg, .offcanvas-md, .offcanvas-sm {
   --bs-offcanvas-zindex: 1045;
   --bs-offcanvas-width: 400px;

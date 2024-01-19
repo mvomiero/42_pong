@@ -26,9 +26,27 @@ class TournamentData(models.Model):
     tournament_duration_secs = models.PositiveIntegerField()
     #player_ranking = models.ArrayField(models.CharField(max_length=255), size=4)
     player_ranking = models.JSONField()
+    blockchain_hash = models.CharField(max_length=64, null=True, blank=True)
 
     def __str__(self):
         return f"Tournament"
+    
+    # returns a dictionary with timestamps as keys and corresponding blockchain hashes as values
+    def get_blockchain_data(self):
+        timestamp = self.tournament_end_timestamp
+        formatted_timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        return {formatted_timestamp: self.blockchain_hash}
+
+    # iterates through all instances and accumulates the data into a single dictionary
+    @classmethod
+    def get_all_blockchain_data(cls):
+        all_blockchain_data = {}
+        tournaments = cls.objects.all()
+
+        for tournament in tournaments:
+            all_blockchain_data.update(tournament.get_blockchain_data())
+
+        return all_blockchain_data
         
     class Meta:
         app_label = 'pong'

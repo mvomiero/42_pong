@@ -112,13 +112,15 @@ def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, t
     gdur = finalMatch['endTime'] - finalMatch['startTime']
     matchIdFinal = add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
     tend = (pytz.timezone('UTC')).localize(tend)
+    hash = '#hash'
     tournament_data = TournamentData(
         match_id_semi_1=matchIdSemi1,
         match_id_semi_2=matchIdSemi2,
         match_id_final=matchIdFinal,
         tournament_end_timestamp=tend,
         tournament_duration_secs=tdur,
-        player_ranking = playersRank
+        player_ranking = playersRank,
+        blockchain_hash=hash
     )
     tournament_data.save()
 
@@ -402,6 +404,7 @@ def get_dashboardTournament_data(request):
         'lineChart1': chart_TournamentsPerHour,
         'scatteredChart1': chart_allTournamentDurations,
         'lineChart2': chart_avgTournamentDurations,
+        'allAndHash': TournamentData.get_all_blockchain_data(),
         'cards': {
             'uniquePlayers': nbr_unique_players,
             'nbrMatches': nbr_tournaments,

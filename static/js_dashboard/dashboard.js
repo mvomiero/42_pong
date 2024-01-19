@@ -40,6 +40,45 @@ function createTournamentDashboard() {
     drawLineChart(globalTournamentData.lineChart1, 'tournament-chart2', 'Tournaments per Hour');
     drawAreaChart(globalTournamentData.areaChart1, 'tournament-chart3', 'Accumulated Playing Time');
     drawScatteredChart(globalTournamentData.scatteredChart1, globalTournamentData.lineChart2, 'tournament-chart4', 'Tournament Duration (Average & Seperately)');
+
+    // Draw table
+    initDataTableTournament(globalTournamentData.allAndHash); // tournamentsHash
+}
+
+
+/***************************************************/
+/********** TABLE INITIALATION / SETTINGS **********/
+/************* (TOURNAMENT DASHBOARD) **************/
+/***************************************************/
+
+let dataTableTournament;
+
+window.addEventListener('DOMContentLoaded', event => {
+    const table = document.querySelector('#tournamentsHash');
+
+    if (table) {
+        dataTableTournament = new simpleDatatables.DataTable(table, {
+            perPage: 5,             // Number of items per page
+            perPageSelect: false,   // Hide the dropdown for selecting number of items per page
+            searchable: false,       // Enable search field
+
+            paging: true,           // Enable pagination
+            firstLast: true,        // Show the 'first' and 'last' buttons
+            truncatePager: true,    // Truncate the page links to prevent overflow with large datasets.
+            pagerDelta: 1,          // Number of page links to display before and after the current page
+        });
+        console.log('dataTableTournament: ', dataTableTournament);
+    }
+});
+
+function initDataTableTournament(tournamentList) {
+    for (const [key, value] of Object.entries(tournamentList)) {
+        console.log(`${key}: ${value}`);
+        var newRow = [key, `<a class="btn btn-vaporwave btn-choose" href="https://ecosia.org" target="_blank">${value}</a>`];
+
+        dataTableTournament.rows.add(newRow);
+    }
+    
 }
 
 
