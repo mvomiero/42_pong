@@ -196,3 +196,9 @@
 .text-lightBlue {
   color: var(--bs-secondary) !important;
 }
+
+.col-background {
+  background-color: #dd00ff;
+  padding: 1rem;
+
+}
