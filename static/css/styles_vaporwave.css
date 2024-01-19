@@ -186,11 +186,15 @@
 }
 
 .text-white {
-  color: #ffffff !important;
+  color: white !important;
+  text-shadow: 2px 2px 0px var(--btn-color);
+  /* color: #ffffff !important; */
 }
 
 .text-magenta {
   color: #ff00ff !important;
+  text-shadow: 3px 3px 0px var(--bs-btn-submit-bg);
+  margin: 1.5rem;
 }
 
 .text-lightBlue {
@@ -201,4 +205,39 @@
   background-color: #dd00ff;
   padding: 1rem;
 
+}
+
+
+.datatable-input {
+  border: magenta 3px solid;
+  color: magenta;
+  background-color: #000000;
+  box-shadow: 2px 2px 0px var(--btn-hover-color);
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+}
+
+.datatable-bottom {
+  margin-top: 3rem;
+}
+
+
+.page-link {
+  border: magenta;
+  background-color: #000000;
+  color: white;
+  box-shadow: 4px 4px 0px var(--btn-hover-color);
+}
+
+.page-link:hover {
+  background-color: var(--btn-hover-color);
+  color: magenta;
+  font-weight: bold;
+  box-shadow: 0 0;
+}
+
+.datatable-pagination-list-item:active {
+  color: magenta;
+  font-weight: bold;
+  box-shadow: 4px 4px 0px var(--btn-hover-color);
 }
