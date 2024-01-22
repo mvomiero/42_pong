@@ -68,7 +68,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   sceneProperties.scene.background = new THREE.Color(sceneProperties.backgroundColour);
 
   var scorePlayer1 = 0, scorePlayer2 = 0;
-  const winningScore = 3;
+  const winningScore = 13;
   const ball = {};
   var intervalUpdateRateMs = 20;
   var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;

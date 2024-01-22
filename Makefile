@@ -3,6 +3,9 @@ all: run
 run:
 	python3 manage.py runserver
 
+run_public:
+	python3 manage.py runserver 10.15.204.1:18000
+
 migrate:
 	python3 manage.py makemigrations
 	python3 manage.py migrate
