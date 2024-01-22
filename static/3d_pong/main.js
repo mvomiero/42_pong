@@ -112,7 +112,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     var connectionString =
       "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
     gameSocket = new WebSocket(connectionString);
-    console.log("[WebSocket starte] connectionString: ", connectionString);
+    console.log("[WebSocket started] connectionString: ", connectionString);
 
     // start the game
     initGame();
@@ -123,11 +123,20 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     gameSocket.onerror = handleWebSocketError;
   }
 
+  // Function to show the name input field
+  function showNameInput2() {
+    document.getElementById('restartGameButton').style.display = 'none';
+    document.getElementById('nameInputSection').style.display = 'block';
+  }
+
   // Event listener for the Start Game Button
   document.getElementById('startRemoteGameButton').addEventListener('click', showNameInput);
 
   // Event listener for the Submit Name Button
   document.getElementById('submitNameButton').addEventListener('click', submitNameAndStartGame);
+
+  // Event listener for the Submit Name Button
+  document.getElementById('restartGameButton').addEventListener('click', showNameInput2);
 
   // Function to check if an element is in the viewport
   function isInViewport(element) {
@@ -394,6 +403,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       sceneProperties.winnerName = thisPlayer;
       sceneProperties.winnerColour = playerColour;
       sceneProperties.currentScene = "end";
+      console.log("current scene is: ", sceneProperties.currentScene);
+      endGame2();
+      sendMatchInfo(); // send "end" command to add gameData to database
       // initClosingTitles(sceneProperties);
     }
   }
@@ -630,9 +642,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     // if (sceneProperties.currentScene === "closingTitles") {
     //   animateClosingTitles(sceneProperties);
     // }
+    console.log("[in Loop] current scene is: ", sceneProperties.currentScene);
     if (sceneProperties.currentScene === "end") {
+      console.log("sendMatchInfo for end game");
       endGame2();
       sendMatchInfo(); // send "end" command to add gameData to database
+      return;
     }
   }
 
@@ -737,6 +752,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   // Event handler for connection closure
   function handleWebSocketClose(event) {
     console.log("WebSocket connection closed! (code: " + event.code + ")");
+
+    // set canvas to display none and 'restartPongSection' to display block
+    document.getElementById('game_board').style.display = 'none';
+    document.getElementById('restartPongSection').style.display = 'block';
+
     /*********************************************************/
     /***************** CHANGES STARTING HERE *****************/
     /*********************************************************/
