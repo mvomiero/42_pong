@@ -92,8 +92,14 @@ function fetchPlayerDashboardList() {
         // Process the retrieved data
         console.log('[Player] Data received from backend (player List): ', data);
         
-        // Initialize DataTable
-        initializeDataTable(data.playerList);
+        // wait until 'dataTable' is initialized
+        let wait = setInterval(function() {
+            if (typeof dataTable !== 'undefined') {
+                clearInterval(wait);
+                initializeDataTable(data.playerList);
+            }
+        }, 10);
+
       })
       .catch(error => {
         console.error('Fetch error:', error);
