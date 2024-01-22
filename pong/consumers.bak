@@ -71,6 +71,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'group_name':  ['tournament_1'],
                     #     'startTime':   <timestamp>,
                     #     'endTime':     None,          # None if not started yet
+                    #     'playersRank': ['player3', 'player1', 'player2', 'player4'],
                     # },
                     # 'id2': {
                     #     'players':     ['player5', 'player6'],
@@ -79,6 +80,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'group_name':  ['tournament_2'],
                     #     'startTime':   <timestamp>,
                     #     'endTime':     <timestamp>,
+                    #     'playersRank': [None, None, None, None],
                     # },
 
 
@@ -516,7 +518,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
             # [match_info for Final]
             elif self.match_id == tournament['matchFinal']:
-                finalRank = await self.get_finalRankTournament(self.tournament_id)
+                self.set_tournaments[self.tournament_id]['playersRank'] = await self.get_finalRankTournament(self.tournament_id)
                 self.match_id = None
                 self.discard_playerFromGroup(self.group_name_match)
                 self.group_name_match = None
@@ -539,13 +541,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
 
         # [Broadcast match game-data]
         if (self.match_id is not None 
-            and (
-                received_data['command'] == "updateLeftPaddle" or
-                received_data['command'] == "updateRightPaddle" or
-                received_data['command'] == "updateBall" or
-                received_data['command'] == "initBall" or
-                received_data['command'] == "gamePause"
-            )
+            and (received_data['command'] == "update" or received_data['command'] == "gamePause")
             and self.set_matches[self.match_id]['finished'] == False):
             await self.send_to_group(text_data, self.group_name_match)
 
