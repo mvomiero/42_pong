@@ -40,9 +40,9 @@ import {OrbitControls} from 'three/OrbitControls';
 const fontLoader = new FontLoader();
 fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_serif_regular.typeface.json', function (font) {
   const canvas = document.getElementById("gameCanvas");
-  console.log("canvas=", canvas);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
+  const light = new THREE.PointLight(0xffddaa, 1.3, 150);
   const renderer = new THREE.WebGLRenderer({ canvas: canvas });
   renderer.setSize(canvas.width, canvas.height);
   const zoomFactor = 0.027;
@@ -62,15 +62,15 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     tableColour: 0x46A07E,
     tableWallsColour: 0x77777E,
     font: font,
-    winnerName: undefined,
-    winnerColour: undefined
   };
   sceneProperties.scene.background = new THREE.Color(sceneProperties.backgroundColour);
+  light.position.set(0, 0, 12);
+  sceneProperties.scene.add(light);
 
   var scorePlayer1 = 0, scorePlayer2 = 0;
-  const winningScore = 13;
+  const winningScore = 2;
   const ball = {};
-  var intervalUpdateRateMs = 20;
+  const intervalUpdateRateMs = 20;
   var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
   var ballMesh, minBallZ, maxBallZ;
   const ballSize = 0.4, initBallSpeed = 0.2, minBallSpeed = 0.1, amountToSlow = 0, maxBallSpeedDivider = 4; // amountToSlow = 0.025
@@ -82,8 +82,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   var controls;
   var player1, player2;
   var player = 0;
+  var winnerName;
+  var winnerColour;
   var char_choice;
   var gameSocket;
+  var animationId;
   
   /**************************************************/
   /******************** NEW PART ********************/
@@ -158,7 +161,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     minBallZ = sceneProperties.zoomedCanvasWidth * 0.05;
     maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     initCamera();
-    initLight();
     initTable();
     createTable();
     renderer.render(scene, camera);
@@ -180,33 +182,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     window.addEventListener('resize', onWindowResize, false);
     setNormalCam();
   }
-
-  function initLight() {
-    const light = new THREE.PointLight(0xffddaa, 1.3, 150);
-    light.position.set(0, 0, 12);
-    sceneProperties.scene.add(light);
-  }
-
-  function endGame1() {
-    removeAndDispose(ballMesh);
-    removeAndDispose(scorePlayer1Mesh);
-    removeAndDispose(scorePlayer2Mesh);
-    removeAndDispose(namePlayer1Mesh);
-    removeAndDispose(namePlayer2Mesh);
-  }
-
-  function endGame2() {
-    removeAndDispose(leftPaddleMesh);
-    removeAndDispose(rightPaddleMesh);
-    removeAndDispose(tableMesh);
-    removeAndDispose(tableMesh);
-    removeAndDispose(tableUpperWallMesh);
-    removeAndDispose(tableLowerWallMesh);
-    removeAndDispose(netMesh);
-    renderer.render(scene, camera);
-  }
-
-  function removeAndDispose(object) {
+  
+  function removeAndDisposeAndMakeUndefined(object) {
     sceneProperties.scene.remove(object);
     if (object.geometry)
       object.geometry.dispose();
@@ -215,6 +192,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         object.material.map.dispose();
       object.material.dispose();
     }
+    object = undefined;
   }
 
   function initTable() {
@@ -397,15 +375,48 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       ball.speed = newBallSpeed;
   }
 
+  function reinitialise() {
+    scorePlayer1 = 0;
+    scorePlayer2 = 0;
+    leftPaddleSpeed = 0;
+    rightPaddleSpeed = 0;
+    paddleCam = false;
+    player1 = undefined;
+    player2 = undefined;
+    player = undefined;
+    winnerName = undefined;
+    winnerColour = undefined;
+    char_choice = undefined;
+    gameSocket = undefined;
+    animationId = undefined;
+    sceneProperties.currentScene = "waitingForPlayers";
+  }
+
   function checkForWin(score, thisPlayer, playerColour) {
     if (score === winningScore) {
-      endGame1();
-      sceneProperties.winnerName = thisPlayer;
-      sceneProperties.winnerColour = playerColour;
-      sceneProperties.currentScene = "end";
-      console.log("current scene is: ", sceneProperties.currentScene);
-      endGame2();
-      sendMatchInfo(); // send "end" command to add gameData to database
+      winnerName = thisPlayer;
+      winnerColour = playerColour;
+      removeAndDisposeAndMakeUndefined(ballMesh);
+      removeAndDisposeAndMakeUndefined(scorePlayer1Mesh);
+      removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
+      removeAndDisposeAndMakeUndefined(namePlayer1Mesh);
+      removeAndDisposeAndMakeUndefined(namePlayer2Mesh);
+      removeAndDisposeAndMakeUndefined(leftPaddleMesh); 
+      removeAndDisposeAndMakeUndefined(rightPaddleMesh);
+      removeAndDisposeAndMakeUndefined(tableMesh);
+      removeAndDisposeAndMakeUndefined(tableMesh);
+      removeAndDisposeAndMakeUndefined(tableUpperWallMesh);
+      removeAndDisposeAndMakeUndefined(tableLowerWallMesh);
+      removeAndDisposeAndMakeUndefined(netMesh);
+      removeAndDisposeAndMakeUndefined(controls);
+      renderer.render(scene, camera);
+      cancelAnimationFrame(animationId);
+      setTimeout(function() {
+        console.log("sending match info");
+        sendMatchInfo(); // send "end" command to add gameData to database
+        console.log("reinitialising");
+        reinitialise();
+      }, 500);
       // initClosingTitles(sceneProperties);
     }
   }
@@ -456,9 +467,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   function ballPassedLeftPaddle() {
     scorePlayer2++;
-    removeAndDispose(scorePlayer2Mesh);
+    removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
     createP2ScoreText();
-    removeAndDispose(ballMesh);  
+    removeAndDisposeAndMakeUndefined(ballMesh);  
     // setPaddleCamForLeadingPlayer();
     renderer.render(scene, camera);
     checkForWin(scorePlayer2, player2, sceneProperties.p2Colour);
@@ -470,9 +481,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   function ballPassedRightPaddle() {
     scorePlayer1++;
-    removeAndDispose(scorePlayer1Mesh);
+    removeAndDisposeAndMakeUndefined(scorePlayer1Mesh);
     createP1ScoreText();
-    removeAndDispose(ballMesh);
+    removeAndDisposeAndMakeUndefined(ballMesh);
     // setPaddleCamForLeadingPlayer();
     renderer.render(scene, camera);
     checkForWin(scorePlayer1, player1, sceneProperties.p1Colour);
@@ -620,15 +631,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         player1: scorePlayer1,
         player2: scorePlayer2,
       },
-      winner: sceneProperties.winnerName
+      winner: winnerName
     };
     gameSocket.send(JSON.stringify(matchInfo));
   }
-
   // RECEIVING DATA
 
   function startAnimationLoop() {
-    requestAnimationFrame(startAnimationLoop);
+    animationId = requestAnimationFrame(startAnimationLoop);
     // console.log("current scene is: ", sceneProperties.currentScene);
     // if (sceneProperties.currentScene === "openingTitles") {
     //   animateOpeningTitles(sceneProperties);
@@ -637,24 +647,19 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       checkIfBallHitTopBottomTable();
       checkIfBallHitOrPassedPaddles();
       updateBall();
-      renderer.render(scene, camera);
+      renderer.render(scene, camera); 
     }
     // if (sceneProperties.currentScene === "closingTitles") {
     //   animateClosingTitles(sceneProperties);
     // }
-    console.log("[in Loop] current scene is: ", sceneProperties.currentScene);
-    if (sceneProperties.currentScene === "end") {
-      console.log("sendMatchInfo for end game");
-      endGame2();
-      sendMatchInfo(); // send "end" command to add gameData to database
-      return;
-    }
   }
 
   function handleWebSocketOpen(event) {
     try {
       // console.log("RECEIVED DATA:", event.data);
       var data = JSON.parse(event.data);
+      console.log("ed", event.data);
+      console.log("currentScene", sceneProperties.currentScene);
 
       if (sceneProperties.currentScene === "waitingForPlayers" && data.command === "set_player") {
         console.log("set player", data.player);
@@ -693,7 +698,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
       if (data.command === "initBall") {
         if (ballMesh)
-          removeAndDispose(ballMesh);
+          removeAndDisposeAndMakeUndefined(ballMesh);
         sceneProperties.currentScene = "game";
         var geometry = new THREE.SphereGeometry(ballSize, 50);
         var material = new THREE.MeshPhongMaterial({color: sceneProperties.ballColour});

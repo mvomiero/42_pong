@@ -17,3 +17,6 @@ clean:
 	
 su:
 	python3 manage.py createsuperuser
+
+install_cors_headers:
+	pip3 install corsheaders

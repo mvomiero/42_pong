@@ -481,6 +481,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # [Match (Remote & Tournament)] broadcast match_info (update & end) to all players in the match_group
         if self.match_id is not None and received_data['command'] == "match_info" and (received_data['mode'] == "update" or received_data['mode'] == "end") and not self.set_matches[self.match_id]['finished']:
             await self.send_to_group(text_data, self.set_matches[self.match_id]['group_name'])
+            print(f"\n   ++++++++++++++ message: {received_data}")
             if received_data['mode'] == "end":
                 self.set_matches[self.match_id]['finished'] = True
                 self.set_matches[self.match_id]['endTime'] = self.get_currentTimestamp()
