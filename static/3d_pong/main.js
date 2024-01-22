@@ -125,7 +125,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // Function to show the name input field
   function showNameInput2() {
-    document.getElementById('restartGameButton').style.display = 'none';
+    document.getElementById('restartPongSection').style.display = 'none';
     document.getElementById('nameInputSection').style.display = 'block';
   }
 

@@ -134,7 +134,8 @@
                     <!-- Restart selection process -->
                     <div id="restartPongSection" style="display: none;">
                         <button id="restartGameButton" class="btn-vaporwave btn-vaporwave-submit">Restart</button>
-                        <button id="dashboard" href="#dashboard" class="btn-vaporwave btn-vaporwave-submit">Dashboard</button>
+                        <!-- <button id="dashboard" href="#dashboard" class="btn-vaporwave btn-vaporwave-submit">Dashboard</button> -->
+                        <a class="btn-vaporwave" href="#dashboard">Dashboard</a>
                     </div>
 
                 </div>
@@ -593,11 +594,6 @@
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
 
-        <!-- Pong Game-->
-        <script type="module" src="{% static '3d_pong/main.js' %}"></script>
-        <!-- <script type="text/javascript" src ="{% static '3d_pong/keyboardEvents.js' %}"></script>
-        <script type="text/javascript" src ="{% static '3d_pong/webSocket.js' %}"></script> -->
-        
         <!-- Dashboard -->
         <script type="text/javascript" src ="{% static 'js_dashboard/fetchData.js' %}"></script>
         <script type="text/javascript" src ="{% static 'js_dashboard/drawCharts.js' %}"></script>
@@ -605,5 +601,11 @@
         <script type="text/javascript" src ="{% static 'js_dashboard/playerDaschboard.js' %}"></script>
         <script type="text/javascript" src ="{% static 'js_dashboard/pagination.js' %}"></script>
         <script type="text/javascript" src ="{% static 'js_dashboard/dashboard.js' %}"></script>
+
+        <!-- Pong Game-->
+        <script type="module" src="{% static '3d_pong/main.js' %}"></script>
+        <!-- <script type="text/javascript" src ="{% static '3d_pong/keyboardEvents.js' %}"></script>
+        <script type="text/javascript" src ="{% static '3d_pong/webSocket.js' %}"></script> -->
+        
     </body>
 </html>
