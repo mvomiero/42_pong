@@ -87,7 +87,15 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   var char_choice;
   var gameSocket;
   var animationId;
-  
+
+  // variables for tournament:
+  var tournament_stage; // show the state of the tournament: "waitingForPlayers", "semifinal", "final", "closing"
+                        // "final" & "semifinal": when activily playing the match
+                        // state: my semifinal is over and the other semifinal is still running -> still in "semifinal" (trigger is match_info with mode "start")
+                        // "closing": when the tournament is over, WebSocket is closed and e.g. the closing titles are shown
+  var game_mode; // "local" or "remote" or "tournament"
+
+
   /**************************************************/
   /******************** NEW PART ********************/
   /**************************************************/
@@ -108,6 +116,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         // Connect to the websocket
         // roomCode, connectionString and gameSocket are set as var as we will need to change them later!
         var roomCode = document.getElementById("room_code").value;
+        if (roomCode === "Tournament") {
+            game_mode = "tournament";
+            tournament_stage = "waitingForPlayers";
+        } else if (roomCode === "Match") {
+            game_mode = "remote";
+        }
         char_choice = playerName;
         var connectionString =
           "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
@@ -379,6 +393,13 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   }
 
   function reinitialise() {
+    animationId = undefined;
+    /* if (tournament_stage === undefined) {
+        console.log("tournament_stage: ", tournament_stage);
+        char_choice = undefined;
+        gameSocket = undefined;
+        animationId = undefined;
+    } */
     scorePlayer1 = 0;
     scorePlayer2 = 0;
     leftPaddleSpeed = 0;
@@ -389,9 +410,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     player = undefined;
     winnerName = undefined;
     winnerColour = undefined;
-    char_choice = undefined;
-    gameSocket = undefined;
-    animationId = undefined;
     sceneProperties.currentScene = "waitingForPlayers";
   }
 
@@ -414,12 +432,16 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       removeAndDisposeAndMakeUndefined(controls);
       renderer.render(scene, camera);
       cancelAnimationFrame(animationId);
+      /* if (tournament_stage === undefined) {
+          cancelAnimationFrame(animationId);
+      } */
       setTimeout(function() {
         console.log("sending match info");
         sendMatchInfo(); // send "end" command to add gameData to database
         console.log("reinitialising");
         reinitialise();
       }, 500);
+      console.log("[checkForWin] gameSocket: ", gameSocket);
       // initClosingTitles(sceneProperties);
     }
   }
@@ -664,8 +686,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     try {
       // console.log("RECEIVED DATA:", event.data);
       var data = JSON.parse(event.data);
-      console.log("ed", event.data);
-      console.log("currentScene", sceneProperties.currentScene);
+      /* console.log("ed", event.data);
+      console.log("currentScene", sceneProperties.currentScene); */
 
       if (sceneProperties.currentScene === "waitingForPlayers" && data.command === "set_player") {
         console.log("set player", data.player);
@@ -673,8 +695,15 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         char_choice = data.player;
       }
 
+      if (data.command === "match_info") {
+        console.log("match_info", data);
+      }
       if (sceneProperties.currentScene === "waitingForPlayers" && data.command === "match_info") {
         if (data.mode === "start") {
+          if (tournament_stage === "final") {
+            initGame();
+            createLeftPaddle();
+          }
           player1 = data.player1;
           player2 = data.player2;
           if (char_choice === player1) {
@@ -745,14 +774,18 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         rightPaddleSpeed = data.speed;
       }
 
-      // if (data.command === "tournament_info") {
-      //   // PlayerCheck if both players in the final match are set
-      //   if (data.matchFinal.player1 !== undefined && data.matchFinal.player2 !== undefined) {
-      //     tournament_stage = "final";
-      //   } else {
-      //     tournament_stage = "semifinal";
-      //   }
-      // }
+      // keeping track of tournament_info states
+      if (data.command === "tournament_info") {
+        console.log("tournament_info: ", data);
+        if (data.mode === "start") {
+            tournament_stage = "semifinal";
+        } else if (data.mode === "update" && data.matchFinal.player1 !== undefined && data.matchFinal.player2 !== undefined) {
+            tournament_stage = "final";
+        } else if (data.mode === "end") {
+            tournament_stage = "closing";
+        }
+        console.log("tournament_stage: ", tournament_stage);
+      }
 
     } catch (error) {
       console.error("Error parsing received data:", error);

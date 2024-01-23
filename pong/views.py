@@ -103,13 +103,23 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     durations (e.g. tdur) = number (e.g. 10)
 def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur):
     gend = datetime.fromtimestamp(semiMatch1['endTime'])
-    gdur = semiMatch1['endTime'] - semiMatch1['startTime']
+    try:
+        gdur = semiMatch1['endTime'] - semiMatch1['startTime']
+    except:
+        gdur = 0
     matchIdSemi1 = add_game_data(semiMatch1['players'][0], semiMatch1['score'][0], semiMatch1['players'][1], semiMatch1['score'][1], gend, gdur, True)
     gend = datetime.fromtimestamp(semiMatch2['endTime'])
-    gdur = semiMatch2['endTime'] - semiMatch2['startTime']
+    try:
+        gdur = semiMatch2['endTime'] - semiMatch2['startTime']
+    except:
+        gdur = 0
     matchIdSemi2 = add_game_data(semiMatch2['players'][0], semiMatch2['score'][0], semiMatch2['players'][1], semiMatch2['score'][1], gend, gdur, True)
     gend = datetime.fromtimestamp(finalMatch['endTime'])
-    gdur = finalMatch['endTime'] - finalMatch['startTime']
+    try:
+        gdur = finalMatch['endTime'] - finalMatch['startTime']
+    except:
+        gdur = 0
+        print(f"\nError: finalMatch['endTime']={finalMatch['endTime']} | finalMatch['startTime']={finalMatch['startTime']}")
     matchIdFinal = add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
     tend = (pytz.timezone('UTC')).localize(tend)
     hash = '#hash'

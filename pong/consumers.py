@@ -261,6 +261,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             # Start match
             print(f"semi-final 1: {self.set_matches[id_semi1]}")
             print(f"semi-final 2: {self.set_matches[id_semi2]}")
+            self.set_matches[id_semi1]['startTime'] = self.get_currentTimestamp()
+            self.set_matches[id_semi2]['startTime'] = self.get_currentTimestamp()
             await self.send_to_group(match_info('start', self.set_matches[id_semi1]['players']), self.set_matches[id_semi1]['group_name'])
             await self.send_to_group(match_info('start', self.set_matches[id_semi2]['players']), self.set_matches[id_semi2]['group_name'])
 
@@ -395,6 +397,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         if code is not None:
             await user.reject_connection(code)
 
+        print(f"\nDeleted user {user_id} with code {code}.\n")
+
         # Set user parameters to None
         user.room_code = None
         user.player = None
@@ -481,12 +485,11 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # [Match (Remote & Tournament)] broadcast match_info (update & end) to all players in the match_group
         if self.match_id is not None and received_data['command'] == "match_info" and (received_data['mode'] == "update" or received_data['mode'] == "end") and not self.set_matches[self.match_id]['finished']:
             await self.send_to_group(text_data, self.set_matches[self.match_id]['group_name'])
-            print(f"\n   ++++++++++++++ message: {received_data}")
             if received_data['mode'] == "end":
                 self.set_matches[self.match_id]['finished'] = True
                 self.set_matches[self.match_id]['endTime'] = self.get_currentTimestamp()
                 self.storeMatchScore(self.match_id, received_data['score'])
-                print(f"FINISHED MATCH: {self.set_matches[self.match_id]}")
+                #print(f"FINISHED MATCH: {self.set_matches[self.match_id]}")
                 if self.tournament_id is None:
                     # [store in database]
                     # await self.send_matchToDatabase(self.set_matches[self.match_id])
@@ -510,21 +513,24 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     await self.add_playerToMatch(tournament['matchFinal'])
                 await self.add_playerToGroup(self.set_matches[self.match_id]['group_name'])
                 # [all 4 players in final group] broadcast match_info 'start'
+                print(f"\n\n[player: {self.player}] len(self.channel_layer.groups.get(...): {len(self.channel_layer.groups.get(self.group_name_match, {}).items())}")
                 if len(self.channel_layer.groups.get(self.group_name_match, {}).items()) == 4:
+                    print(f"+++++++++++++ sending match_info 'start' for final match +++++++++++++")
+                    self.set_matches[tournament['matchFinal']]['startTime'] = self.get_currentTimestamp()
                     await self.send_to_group(match_info('start', self.set_matches[tournament['matchFinal']]['players']), self.group_name_match)
                 # [broadcast tournament_info]
-                print(f"Broadcasting: {tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank)}")
+                print(f"Broadcasting1: {tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank)}")
                 await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
             # [match_info for Final]
             elif self.match_id == tournament['matchFinal']:
-                finalRank = await self.get_finalRankTournament(self.tournament_id)
+                self.set_tournaments[self.tournament_id]['playersRank'] = await self.get_finalRankTournament(self.tournament_id)
                 self.match_id = None
                 self.discard_playerFromGroup(self.group_name_match)
                 self.group_name_match = None
                 tournament_mode = 'end'
                 self.set_tournaments[self.tournament_id]['endTime'] = self.get_currentTimestamp()
                 # [broadcast tournament_info]
-                print(f"Broadcasting: {tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank)}")
+                print(f"Broadcasting2: {tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank)}")
                 await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
                 # [store in database]
                 await self.send_tournamentToDatabase(tournament)
