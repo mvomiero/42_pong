@@ -100,30 +100,41 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // Function to show the canvas after submitting the name
   function submitNameAndStartGame() {
-    const playerName = document.getElementById('playerName').value;
-    if (playerName.trim() !== '') { // Check if name is not empty
+    const playerName = document.getElementById('playerName').value.trim();  // Get the player name and remove leading and trailing whitespace
+    if (playerName === '') {
+        console.log('The string is empty.');
+      } else if (playerName.length > 10) {
+        console.log('The string has more than 10 characters.');
+      } else {
+        console.log('The string is not empty and has 10 or fewer characters.');
+      }
+
+    if (playerName !== '' && playerName.length <= 10) { // Check if name is not empty and has max 10 characters
         document.getElementById('nameInputSection').style.display = 'none';
         document.getElementById('game_board').style.display = 'block';
+
+        // Connect to the websocket
+        // roomCode, connectionString and gameSocket are set as var as we will need to change them later!
+        var roomCode = document.getElementById("room_code").value;
+        char_choice = playerName;
+        var connectionString =
+          "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
+        gameSocket = new WebSocket(connectionString);
+        console.log("[WebSocket started] connectionString: ", connectionString);
+
+        // start the game
+        initGame();
+
+        // Set the event handlers
+        gameSocket.onmessage = handleWebSocketOpen;
+        gameSocket.onclose = handleWebSocketClose;
+        gameSocket.onerror = handleWebSocketError;
+
+    } else if (playerName.length > 10) {
+        alert('Name too long - Please enter a valid name.');
     } else {
         alert('Please enter a valid name.');
     }
-
-    // Connect to the websocket
-    // roomCode, connectionString and gameSocket are set as var as we will need to change them later!
-    var roomCode = document.getElementById("room_code").value;
-    char_choice = playerName;
-    var connectionString =
-      "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
-    gameSocket = new WebSocket(connectionString);
-    console.log("[WebSocket started] connectionString: ", connectionString);
-
-    // start the game
-    initGame();
-
-    // Set the event handlers
-    gameSocket.onmessage = handleWebSocketOpen;
-    gameSocket.onclose = handleWebSocketClose;
-    gameSocket.onerror = handleWebSocketError;
   }
 
   // Function to show the name input field
