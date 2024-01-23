@@ -101,14 +101,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   // Function to show the canvas after submitting the name
   function submitNameAndStartGame() {
     const playerName = document.getElementById('playerName').value.trim();  // Get the player name and remove leading and trailing whitespace
-    if (playerName === '') {
-        console.log('The string is empty.');
-      } else if (playerName.length > 10) {
-        console.log('The string has more than 10 characters.');
-      } else {
-        console.log('The string is not empty and has 10 or fewer characters.');
-      }
-
     if (playerName !== '' && playerName.length <= 10) { // Check if name is not empty and has max 10 characters
         document.getElementById('nameInputSection').style.display = 'none';
         document.getElementById('game_board').style.display = 'block';
