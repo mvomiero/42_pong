@@ -119,7 +119,6 @@ def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, t
         gdur = finalMatch['endTime'] - finalMatch['startTime']
     except:
         gdur = 0
-        print(f"\nError: finalMatch['endTime']={finalMatch['endTime']} | finalMatch['startTime']={finalMatch['startTime']}")
     matchIdFinal = add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
     tend = (pytz.timezone('UTC')).localize(tend)
     hash = '#hash'
