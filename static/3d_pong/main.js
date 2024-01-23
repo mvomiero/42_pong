@@ -555,6 +555,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // listen to keyboard events to move the paddles
   document.addEventListener("keydown", function (e) {
+    if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+        e.preventDefault();
+    }
     if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKey.toLowerCase()) {
       clearInterval(paddleInterval);
       myPaddleSpeed = 0;
