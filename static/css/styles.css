@@ -4214,7 +4214,7 @@ form-control
   --bs-card-cap-color: ;
   --bs-card-height: ;
   --bs-card-color: ;
-  --bs-card-bg: #1d0232;
+  --bs-card-bg: #000000;
   --bs-card-img-overlay-padding: 1rem;
   --bs-card-group-margin: 0.75rem;
   position: relative;
@@ -7733,7 +7733,7 @@ form-control
 }
 
 .mb-1 {
-  margin-bottom: 4rem !important;
+  margin-bottom: 0.25rem !important;
   /* font-family: 'Press Start 2P', cursive !important; */
 }
 
@@ -11201,6 +11201,6 @@ footer.footer .social-link:hover {
 }
 
 .dashboard-icon {
-    background-color:  #fff;
-    color: rgba(var(--bs-primary-rgb)); /* Specify the desired color */
+    background-color:  transparent;
+    color: rgba(var(--bs-secondary-rgb));
 }
