@@ -6104,7 +6104,7 @@ form-control
 
 .pongCanvas {
   background-color: rgba(var(--bs-secondary-rgb)) !important;;
-  opacity: 0.5;
+  opacity: 1;
   width: 100%;
   height: auto;
 }
