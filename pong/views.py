@@ -102,6 +102,15 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
 def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur):
+    # print for all data that is added to the database
+    print(f"\n\nAdding tournament data:")
+    print(f"semiMatch1={semiMatch1}")
+    print(f"semiMatch2={semiMatch2}")
+    print(f"finalMatch={finalMatch}")
+    print(f"playersRank={playersRank}")
+    print(f"tend={tend} | tdur={tdur}\n\n")
+    
+    
     gend = datetime.fromtimestamp(semiMatch1['endTime'])
     try:
         gdur = semiMatch1['endTime'] - semiMatch1['startTime']
