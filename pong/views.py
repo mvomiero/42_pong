@@ -102,32 +102,14 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
 def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur):
-    # print for all data that is added to the database
-    print(f"\n\nAdding tournament data:")
-    print(f"semiMatch1={semiMatch1}")
-    print(f"semiMatch2={semiMatch2}")
-    print(f"finalMatch={finalMatch}")
-    print(f"playersRank={playersRank}")
-    print(f"tend={tend} | tdur={tdur}\n\n")
-    
-    
     gend = datetime.fromtimestamp(semiMatch1['endTime'])
-    try:
-        gdur = semiMatch1['endTime'] - semiMatch1['startTime']
-    except:
-        gdur = 0
+    gdur = semiMatch1['endTime'] - semiMatch1['startTime']
     matchIdSemi1 = add_game_data(semiMatch1['players'][0], semiMatch1['score'][0], semiMatch1['players'][1], semiMatch1['score'][1], gend, gdur, True)
     gend = datetime.fromtimestamp(semiMatch2['endTime'])
-    try:
-        gdur = semiMatch2['endTime'] - semiMatch2['startTime']
-    except:
-        gdur = 0
+    gdur = semiMatch2['endTime'] - semiMatch2['startTime']
     matchIdSemi2 = add_game_data(semiMatch2['players'][0], semiMatch2['score'][0], semiMatch2['players'][1], semiMatch2['score'][1], gend, gdur, True)
     gend = datetime.fromtimestamp(finalMatch['endTime'])
-    try:
-        gdur = finalMatch['endTime'] - finalMatch['startTime']
-    except:
-        gdur = 0
+    gdur = finalMatch['endTime'] - finalMatch['startTime']
     matchIdFinal = add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
     tend = (pytz.timezone('UTC')).localize(tend)
     hash = '#hash'
