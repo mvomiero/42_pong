@@ -241,3 +241,10 @@
   font-weight: bold;
   box-shadow: 4px 4px 0px var(--btn-hover-color);
 }
+
+#closing_message {
+  color: #001aff;
+  text-shadow: 4px 4px 0px magenta;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 3em !important;
+}
