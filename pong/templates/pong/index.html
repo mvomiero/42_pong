@@ -152,6 +152,14 @@
                         <canvas class="pongCanvas" width="750" height="485" id="gameCanvas"></canvas>
                     </div>
 
+                    <div id="img_win" class="align-items-center" style="display: none;">
+                        <img class="mx-auto rounded-circle smaller-image image-results animation win" src="{% static 'assets/img/results/win1.png' %}" alt="..." />
+                    </div>
+
+                    <div id="img_loss" class="align-items-center" style="display: none;">
+                        <img class="mx-auto rounded-circle smaller-image image-results animation loss" src="{% static 'assets/img/results/loss1.png' %}" alt="..." />
+                    </div>
+
                     <div id="game_message" class="game row justify-content-between" style="display: none;">
                         <div id="message_info" class="info col-md-6 text-left">Info</div>
                     </div>

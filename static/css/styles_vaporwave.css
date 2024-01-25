@@ -74,6 +74,11 @@
     
 }
 
+.image-results {
+  width: 300px; 
+  height: 300px;
+}
+
 .smaller-image:hover {
     border-color: #0114c2;
     transition: transform 0.3s ease;
@@ -95,6 +100,12 @@
 }
 .smaller-image.pa:hover {
     content: url("../assets/img/team/pa2.png");
+}
+.smaller-image.win:hover {
+    content: url("../assets/img/results/win2.png");
+}
+.smaller-image.loss:hover {
+    content: url("../assets/img/results/loss2.png");
 }
 
 .btn-vaporwave {

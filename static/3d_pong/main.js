@@ -133,7 +133,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       var connectionString =
         "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
       gameSocket = new WebSocket(connectionString);
-      console.log("[WebSocket started] connectionString: ", connectionString);  
+      console.log("[WebSocket started] connectionString: ", connectionString);
 
       displayPlayerAndMode(char_choice, roomCode);
       document.getElementById('message_info').innerHTML = "Info: Waiting for opponent to connect...";
@@ -798,6 +798,18 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     }
   };
 
+  function displayResultMessage() {
+    console.log("displayResultMessage: ", winnerName, char_choice, game_mode);
+    if (game_mode === "match") {
+      if (thisPlayer === winnerName) {
+        document.getElementById('img_win').style.display = "block";
+      }
+      else {
+        document.getElementById('img_loss').style.display = "block";
+      }
+    }
+  }
+
   // Event handler for connection closure
   function handleWebSocketClose(event) {
     console.log("WebSocket connection closed! (code: " + event.code + ")");
@@ -817,6 +829,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
       document.getElementById('game_info').style.display = 'none';
       document.getElementById('game_message').style.display = 'none';
+      document.getElementById('img_win').style.display = "block";
+
+      displayResultMessage();
 
       if (event.code === 3001 || event.code === 3002) {
         document.getElementById('closing_message').innerHTML = "GAME OVER";
@@ -846,10 +861,13 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     // Handle WebSocket errors
   };
 
-});
+  
+  document.getElementById("end_closing_message").addEventListener("click", function () {
+    document.getElementById('restartPongSection').style.display = 'block';
+    document.getElementById('closing_message').style.display = 'none';
+    document.getElementById('end_closing_message').style.display = 'none';
+    document.getElementById('img_win').style.display = 'none';
+    document.getElementById('img_loss').style.display = 'none';
+  });
 
-document.getElementById("end_closing_message").addEventListener("click", function () {
-  document.getElementById('restartPongSection').style.display = 'block';
-  document.getElementById('closing_message').style.display = 'none';
-  document.getElementById('end_closing_message').style.display = 'none';
 });
