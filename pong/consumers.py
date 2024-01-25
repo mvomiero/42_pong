@@ -541,7 +541,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
                 # [match_info for Final if it is not set to finished]
                 elif not tournament['finished'] and self.match_id == tournament['matchFinal']:
-                    channel_layer_group = self.channel_layer.groups.get(self.group_name_match, {})  # for check clean up
                     # [broadcast tournament_info 'end']
                     tournament_mode = 'end'
                     print(f"Broadcasting [final=over]: {tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank)}")
