@@ -68,7 +68,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   sceneProperties.scene.add(light);
 
   var scorePlayer1 = 0, scorePlayer2 = 0;
-  const winningScore = 2;
+  const winningScore = 20;
   const ball = {};
   const intervalUpdateRateMs = 20;
   var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
