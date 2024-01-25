@@ -821,29 +821,38 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     console.log("WebSocket connection closed! (code: " + event.code + ")");
 
     // set canvas to display none and 'restartPongSection' to display block
-    document.getElementById('game_board').style.display = 'none';
-    document.getElementById('restartPongSection').style.display = 'block';
+    //document.getElementById('game_board').style.display = 'none';
+    //document.getElementById('restartPongSection').style.display = 'block';
 
     /*********************************************************/
     /***************** CHANGES STARTING HERE *****************/
     /*********************************************************/
-      /* setTimeout(function () {
-        if (event.code === 3001 || event.code === 3002) {
-          window.location.href = '/dashboard';
-        }
-        else if (event.code === 4001) {
-          window.location.href = '/error/duplicate';
-        }
-        else if (event.code === 4002) {
-          window.location.href = '/error/full';
-        }
-        else if (event.code === 4005 || event.code === 4006) {
-          window.location.href = '/error/disconnection';
-        }
-      }, 1000); */ // 1000 milliseconds = 1 seconds
+
+    setTimeout(function () {
+      document.getElementById('game_board').style.display = 'none';
+      document.getElementById('end_closing_message').style.display = 'inline-block';
+      document.getElementById('closing_message').style.display = 'block';
+
+      if (event.code === 3001 || event.code === 3002) {
+        document.getElementById('closing_message').innerHTML = "GAME OVER";
+      }
+      else if (event.code === 4001) {
+        document.getElementById('closing_message').innerHTML = "A duplicate has been detected.";
+      }
+      else if (event.code === 4002) {
+        document.getElementById('closing_message').innerHTML = "The room is full.";
+      }
+      else if (event.code === 4005 || event.code === 4006) {
+        document.getElementById('closing_message').innerHTML = "The connection has been lost.";
+      }
+
+
+    }, 1000);
+
     /*********************************************************/
     /****************** CHANGES ENDING HERE ******************/
     /*********************************************************/
+
   };
 
   // Error handler for WebSocket errors
