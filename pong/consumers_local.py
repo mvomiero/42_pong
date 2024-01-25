@@ -26,6 +26,7 @@ class PongConsumerLocal(AsyncJsonWebsocketConsumer):
     # ******************* DISCONNECT WEBSOCKET ******************* #
     # ************************************************************ #
     async def disconnect(self, close_code):
+
         if close_code != 1001:
             print(f"Connection closed by Client with close_code {close_code}")
         
@@ -33,7 +34,7 @@ class PongConsumerLocal(AsyncJsonWebsocketConsumer):
             print("No Client found.")
             return
 
-        self.closeConnection(4005)
+        await self.closeConnection(4005)
 
 
     # ************************************************************ #
@@ -44,13 +45,12 @@ class PongConsumerLocal(AsyncJsonWebsocketConsumer):
         received_data = json.loads(text_data)
         
         # Log/print the received JSON data
-        # print("Received JSON data:", received_data)
+        #print("Received JSON data:", received_data)
 
         # [match_info "end"]
         if received_data['command'] == "match_info" and received_data['mode'] == "end":
-            print(f"Received match_info 'end' from {self.player}.")
             await self.send_matchToDatabase(received_data)
-            self.closeConnection(3001)
+            await self.closeConnection(3001)
         # [other message]
         else:
             print(f"Warning: Received wrong message ({self.player1}, {self.player2}): {received_data}")
