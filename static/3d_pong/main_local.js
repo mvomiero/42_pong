@@ -102,7 +102,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // Function to show the name input field
   function showNameInput() {
-    document.getElementById('startLocalGameButton').style.display = 'none';
+    /* document.getElementById('startLocalGameButton').style.display = 'none';
+    document.getElementById('startRemoteGameButton').style.display = 'none'; */
+    document.getElementById('pongChooseMode').style.display = 'none';
     document.getElementById('nameInputSectionLocal').style.display = 'block';
   }
 
@@ -110,32 +112,52 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function submitNameAndStartGame() {
     const playerName1 = document.getElementById('playerName1').value.trim();  // Get the player name and remove leading and trailing whitespace
     const playerName2 = document.getElementById('playerName2').value.trim();  // Get the player name and remove leading and trailing whitespace
-    if (playerName1 !== '' && playerName1.length <= 10) { // Check if name is not empty and has max 10 characters
-        document.getElementById('nameInputSection').style.display = 'none';
+    if ((playerName1 !== '' && playerName1.length <= 10) 
+        && (playerName2 !== '' && playerName2.length <= 10)) { // Check if names are not empty and have max 10 characters
+        
+        document.getElementById('nameInputSectionLocal').style.display = 'none';
         document.getElementById('game_board').style.display = 'block';
 
         // Connect to the websocket
-        // roomCode, connectionString and gameSocket are set as var as we will need to change them later!
-        var game_mode = "local";//document.getElementById("room_code").value;
-        if (roomCode === "Tournament") {
+        var roomCode = "local";
+        /* if (roomCode === "Tournament") {
             game_mode = "tournament";
             tournament_stage = "waitingForPlayers";
         } else if (roomCode === "Match") {
             game_mode = "remote";
-        }
-        char_choice = playerName;
+        } */
+        char_choice = playerName1;
         var connectionString =
-          "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
+          "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + playerName1 + "/" + playerName2 + "/";
         gameSocket = new WebSocket(connectionString);
         console.log("[WebSocket started] connectionString: ", connectionString);
 
         // start the game
-        initGame();
+        //initGame();
+
+        gameSocket.onopen = function (event) {
+            console.log("[WebSocket opened] connectionString: ", connectionString);
+        
+            // Now that the connection is open, you can send data
+            var matchInfo = {
+                command: "match_info",
+                mode: "end",
+                score: {
+                    player1: 11,
+                    player2: 4,
+                },
+                winner: playerName1,
+            };
+            gameSocket.send(JSON.stringify(matchInfo));
+        };
 
         // Set the event handlers
         gameSocket.onmessage = handleWebSocketOpen;
         gameSocket.onclose = handleWebSocketClose;
         gameSocket.onerror = handleWebSocketError;
+
+        console.log("gameSocket: ", gameSocket);
+        //testingSendMatchInfo();
 
     } else if (playerName.length > 10) {
         alert('Name too long - Please enter a valid name.');
@@ -147,7 +169,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   // Function to show the name input field
   function showNameInput2() {
     document.getElementById('restartPongSection').style.display = 'none';
-    document.getElementById('nameInputSection').style.display = 'block';
+    document.getElementById('pongChooseMode').style.display = 'block';
   }
 
   // Event listener for the Start Game Button

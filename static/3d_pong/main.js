@@ -102,7 +102,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // Function to show the name input field
   function showNameInput() {
-    document.getElementById('startRemoteGameButton').style.display = 'none';
+    document.getElementById('pongChooseMode').style.display = 'none';
     document.getElementById('nameInputSection').style.display = 'block';
   }
 
@@ -146,7 +146,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   // Function to show the name input field
   function showNameInput2() {
     document.getElementById('restartPongSection').style.display = 'none';
-    document.getElementById('nameInputSection').style.display = 'block';
+    document.getElementById('pongChooseMode').style.display = 'block';
   }
 
   // Event listener for the Start Game Button
