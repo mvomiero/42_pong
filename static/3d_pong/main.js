@@ -54,13 +54,13 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     zoomedCanvasWidth: canvas.width * zoomFactor,
     zoomedCanvasHeight: canvas.height * zoomFactor,
     currentScene: "waitingForPlayers", // scenes: "openingTitles", "preGame", "game", "closingTitles" and "end"
-    backgroundColour: 0x87CEEB,
-    p1Colour: 0x990000,
+    backgroundColour: 0x000000,
+    p1Colour: 0xb744ff,
     otherTextColour: 0xFFFFAA,
-    p2Colour: 0x009900,
-    ballColour: 0xFF0000,
-    tableColour: 0x46A07E,
-    tableWallsColour: 0x77777E,
+    p2Colour: 0xff00a2,
+    ballColour: 0x00eaff,
+    tableColour: 0x001aff,
+    tableWallsColour: 0x001aff,
     font: font,
   };
   sceneProperties.scene.background = new THREE.Color(sceneProperties.backgroundColour);
@@ -273,7 +273,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     var tableWallGeometry = new THREE.BoxGeometry(tableWidth, sceneProperties.zoomedCanvasHeight * 0.02, maxBallZ);
     var tableWallMaterial = new THREE.MeshPhongMaterial({
       color: sceneProperties.tableWallsColour,
-      opacity: 0.1,
+      opacity: 0.5,
       transparent: true
     });
     tableUpperWallMesh = new THREE.Mesh(tableWallGeometry, tableWallMaterial);
