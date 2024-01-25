@@ -104,18 +104,31 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         #'ENGINE': 'django.db.backends.postgresql',
+#         #'NAME': 'pong_database',
+#         'USER': 'pong_user',
+#         'PASSWORD': 'pong',
+#         'HOST': 'localhost',  # Change this if your database is hosted elsewhere
+#         'PORT': '5432',           # Set the port if needed - 5432 = default postgresql port
+# 		'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        #'ENGINE': 'django.db.backends.postgresql',
-        #'NAME': 'pong_database',
-        'USER': 'pong_user',
-        'PASSWORD': 'pong',
-        'HOST': 'localhost',  # Change this if your database is hosted elsewhere
-        'PORT': '5432',           # Set the port if needed - 5432 = default postgresql port
-		'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+         'ENGINE': 'django.db.backends.postgresql',
+         'NAME': 'postgres',
+         'USER': 'postgres',
+         'PASSWORD': 'backend',
+         'HOST': 'pongpostgres',
+         'PORT': '5432',
     }
 }
+import os
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 
 # Password validation

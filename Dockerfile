@@ -1,6 +1,15 @@
 FROM python:3.12.0-bookworm
-RUN apt upgrade && apt update && apt install -y nano && rm -rf /var/lib/apt/lists/*
+RUN apt upgrade && apt update && apt install -y nano \
+    && apt install -y software-properties-common python3 python3-pip python3-launchpadlib \
+    && pip3 install web3 python-dotenv --break-system-packages \
+    && apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev \
+    && pip3 install django-cors-headers --break-system-packages \
+    && rm -rf /var/lib/apt/lists/*
 COPY config/requirements.txt .
+RUN pip3 install -r requirements.txt --break-system-packages \
+    && apt-get update && apt-get install -y postgresql \
+    && apt-get install postgresql-client \
+    && pip install psycopg2
 RUN pip install django-cors-headers pytz -r requirements.txt
 RUN django-admin startproject transcendence
 WORKDIR /transcendence
@@ -50,5 +59,9 @@ COPY ./config/static/js_dashboard/updateCards.js ./static/js_dashboard/
 COPY ./config/static/js_dashboard/fetchData.js ./static/js_dashboard/
 COPY ./config/static/3d_pong/main.js ./static/3d_pong/
 COPY ./config/entrypoint.sh .
-# run the script
+COPY ./config/pong/trans.sol ./pong/
+COPY ./config/pong/trans.abi ./pong/
+COPY ./config/pong/trans.bin ./pong/
+COPY ./config/pong/deploy_sepo.py ./pong/
+COPY ./config/.env .
 CMD ./entrypoint.sh

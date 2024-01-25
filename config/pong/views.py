@@ -14,6 +14,9 @@ from itertools import groupby
 from operator import itemgetter
 from django.db.models import Subquery, OuterRef
 
+from .deploy_sepo import deploy_sepo
+from asgiref.sync import sync_to_async
+
 def index(request):
 	return render(request, "pong/index.html")
 
@@ -83,6 +86,9 @@ def error_disconnection(request):
 #     durations (e.g. gdur) = number (e.g. 10)
 def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
+        # game_result = p1n + ", " + p1s + ", " + p2n + ", " + p2s
+        # async_deploy = sync_to_async(deploy_sepo)
+        # tx_hash = await async_deploy(game_result)
         gend = (pytz.timezone('UTC')).localize(gend)
         game_data = GameData(
             player1_name=p1n,
@@ -92,7 +98,8 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
             game_end_timestamp=gend,
             game_duration_secs=gdur,
             is_tournament_game=itg,
-            blockchain_hash=None
+            # blockchain_hash=tx_hash.hex(),
+            blockchain_hash = "olallala",
         )
         game_data.save()
         return game_data.id
