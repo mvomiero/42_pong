@@ -248,3 +248,25 @@
   font-family: 'Press Start 2P', cursive;
   font-size: 3em !important;
 }
+
+.game {
+  width: 750px;
+  height: 2rem;
+  border: 0px solid #001aff;
+  padding: 0rem;
+  margin: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info {
+  color: var(--btn-hover-color);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1em;
+  text-align: left;
+  text-shadow: 0 0 10px magenta;
+}
+
+#mode_info {
+  text-align: right;
+}

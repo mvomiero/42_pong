@@ -106,6 +106,13 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     document.getElementById('nameInputSection').style.display = 'block';
   }
 
+  function displayPlayerAndMode(player, mode) {
+    document.getElementById('player_info').innerHTML = "Player: " + player;
+    document.getElementById('game_info').style.display = 'inline-flex';
+    document.getElementById('mode_info').innerHTML = "Mode: " + mode;
+    document.getElementById('game_message').style.display = 'block';
+  }
+
   // Function to show the canvas after submitting the name
   function submitNameAndStartGame() {
     const playerName = document.getElementById('playerName').value.trim();  // Get the player name and remove leading and trailing whitespace
@@ -126,7 +133,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       var connectionString =
         "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
       gameSocket = new WebSocket(connectionString);
-      console.log("[WebSocket started] connectionString: ", connectionString);
+      console.log("[WebSocket started] connectionString: ", connectionString);  
+
+      displayPlayerAndMode(char_choice, roomCode);
+      document.getElementById('message_info').innerHTML = "Info: Waiting for opponent to connect...";
+
 
       // start the game
       initGame();
@@ -693,6 +704,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       }
       if (sceneProperties.currentScene === "waitingForPlayers" && data.command === "match_info") {
         if (data.mode === "start") {
+          document.getElementById('message_info').style.display = 'none';
           if (tournament_stage === "final") {
             initGame();
             createLeftPaddle();
@@ -802,6 +814,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       document.getElementById('game_board').style.display = 'none';
       document.getElementById('end_closing_message').style.display = 'inline-block';
       document.getElementById('closing_message').style.display = 'block';
+
+      document.getElementById('game_info').style.display = 'none';
+      document.getElementById('game_message').style.display = 'none';
 
       if (event.code === 3001 || event.code === 3002) {
         document.getElementById('closing_message').innerHTML = "GAME OVER";

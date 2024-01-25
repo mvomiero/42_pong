@@ -26,6 +26,8 @@
         type="text/css" />
     <link href="https://fonts.googleapis.com/css?family=DotGothic16:300,400,700&display=swap" rel="stylesheet"
         type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Orbitron:300,400,700&display=swap" rel="stylesheet"
+        type="text/css" />
 
     <!-- Include Chart.js library -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script> -->
@@ -140,9 +142,18 @@
                         <button id="submitNameButtonLocal" class="btn-vaporwave btn-vaporwave-submit">Submit</button>
                     </div>
 
+                    <div id="game_info" class="game row justify-content-between" style="display: none;">
+                        <div id="player_info" class="info col-md-6 text-left">Player</div>
+                        <div id="mode_info" class="info col-md-6 text-right">Mode</div>
+                    </div>
+
                     <!-- Canvas initially hidden -->
                     <div id="game_board" room_code="match" char_choice="player_alias" style="display: none;">
                         <canvas class="pongCanvas" width="750" height="485" id="gameCanvas"></canvas>
+                    </div>
+
+                    <div id="game_message" class="game row justify-content-between" style="display: none;">
+                        <div id="message_info" class="info col-md-6 text-left">Info</div>
                     </div>
 
                     <!-- Restart selection process -->
