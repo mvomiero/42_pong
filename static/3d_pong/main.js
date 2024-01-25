@@ -29,9 +29,9 @@
 // ball is offset positively by half its size
 
 import * as THREE from 'three';
-import {FontLoader} from 'three/FontLoader';
-import {TextGeometry} from 'three/TextGeometry';
-import {OrbitControls} from 'three/OrbitControls';
+import { FontLoader } from 'three/FontLoader';
+import { TextGeometry } from 'three/TextGeometry';
+import { OrbitControls } from 'three/OrbitControls';
 // import {initOpeningTitles} from './openingTitles.js';
 // import {animateOpeningTitles} from './openingTitles.js';
 // import {initClosingTitles} from './closingTitles.js';
@@ -90,9 +90,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // variables for tournament:
   var tournament_stage; // show the state of the tournament: "waitingForPlayers", "semifinal", "final", "closing"
-                        // "final" & "semifinal": when activily playing the match
-                        // state: my semifinal is over and the other semifinal is still running -> still in "semifinal" (trigger is match_info with mode "start")
-                        // "closing": when the tournament is over, WebSocket is closed and e.g. the closing titles are shown
+  // "final" & "semifinal": when activily playing the match
+  // state: my semifinal is over and the other semifinal is still running -> still in "semifinal" (trigger is match_info with mode "start")
+  // "closing": when the tournament is over, WebSocket is closed and e.g. the closing titles are shown
   var game_mode; // "local" or "remote" or "tournament"
 
 
@@ -110,36 +110,36 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function submitNameAndStartGame() {
     const playerName = document.getElementById('playerName').value.trim();  // Get the player name and remove leading and trailing whitespace
     if (playerName !== '' && playerName.length <= 10) { // Check if name is not empty and has max 10 characters
-        document.getElementById('nameInputSection').style.display = 'none';
-        document.getElementById('game_board').style.display = 'block';
+      document.getElementById('nameInputSection').style.display = 'none';
+      document.getElementById('game_board').style.display = 'block';
 
-        // Connect to the websocket
-        // roomCode, connectionString and gameSocket are set as var as we will need to change them later!
-        var roomCode = document.getElementById("room_code").value;
-        if (roomCode === "Tournament") {
-            game_mode = "tournament";
-            tournament_stage = "waitingForPlayers";
-        } else if (roomCode === "Match") {
-            game_mode = "remote";
-        }
-        char_choice = playerName;
-        var connectionString =
-          "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
-        gameSocket = new WebSocket(connectionString);
-        console.log("[WebSocket started] connectionString: ", connectionString);
+      // Connect to the websocket
+      // roomCode, connectionString and gameSocket are set as var as we will need to change them later!
+      var roomCode = document.getElementById("room_code").value;
+      if (roomCode === "Tournament") {
+        game_mode = "tournament";
+        tournament_stage = "waitingForPlayers";
+      } else if (roomCode === "Match") {
+        game_mode = "remote";
+      }
+      char_choice = playerName;
+      var connectionString =
+        "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
+      gameSocket = new WebSocket(connectionString);
+      console.log("[WebSocket started] connectionString: ", connectionString);
 
-        // start the game
-        initGame();
+      // start the game
+      initGame();
 
-        // Set the event handlers
-        gameSocket.onmessage = handleWebSocketOpen;
-        gameSocket.onclose = handleWebSocketClose;
-        gameSocket.onerror = handleWebSocketError;
+      // Set the event handlers
+      gameSocket.onmessage = handleWebSocketOpen;
+      gameSocket.onclose = handleWebSocketClose;
+      gameSocket.onerror = handleWebSocketError;
 
     } else if (playerName.length > 10) {
-        alert('Name too long - Please enter a valid name.');
+      alert('Name too long - Please enter a valid name.');
     } else {
-        alert('Please enter a valid name.');
+      alert('Please enter a valid name.');
     }
   }
 
@@ -160,11 +160,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // Function to check if an element is in the viewport
   function isInViewport(element) {
-  const rect = element.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-  );
+    const rect = element.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+    );
   }
 
   /**************************************************/
@@ -199,7 +199,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     window.addEventListener('resize', onWindowResize, false);
     setNormalCam();
   }
-  
+
   function removeAndDisposeAndMakeUndefined(object) {
     sceneProperties.scene.remove(object);
     if (object.geometry)
@@ -221,7 +221,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function generateRandomBallHeight() {
     return Math.floor(Math.random() * (maxBallZ - minBallZ + 1)) + minBallZ;
   }
-  
+
   function initTextParams() {
     textHeight = sceneProperties.zoomedCanvasHeight * 0.075;
     textDepth = sceneProperties.zoomedCanvasHeight * 0.01;
@@ -347,49 +347,42 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     }
   }
 
-  function checkIfBallHitOrPassedPaddles()
-  {
+  function checkIfBallHitOrPassedPaddles() {
     // left paddle
-    if (ballMesh.position.x < -tableWidth / 2)
-    {
+    if (ballMesh.position.x < -tableWidth / 2) {
       const halfPaddleHeight = paddleHeight / 2;
-      if (ballMesh.position.y < leftPaddleMesh.position.y + halfPaddleHeight && ballMesh.position.y > leftPaddleMesh.position.y - halfPaddleHeight)
-      {
+      if (ballMesh.position.y < leftPaddleMesh.position.y + halfPaddleHeight && ballMesh.position.y > leftPaddleMesh.position.y - halfPaddleHeight) {
         ballMesh.position.x = -tableWidth / 2;
         ballHitPaddle(leftPaddleSpeed);
       }
-      else
-      {
+      else {
         ballPassedLeftPaddle();
       }
     }
     // right paddle
-    else if (ballMesh.position.x > tableWidth / 2)
-    {
+    else if (ballMesh.position.x > tableWidth / 2) {
       const halfPaddleHeight = paddleHeight / 2;
-      if (ballMesh.position.y < rightPaddleMesh.position.y + halfPaddleHeight && ballMesh.position.y > rightPaddleMesh.position.y - halfPaddleHeight)
-      {
+      if (ballMesh.position.y < rightPaddleMesh.position.y + halfPaddleHeight && ballMesh.position.y > rightPaddleMesh.position.y - halfPaddleHeight) {
         ballMesh.position.x = tableWidth / 2;
         ballHitPaddle(rightPaddleSpeed);
       }
-      else
-      {
+      else {
         ballPassedRightPaddle();
       }
     }
   }
 
   function ballHitPaddle(paddleSpeed) {
-      // ball.height = generateRandomBallHeight();
-      ball.dx = -ball.dx;
-      ball.height = minBallZ;
-      // adjust ball speed according to paddle speed:
-      let newBallSpeed = ball.speed - amountToSlow; // ball first slows a bit on each paddle hit
-      if (myPaddleSpeed > 0) // if the paddle is moving, it adds to the ball speed, if it is not moving the ball will slow a little
-        newBallSpeed = newBallSpeed + paddleSpeed / maxBallSpeedDivider; // divider controls overall max ball speed
-      if (newBallSpeed < minBallSpeed) // we check that the final ball speed doesn't fall below a minimum threshold
-        newBallSpeed = minBallSpeed;
-      ball.speed = newBallSpeed;
+    // ball.height = generateRandomBallHeight();
+    ball.dx = -ball.dx;
+    ball.height = minBallZ;
+    // adjust ball speed according to paddle speed:
+    let newBallSpeed = ball.speed - amountToSlow; // ball first slows a bit on each paddle hit
+    if (myPaddleSpeed > 0) // if the paddle is moving, it adds to the ball speed, if it is not moving the ball will slow a little
+      newBallSpeed = newBallSpeed + paddleSpeed / maxBallSpeedDivider; // divider controls overall max ball speed
+    if (newBallSpeed < minBallSpeed) // we check that the final ball speed doesn't fall below a minimum threshold
+      newBallSpeed = minBallSpeed;
+    ball.speed = newBallSpeed;
   }
 
   function reinitialise() {
@@ -422,7 +415,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
       removeAndDisposeAndMakeUndefined(namePlayer1Mesh);
       removeAndDisposeAndMakeUndefined(namePlayer2Mesh);
-      removeAndDisposeAndMakeUndefined(leftPaddleMesh); 
+      removeAndDisposeAndMakeUndefined(leftPaddleMesh);
       removeAndDisposeAndMakeUndefined(rightPaddleMesh);
       removeAndDisposeAndMakeUndefined(tableMesh);
       removeAndDisposeAndMakeUndefined(tableMesh);
@@ -435,7 +428,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       /* if (tournament_stage === undefined) {
           cancelAnimationFrame(animationId);
       } */
-      setTimeout(function() {
+      setTimeout(function () {
         console.log("sending match info");
         sendMatchInfo(); // send "end" command to add gameData to database
         console.log("reinitialising");
@@ -451,7 +444,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     paddleIncreaseKey = "W";
     paddleDecreaseKey = "S";
     sceneProperties.camera.position.set(0, 0, 11);
-    sceneProperties.camera.rotation.set(0, 0, 0);   
+    sceneProperties.camera.rotation.set(0, 0, 0);
   }
 
   function setPaddleCam(player) {
@@ -461,14 +454,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       paddleIncreaseKey = "D";
       paddleDecreaseKey = "A";
       sceneProperties.camera.position.set(leftPaddleMesh.position.x, leftPaddleMesh.position.y, halfPaddleDepth);
-      sceneProperties.camera.rotation.set(Math.PI / 2, -Math.PI / 2, 0);    
+      sceneProperties.camera.rotation.set(Math.PI / 2, -Math.PI / 2, 0);
     }
     if (player === 2) {
       controls.enabled = false;
       paddleIncreaseKey = "D";
       paddleDecreaseKey = "A";
       sceneProperties.camera.position.set(rightPaddleMesh.position.x, rightPaddleMesh.position.y, halfPaddleDepth);
-      sceneProperties.camera.rotation.set(Math.PI / 2, Math.PI / 2, 0);    
+      sceneProperties.camera.rotation.set(Math.PI / 2, Math.PI / 2, 0);
     }
   }
 
@@ -494,7 +487,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     scorePlayer2++;
     removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
     createP2ScoreText();
-    removeAndDisposeAndMakeUndefined(ballMesh);  
+    removeAndDisposeAndMakeUndefined(ballMesh);
     // setPaddleCamForLeadingPlayer();
     renderer.render(scene, camera);
     checkForWin(scorePlayer2, player2, sceneProperties.p2Colour);
@@ -561,7 +554,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         myPaddleSpeed = 0;
       }
     }
-    
+
     // determine which paddle to update
     var command;
     if (player === 1)
@@ -581,7 +574,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   // listen to keyboard events to move the paddles
   document.addEventListener("keydown", function (e) {
     if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-        e.preventDefault();
+      e.preventDefault();
     }
     if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKey.toLowerCase()) {
       clearInterval(paddleInterval);
@@ -604,23 +597,23 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKey.toLowerCase()) {
       if (player === 1)
         clearInterval(paddleInterval);
-        myPaddleSpeed = 0;
+      myPaddleSpeed = 0;
     }
     if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKey.toLowerCase()) {
       if (player === 2)
         clearInterval(paddleInterval);
-        myPaddleSpeed = 0;
+      myPaddleSpeed = 0;
     }
     if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKey.toLowerCase()) {
       if (player === 1)
         clearInterval(paddleInterval);
-        myPaddleSpeed = 0;
+      myPaddleSpeed = 0;
     }
     if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKey.toLowerCase()) {
       if (player === 2)
         clearInterval(paddleInterval);
-        myPaddleSpeed = 0;
-    }    
+      myPaddleSpeed = 0;
+    }
   });
 
   // WEBSOCKET CODE
@@ -634,7 +627,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     // setTimeout(function() {
     gameSocket.send(JSON.stringify(initBallData));
     // }, 500); // 1000 milliseconds (1 second) delay
-  }    
+  }
 
   function sendBallData(ballX, ballY) {
     var ballData = {
@@ -675,7 +668,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       checkIfBallHitTopBottomTable();
       checkIfBallHitOrPassedPaddles();
       updateBall();
-      renderer.render(scene, camera); 
+      renderer.render(scene, camera);
     }
     // if (sceneProperties.currentScene === "closingTitles") {
     //   animateClosingTitles(sceneProperties);
@@ -736,7 +729,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           removeAndDisposeAndMakeUndefined(ballMesh);
         sceneProperties.currentScene = "game";
         var geometry = new THREE.SphereGeometry(ballSize, 50);
-        var material = new THREE.MeshPhongMaterial({color: sceneProperties.ballColour});
+        var material = new THREE.MeshPhongMaterial({ color: sceneProperties.ballColour });
         ballMesh = new THREE.Mesh(geometry, material);
         const halfBallSize = ballSize / 2;
         ballMesh.position.set(0, 0, halfBallSize + minBallZ);
@@ -778,11 +771,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       if (data.command === "tournament_info") {
         console.log("tournament_info: ", data);
         if (data.mode === "start") {
-            tournament_stage = "semifinal";
+          tournament_stage = "semifinal";
         } else if (data.mode === "update" && data.matchFinal.player1 !== undefined && data.matchFinal.player2 !== undefined) {
-            tournament_stage = "final";
+          tournament_stage = "final";
         } else if (data.mode === "end") {
-            tournament_stage = "closing";
+          tournament_stage = "closing";
         }
         console.log("tournament_stage: ", tournament_stage);
       }
@@ -805,60 +798,31 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     /***************** CHANGES STARTING HERE *****************/
     /*********************************************************/
 
-      setTimeout(function () {
-        document.getElementById('game_board').style.display = 'none';
-        document.getElementById('end_closing_message').style.display = 'inline-block';
-        document.getElementById('closing_message').style.display = 'block';
-        //closing_message = document.getElementById('closing_message');
-        //closing_message.style.display = 'block';
+    setTimeout(function () {
+      document.getElementById('game_board').style.display = 'none';
+      document.getElementById('end_closing_message').style.display = 'inline-block';
+      document.getElementById('closing_message').style.display = 'block';
 
-        if (event.code === 3001 || event.code === 3002) {
-          document.getElementById('closing_message').innerHTML = "GAME OVER";
-          //closing_message.innerHTML = "GAME OVER CIAO";
-          //window.location.href = '/dashboard';
-        }
-        else if (event.code === 4001) {
-          document.getElementById('closing_message').innerHTML = "A duplicate has been detected.";
-          //window.location.href = '/error/duplicate';
-        }
-        else if (event.code === 4002) {
-          document.getElementById('closing_message').innerHTML = "The room is full.";
-          //window.location.href = '/error/full';
-        }
-        else if (event.code === 4005 || event.code === 4006) {
-          document.getElementById('closing_message').innerHTML = "The connection has been lost.";
-          //window.location.href = '/error/disconnection';
-        }
+      if (event.code === 3001 || event.code === 3002) {
+        document.getElementById('closing_message').innerHTML = "GAME OVER";
+      }
+      else if (event.code === 4001) {
+        document.getElementById('closing_message').innerHTML = "A duplicate has been detected.";
+      }
+      else if (event.code === 4002) {
+        document.getElementById('closing_message').innerHTML = "The room is full.";
+      }
+      else if (event.code === 4005 || event.code === 4006) {
+        document.getElementById('closing_message').innerHTML = "The connection has been lost.";
+      }
 
-        //document.getElementById('restartPongSection').style.display = 'block';
-        
-      }, 1000); // 1000 milliseconds = 1 seconds
+
+    }, 1000);
 
     /*********************************************************/
     /****************** CHANGES ENDING HERE ******************/
     /*********************************************************/
 
-    
-    /*********************************************************/
-    /***************** CHANGES STARTING HERE *****************/
-    /*********************************************************/
-      /* setTimeout(function () {
-        if (event.code === 3001 || event.code === 3002) {
-          window.location.href = '/dashboard';
-        }
-        else if (event.code === 4001) {
-          window.location.href = '/error/duplicate';
-        }
-        else if (event.code === 4002) {
-          window.location.href = '/error/full';
-        }
-        else if (event.code === 4005 || event.code === 4006) {
-          window.location.href = '/error/disconnection';
-        }
-      }, 1000); */ // 1000 milliseconds = 1 seconds
-    /*********************************************************/
-    /****************** CHANGES ENDING HERE ******************/
-    /*********************************************************/
   };
 
   // Error handler for WebSocket errors
