@@ -805,8 +805,10 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         console.log("tournament_info: ", data);
         if (data.mode === "start") {
           tournament_stage = "semifinal";
+          document.getElementById('mode_info').innerHTML = "Tournament: semifinal";
         } else if (data.mode === "update" && data.matchFinal.player1 !== undefined && data.matchFinal.player2 !== undefined) {
           tournament_stage = "final";
+          document.getElementById('mode_info').innerHTML = "Tournament: final";
         } else if (data.mode === "end") {
           tournament_stage = "closing";
         }
@@ -822,7 +824,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function displayResultMessage() {
     console.log("displayResultMessage: ", winMessage.player, winMessage.game_mode, winMessage.ranking);
     console.log("displayResultMessage: ", winnerName, char_choice, game_mode);
-    if (winMessage.game_mode === "match") {
+    if (winMessage.game_mode === "match" || winMessage.game_mode === "tournament") {
       if (winMessage.player === winMessage.ranking[1]) {
         document.getElementById('img_win').style.display = "block";
         document.getElementById('closing_message').innerHTML = "🌴🎉 Congratulations, you won! 🎉🌴";
@@ -838,10 +840,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function handleWebSocketClose(event) {
     console.log("WebSocket connection closed! (code: " + event.code + ")");
 
-    // set canvas to display none and 'restartPongSection' to display block
-    //document.getElementById('game_board').style.display = 'none';
-    //document.getElementById('restartPongSection').style.display = 'block';
-
     /*********************************************************/
     /***************** CHANGES STARTING HERE *****************/
     /*********************************************************/
@@ -854,8 +852,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       document.getElementById('game_info').style.display = 'none';
       document.getElementById('game_message').style.display = 'none';
 
-      displayResultMessage();
-
+      
       if (event.code === 3001 || event.code === 3002) {
         //document.getElementById('closing_message').innerHTML = "GAME OVER";
         displayResultMessage();
