@@ -95,6 +95,18 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   // "closing": when the tournament is over, WebSocket is closed and e.g. the closing titles are shown
   var game_mode; // "local" or "remote" or "tournament"
 
+  // variables for message at the end of the game:
+  var winMessage = {
+    player: undefined,
+    game_mode: undefined,
+    ranking: {
+      1: undefined,
+      2: undefined,
+      3: undefined,
+      4: undefined
+    }
+  }
+
 
   /**************************************************/
   /******************** NEW PART ********************/
@@ -129,6 +141,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       } else if (roomCode === "Match") {
         game_mode = "remote";
       }
+      winMessage.player = playerName;
+      winMessage.game_mode = roomCode;
+      
       char_choice = playerName;
       var connectionString =
         "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
@@ -417,6 +432,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     sceneProperties.currentScene = "waitingForPlayers";
   }
 
+
+
   function checkForWin(score, thisPlayer, playerColour) {
     if (score === winningScore) {
       winnerName = thisPlayer;
@@ -665,6 +682,10 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       },
       winner: winnerName
     };
+
+    winMessage.ranking[1] = player1 === winnerName ? player1 : player2;
+    winMessage.ranking[2] = player1 !== winnerName ? player1 : player2;
+    
     gameSocket.send(JSON.stringify(matchInfo));
   }
   // RECEIVING DATA
@@ -799,13 +820,16 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   };
 
   function displayResultMessage() {
+    console.log("displayResultMessage: ", winMessage.player, winMessage.game_mode, winMessage.ranking);
     console.log("displayResultMessage: ", winnerName, char_choice, game_mode);
-    if (game_mode === "match") {
-      if (thisPlayer === winnerName) {
+    if (winMessage.game_mode === "match") {
+      if (winMessage.player === winMessage.ranking[1]) {
         document.getElementById('img_win').style.display = "block";
+        document.getElementById('closing_message').innerHTML = "🌴🎉 Congratulations, you won! 🎉🌴";
       }
       else {
         document.getElementById('img_loss').style.display = "block";
+        document.getElementById('closing_message').innerHTML = "👽 Unfortunately, you lost! 👽";
       }
     }
   }
@@ -825,16 +849,16 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     setTimeout(function () {
       document.getElementById('game_board').style.display = 'none';
       document.getElementById('end_closing_message').style.display = 'inline-block';
-      document.getElementById('closing_message').style.display = 'block';
+      document.getElementById('closing_message').style.display = 'inline-block';
 
       document.getElementById('game_info').style.display = 'none';
       document.getElementById('game_message').style.display = 'none';
-      document.getElementById('img_win').style.display = "block";
 
       displayResultMessage();
 
       if (event.code === 3001 || event.code === 3002) {
-        document.getElementById('closing_message').innerHTML = "GAME OVER";
+        //document.getElementById('closing_message').innerHTML = "GAME OVER";
+        displayResultMessage();
       }
       else if (event.code === 4001) {
         document.getElementById('closing_message').innerHTML = "A duplicate has been detected.";
@@ -861,7 +885,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     // Handle WebSocket errors
   };
 
-  
+
   document.getElementById("end_closing_message").addEventListener("click", function () {
     document.getElementById('restartPongSection').style.display = 'block';
     document.getElementById('closing_message').style.display = 'none';

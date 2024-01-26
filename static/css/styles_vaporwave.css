@@ -253,12 +253,12 @@
   box-shadow: 4px 4px 0px var(--btn-hover-color);
 }
 
-#closing_message {
+/* #closing_message {
   color: #001aff;
   text-shadow: 4px 4px 0px magenta;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 3em !important;
-}
+  font-family: 'Orbitron' !important;
+  font-size: 2em !important;
+} */
 
 .game {
   width: 750px;
@@ -281,4 +281,20 @@
 
 #mode_info {
   text-align: right;
+}
+
+#closing_message {
+  font-size: 1.5em !important;
+  border: 0px solid #001aff;
+  justify-content: center !important;
+  margin-bottom: 2rem;
+}
+
+#end_closing_message {
+  margin-top: 2rem;
+  font-size: 1.5em !important;
+  border: 3px solid #001aff;
+  justify-content: center !important;
+  background-color: transparent;
+  font-weight: 800;
 }

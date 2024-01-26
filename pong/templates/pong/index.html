@@ -129,9 +129,19 @@
                         <button id="submitNameButton" class="btn-vaporwave btn-vaporwave-submit">Submit</button>
                     </div>
 
-                    <div id="closing_message" class="btn-vaporwave animation" style="display: none;">Hola</div>
+                    <!-- Closing images and messages -->
+
+                    <div id="img_win" class="align-items-center" style="display: none;">
+                        <img class="mx-auto rounded-circle smaller-image image-results animation win" src="{% static 'assets/img/results/win1.png' %}" alt="..." />
+                    </div>
+
+                    <div id="img_loss" class="align-items-center" style="display: none;">
+                        <img class="mx-auto rounded-circle smaller-image image-results animation loss" src="{% static 'assets/img/results/loss1.png' %}" alt="..." />
+                    </div>
+
+                    <div id="closing_message" class="info animation align-items-center" style="display: none;">Hola</div>
                     <div class=>
-                        <button id="end_closing_message" class="btn-vaporwave" style="display: none;">OK</button>
+                        <button id="end_closing_message" class="info" style="display: none;">OK</button>
                     </div>
 
                     <!-- Name input field and Submit Button -->
@@ -152,13 +162,6 @@
                         <canvas class="pongCanvas" width="750" height="485" id="gameCanvas"></canvas>
                     </div>
 
-                    <div id="img_win" class="align-items-center" style="display: none;">
-                        <img class="mx-auto rounded-circle smaller-image image-results animation win" src="{% static 'assets/img/results/win1.png' %}" alt="..." />
-                    </div>
-
-                    <div id="img_loss" class="align-items-center" style="display: none;">
-                        <img class="mx-auto rounded-circle smaller-image image-results animation loss" src="{% static 'assets/img/results/loss1.png' %}" alt="..." />
-                    </div>
 
                     <div id="game_message" class="game row justify-content-between" style="display: none;">
                         <div id="message_info" class="info col-md-6 text-left">Info</div>
