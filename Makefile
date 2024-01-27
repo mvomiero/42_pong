@@ -1,3 +1,17 @@
+all: compose
+
+compose:
+	docker compose up -d
+
+decompose:
+	docker compose down
+
+logs_transcendence:
+	docker-compose logs transcendence
+
+logs_postgres:
+	docker-compose logs postgres
+
 up:  build_postgres runp build rund 
 
 down: stop
@@ -22,6 +36,7 @@ runp:
 	@sleep 1
 	# docker run -it --rm postgres psql -h 127.0.0.1 -p 5432 -U postgres -d postgres
 	# psql postgresql://postgres:backend@127.0.0.1:5432/po
+
 stop:
 	docker stop transcendence-container
 	docker stop pongpostgres
@@ -33,12 +48,11 @@ execp:
 	docker exec -it pongpostgres psql -h localhost -p 5432 -U postgres -d postgres
 	# docker exec -it pongpostgres psql postgresql postgresql://postgres:backend@127.0.0.1:5432/postgres
 
-
 prune:
 	docker system prune -af
 
 # deletes container instance, freeing up the resources it was consuming, such as disk space and network ports.
-remove_container: # only needed when using rund, removed automatically in runi (--rm)
+remove_containers: # only needed when using rund, removed automatically in runi (--rm)
 	docker rm transcendence-container
 	docker rm pongpostgres
 	docker network rm mynetwork
@@ -68,3 +82,26 @@ game:
 
 tour:
 	python3 trans_autotest_tournament.py
+
+# old stuff
+
+# run:
+# 	python3 manage.py runserver
+
+# run_public:
+# 	python3 manage.py runserver 10.15.204.1:18000
+
+# migrate:
+# 	python3 manage.py makemigrations
+# 	python3 manage.py migrate
+
+# clean:
+# 	rm -f db.sqlite3
+# 	make migrate
+# 	make su
+	
+# su:d
+# 	python3 manage.py createsuperuser
+
+# install_cors_headers:
+# 	pip3 install corsheaders
