@@ -566,11 +566,12 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 elif not tournament['finished'] and self.match_id == tournament['matchFinal']:
                     # [broadcast tournament_info 'end']
                     tournament_mode = 'end'
+                    finalRank = await self.get_finalRankTournament(self.tournament_id)
                     print(f"Broadcasting [final=over]: {tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank)}")
                     await self.send_to_group(tournament_info(tournament_mode, self.set_matches[tournament['matchesSemi'][0]]['players'], self.set_matches[tournament['matchesSemi'][1]]['players'], self.set_matches[tournament['matchFinal']]['players'], finalRank), self.group_name_tournament)
                     # [store in database]
                     self.set_tournaments[self.tournament_id]['endTime'] = self.get_currentTimestamp()
-                    self.set_tournaments[self.tournament_id]['playersRank'] = await self.get_finalRankTournament(self.tournament_id)
+                    self.set_tournaments[self.tournament_id]['playersRank'] = finalRank
                     await self.send_tournamentToDatabase(tournament)
                     # clean up tournament (includes deleting all matches and players)
                     for player in self.set_tournaments[self.tournament_id]['players']:
