@@ -74,6 +74,11 @@
     
 }
 
+.image-results {
+  width: 300px; 
+  height: 300px;
+}
+
 .smaller-image:hover {
     border-color: #0114c2;
     transition: transform 0.3s ease;
@@ -95,6 +100,12 @@
 }
 .smaller-image.pa:hover {
     content: url("../assets/img/team/pa2.png");
+}
+.smaller-image.win:hover {
+    content: url("../assets/img/results/win2.png");
+}
+.smaller-image.loss:hover {
+    content: url("../assets/img/results/loss2.png");
 }
 
 .btn-vaporwave {
@@ -240,4 +251,50 @@
   color: magenta;
   font-weight: bold;
   box-shadow: 4px 4px 0px var(--btn-hover-color);
+}
+
+/* #closing_message {
+  color: #001aff;
+  text-shadow: 4px 4px 0px magenta;
+  font-family: 'Orbitron' !important;
+  font-size: 2em !important;
+} */
+
+.game {
+  width: 750px;
+  height: 2rem;
+  border: 0px solid #001aff;
+  border: 0px solid #b744ff;
+  padding: 0rem;
+  margin: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info {
+  color: var(--btn-hover-color);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1em;
+  text-align: left;
+  text-shadow: 0 0 10px magenta;
+}
+
+#mode_info {
+  text-align: right;
+}
+
+#closing_message {
+  font-size: 1.5em !important;
+  border: 0px solid #001aff;
+  justify-content: center !important;
+  margin-bottom: 2rem;
+}
+
+#end_closing_message {
+  margin-top: 2rem;
+  font-size: 1.5em !important;
+  border: 3px solid #001aff;
+  justify-content: center !important;
+  background-color: transparent;
+  font-weight: 800;
 }

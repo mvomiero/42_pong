@@ -6107,6 +6107,8 @@ form-control
   opacity: 1;
   width: 100%;
   height: auto;
+  border: 1px solid #001aff;
+  /* box-shadow: 2px 0px magenta; */
 }
 .dashboardCanvas1 {
   background-color: rgba(var(--bs-primary-rgb)) !important;;
