@@ -106,7 +106,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # Reject connection if player already exists
         if self.player in self.connected_users:
             print(f"Player {self.player} already exists.")
-            await self.reject_connection(4001)
+            await PongConsumer.delete_connectedUsers(self, 4001)
+            # await self.reject_connection(4001)
             return
 
         # Add the player to a match or tournament
@@ -151,7 +152,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
 
         # Add player to the dictionary
         await self.add_playerToConnectedUsers(self.match_id, None)
-        #print(f"Added player to connected_users: {self.connected_users}")
+        print(f"Added player to connected_users: {self.connected_users}")
         
         # Add player to the group
         await self.add_playerToGroup(self.set_matches[match_id]['group_name'])
@@ -205,6 +206,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         
         # Add player to the dictionary connected_users
         await self.add_playerToConnectedUsers(None, self.tournament_id)
+        print(f"\nAdded player to connected_users: {self.connected_users}\n")
         
         # Add player to the group
         await self.add_playerToGroup(self.group_name_tournament)
@@ -455,21 +457,42 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         
         # Clear and delete remote-match (including closing all players' connections)
         if self.tournament_id is None:
-            if self.set_matches[self.match_id]['players'][0] != self.player:
-                otherPlayer = self.set_matches[self.match_id]['players'][0]
-            else:
-                otherPlayer = self.set_matches[self.match_id]['players'][1]
-            await PongConsumer.delete_connectedUsers(self.connected_users[otherPlayer]['self'], 4005)
-            await self.delete_match(self.match_id)
-            await PongConsumer.delete_connectedUsers(self, 4005)
+            print(f"self.set_matches: {self.set_matches}")
+            print(f"self.player: {self.player} & self.match_id: {self.match_id}")
+            if len(self.set_matches[self.match_id]['players']) == 2:
+                try:
+                    if self.set_matches[self.match_id]['players'][0] != self.player:
+                        otherPlayer = self.set_matches[self.match_id]['players'][0]
+                    else:
+                        otherPlayer = self.set_matches[self.match_id]['players'][1]
+                    await PongConsumer.delete_connectedUsers(self.connected_users[otherPlayer]['self'], 4005)
+                except KeyError:
+                    print(f"KeyError: {otherPlayer} problems with deleting connected_users")
+            try:
+                await self.delete_match(self.match_id)
+            except KeyError:
+                print(f"KeyError: {self.match_id} problems with deleting match")
+            try:
+                await PongConsumer.delete_connectedUsers(self, 4005)
+            except KeyError:
+                print(f"KeyError: {self.player} problems with deleting connected_users")
             
         # Clear and delete tournament (including closing all players' connections and matches)
-        if self.tournament_id is not None:
+        if self.tournament_id is not None and self.tournament_id in self.set_tournaments.keys():
             for player in self.set_tournaments[self.tournament_id]['players']:
-                if self.connected_users[player]['self'] != self:
-                    await PongConsumer.delete_connectedUsers(self.connected_users[player]['self'], 4006)
-            await self.delete_tournament(self.tournament_id)
-            await PongConsumer.delete_connectedUsers(self, 4006)
+                try:
+                    if self.connected_users[player]['self'] != self:
+                        await PongConsumer.delete_connectedUsers(self.connected_users[player]['self'], 4006)
+                except KeyError:
+                    print(f"KeyError: {player} problems with deleting connected_users tournament")
+            try:
+                await self.delete_tournament(self.tournament_id)
+            except KeyError:
+                print(f"KeyError: {self.tournament_id} problems with deleting tournament")
+            try:
+                await PongConsumer.delete_connectedUsers(self, 4006)
+            except KeyError:
+                print(f"KeyError: {self.player} problems with deleting connected_users tournament")
         
         # Delete the empty groups
         groups_copy = self.channel_layer.groups.copy()
@@ -551,10 +574,16 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     await self.send_tournamentToDatabase(tournament)
                     # clean up tournament (includes deleting all matches and players)
                     for player in self.set_tournaments[self.tournament_id]['players']:
-                        if self.connected_users[player]['self'] != self:
-                            await PongConsumer.delete_connectedUsers(self.connected_users[player]['self'], 3002)
+                        try:
+                            if self.connected_users[player]['self'] != self:
+                                await PongConsumer.delete_connectedUsers(self.connected_users[player]['self'], 3002)
+                        except KeyError:
+                            print(f"KeyError: {player} problems with deleting connected_users after regular end tournament")
                     await self.delete_tournament(self.tournament_id)
-                    await PongConsumer.delete_connectedUsers(self, 3002)
+                    try:
+                        await PongConsumer.delete_connectedUsers(self, 3002)
+                    except KeyError:
+                        print(f"KeyError: {self.player} problems with deleting connected_users after regular end tournament")
                     # set tournament to finished
                     tournament['finished'] = True
                     return
