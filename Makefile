@@ -20,3 +20,9 @@ su:
 
 install_cors_headers:
 	pip3 install corsheaders
+
+test_game:
+	python3 trans_autotest_game.py
+
+test_tour:
+	python3 trans_autotest_tournament.py
