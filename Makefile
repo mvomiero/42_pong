@@ -1,23 +1,38 @@
 all: compose
 
 compose:
-	docker compose up -d
+	docker compose up --remove-orphans --build -d
 
 decompose:
 	docker compose down
 
+exec_transcendence:
+	docker compose exec transcendence /bin/bash
+
 logs_transcendence:
-	docker-compose logs transcendence
+	docker compose logs transcendence
 
 logs_postgres:
-	docker-compose logs postgres
+	docker compose logs postgres
 
+copy_CA:
+	docker cp transcendence:/ssl-keys-local/rootCA.pem .
+
+install_CA:
+	google-chrome chrome://settings/certificates
+	
 prune:
 	docker system prune -af
 
 remove_image:
 	docker rmi -f transcendence
 	docker rmi -f postgres
+
+https_test:
+	google-chrome https://127.0.0.1:4443/admin
+
+https_test_static:
+	google-chrome https://127.0.0.1:4443/static/admin/css/base.css
 
 html_test:
 	google-chrome http://127.0.0.1:8000
@@ -33,26 +48,6 @@ game:
 
 tour:
 	python3 trans_autotest_tournament.py
-
-# old stuff
-
-# run:
-# 	python3 manage.py runserver
-
-# run_public:
-# 	python3 manage.py runserver 10.15.204.1:18000
-
-# migrate:
-# 	python3 manage.py makemigrations
-# 	python3 manage.py migrate
-
-# clean:
-# 	rm -f db.sqlite3
-# 	make migrate
-# 	make su
-	
-# su:d
-# 	python3 manage.py createsuperuser
 
 # install_cors_headers:
 # 	pip3 install corsheaders

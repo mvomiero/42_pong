@@ -1,10 +1,16 @@
 FROM python:3.12.0-bookworm
 RUN apt upgrade && apt update && apt install -y nano \
+    && apt-get install -y nginx \
     && apt install -y software-properties-common python3 python3-pip python3-launchpadlib \
     && pip3 install web3 python-dotenv --break-system-packages \
     && apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev \
     && pip3 install django-cors-headers --break-system-packages \
     && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install mkcert &&\
+    mkdir ./ssl-keys-local &&\
+    export CAROOT=/ssl-keys-local &&\
+	mkcert -install &&\
+    mkcert -cert-file /ssl-keys-local/localhost.pem -key-file /ssl-keys-local/localhost-key.pem 127.0.0.1    
 COPY config/django/requirements.txt .
 RUN pip3 install -r requirements.txt --break-system-packages \
     && apt-get update && apt-get install -y postgresql \
@@ -13,11 +19,10 @@ RUN pip3 install -r requirements.txt --break-system-packages \
 RUN pip install django-cors-headers pytz -r requirements.txt
 RUN django-admin startproject transcendence
 WORKDIR /transcendence
-#RUN python manage.py collectstatic # CORS related - not quite sure why needed
 RUN python manage.py startapp pong
+COPY config/nginx/nginx.conf /etc/nginx/
 
 # would be nice to do this in a less verbose way, but merging using * didn't work with subfolders
-
 COPY ./config/django/pong/admin.py ./pong/
 COPY ./config/django/pong/routing.py ./pong/
 COPY ./config/django/pong/templates/pong/index.html ./pong/templates/pong/
@@ -59,9 +64,10 @@ COPY ./config/django/static/js_dashboard/playerDaschboard.js ./static/js_dashboa
 COPY ./config/django/static/js_dashboard/updateCards.js ./static/js_dashboard/
 COPY ./config/django/static/js_dashboard/fetchData.js ./static/js_dashboard/
 COPY ./config/django/static/3d_pong/main.js ./static/3d_pong/
-COPY ./config/django/entrypoint.sh .
 COPY ./config/blockchain/trans.sol ./pong/
 COPY ./config/blockchain/trans.abi ./pong/
 COPY ./config/blockchain/trans.bin ./pong/
 COPY ./config/blockchain/deploy_sepo.py ./pong/
+RUN python manage.py collectstatic --noinput
+COPY ./config/entrypoint.sh .
 CMD ./entrypoint.sh
