@@ -381,7 +381,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         ballMesh.position.x = -tableWidth / 2;
         ballHitPaddle(leftPaddleSpeed);
       }
-      else {
+      else if (sceneProperties.currentScene === "game") {
         ballPassedLeftPaddle();
       }
     }
@@ -392,7 +392,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         ballMesh.position.x = tableWidth / 2;
         ballHitPaddle(rightPaddleSpeed);
       }
-      else {
+      else if (sceneProperties.currentScene === "game") {
         ballPassedRightPaddle();
       }
     }
