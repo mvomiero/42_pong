@@ -382,6 +382,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         ballHitPaddle(leftPaddleSpeed);
       }
       else if (sceneProperties.currentScene === "game") {
+        console.log("[left] position: ", ballMesh.position.x, " | currentScene: ", sceneProperties.currentScene);
         ballPassedLeftPaddle();
       }
     }
@@ -393,6 +394,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         ballHitPaddle(rightPaddleSpeed);
       }
       else if (sceneProperties.currentScene === "game") {
+        console.log("[right] position: ", ballMesh.position.x, " | currentScene: ", sceneProperties.currentScene);
         ballPassedRightPaddle();
       }
     }
@@ -462,7 +464,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         console.log("reinitialising");
         reinitialise();
       }, 500);
-      console.log("[checkForWin] gameSocket: ", gameSocket);
+      // console.log("[checkForWin] gameSocket: ", gameSocket);
       // initClosingTitles(sceneProperties);
     }
   }
@@ -520,8 +522,10 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     renderer.render(scene, camera);
     checkForWin(scorePlayer2, player2, sceneProperties.p2Colour);
     sceneProperties.currentScene = "none";
+    console.log("[left] current scene changed: ", sceneProperties.currentScene);
     if (player === 2) {
-      sendInitBall();
+      setTimeout(sendInitBall, 200);
+      //sendInitBall();
     }
   }
 
@@ -534,8 +538,10 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     renderer.render(scene, camera);
     checkForWin(scorePlayer1, player1, sceneProperties.p1Colour);
     sceneProperties.currentScene = "none";
+    console.log("[right] current scene changed: ", sceneProperties.currentScene);
     if (player === 1) {
-      sendInitBall();
+      setTimeout(sendInitBall, 200);
+      //sendInitBall();
     }
   }
 
@@ -665,9 +671,15 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       dx: ball.dx,
       dy: ball.dy,
       height: ball.height,
-      speed: ball.speed
+      speed: ball.speed,
+      points: scorePlayer1 + scorePlayer2
     };
-    gameSocket.send(JSON.stringify(ballData));
+    if (sceneProperties.currentScene === "game" && (ballX > 7 || ballX < -7)) {
+      console.log("[sendBallData] ballX: ", ballX);
+    }
+    if (sceneProperties.currentScene === "game") {
+      gameSocket.send(JSON.stringify(ballData));
+    }
   }
 
   function sendMatchInfo() {
@@ -760,7 +772,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       if (data.command === "initBall") {
         if (ballMesh)
           removeAndDisposeAndMakeUndefined(ballMesh);
-        sceneProperties.currentScene = "game";
+        //sceneProperties.currentScene = "game";
         var geometry = new THREE.SphereGeometry(ballSize, 50);
         var material = new THREE.MeshPhongMaterial({ color: sceneProperties.ballColour });
         ballMesh = new THREE.Mesh(geometry, material);
@@ -772,9 +784,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         ball.height = minBallZ;
         ball.speed = initBallSpeed;
         sceneProperties.scene.add(ballMesh);
+        sceneProperties.currentScene = "game";
+        console.log("[initBall] position.x: ", ballMesh.position.x, " | current scene changed: ", sceneProperties.currentScene);
       }
 
-      if (sceneProperties.currentScene === "game" && data.command === "updateBall") {
+      if (sceneProperties.currentScene === "game" && data.command === "updateBall" && data.points === (scorePlayer1 + scorePlayer2)) {
+        if (data.x > 7 || data.x < -7) {
+          console.log("[updateBall] data.x: ", data.x);
+        }
         ballMesh.position.x = data.x;
         ballMesh.position.y = data.y;
         ball.dx = data.dx;
