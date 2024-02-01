@@ -124,7 +124,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         }
         char_choice = playerName;
         var connectionString =
-          "wss://127.0.0.1:4443/ws/play/" + roomCode + "/" + char_choice + "/";
+          "wss://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
         gameSocket = new WebSocket(connectionString);
         console.log("[WebSocket started] connectionString: ", connectionString);
 
