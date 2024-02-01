@@ -7,9 +7,15 @@ from datetime import timedelta, datetime
 import time
 import calendar
 import random
+# from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync
 
 @receiver(post_migrate)
-def initialize_database(sender, **kwargs):
+def on_post_migrate(sender, **kwargs):
+    async_init_database = async_to_sync(initialize_database)
+    async_init_database(sender, **kwargs)
+
+async def initialize_database(sender, **kwargs):
 
     GameData.objects.all().delete()
     TournamentData.objects.all().delete()
@@ -24,7 +30,7 @@ def initialize_database(sender, **kwargs):
     # add entries to have 100 matches in database
     size_GameData = GameData.objects.count()
     while size_GameData < 200:
-        add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
+        await add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
         size_GameData += 1
         #size_GameData = GameData.objects.count()
     
@@ -32,7 +38,7 @@ def initialize_database(sender, **kwargs):
     # add entries to have 10 tournaments in database
     size_TournamentData = TournamentData.objects.count()
     while size_TournamentData < 20:
-        add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData))
+        await add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData))
         size_TournamentData += 1
         #size_TournamentData = TournamentData.objects.count()
 

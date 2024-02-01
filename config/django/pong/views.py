@@ -84,11 +84,12 @@ def error_disconnection(request):
 # format dates:
 #     games (gend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. gdur) = number (e.g. 10)
-def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
+async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
-        # game_result = p1n + ", " + p1s + ", " + p2n + ", " + p2s
-        # async_deploy = sync_to_async(deploy_sepo)
-        # tx_hash = await async_deploy(game_result)
+        game_result = p1n + ", " + str(p1s) + ", " + p2n + ", " + str(p2s)
+        tx_hash = await deploy_sepo(game_result)
+        # tx_hash = "olalal"
+        print(f"tx_hash in views.py: {tx_hash} and the game_result is {game_result}!!!!!!!!!!!!!!!!!")
         gend = (pytz.timezone('UTC')).localize(gend)
         game_data = GameData(
             player1_name=p1n,
@@ -98,28 +99,32 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
             game_end_timestamp=gend,
             game_duration_secs=gdur,
             is_tournament_game=itg,
-            # blockchain_hash=tx_hash.hex(),
-            blockchain_hash = "olallala",
+            blockchain_hash=tx_hash,
         )
-        game_data.save()
+        try:
+            game_data.save()
+        except Exception as e:
+            print(f"Error saving game data: {e}")
         return game_data.id
 
 # format dates:
 #     games (e.g. match['endTime']) = floating point number / POSIX timestamp (e.g. time.time())
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
-def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur):
+async def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur):
     gend = datetime.fromtimestamp(semiMatch1['endTime'])
     gdur = semiMatch1['endTime'] - semiMatch1['startTime']
-    matchIdSemi1 = add_game_data(semiMatch1['players'][0], semiMatch1['score'][0], semiMatch1['players'][1], semiMatch1['score'][1], gend, gdur, True)
+    matchIdSemi1 = await add_game_data(semiMatch1['players'][0], semiMatch1['score'][0], semiMatch1['players'][1], semiMatch1['score'][1], gend, gdur, True)
     gend = datetime.fromtimestamp(semiMatch2['endTime'])
     gdur = semiMatch2['endTime'] - semiMatch2['startTime']
-    matchIdSemi2 = add_game_data(semiMatch2['players'][0], semiMatch2['score'][0], semiMatch2['players'][1], semiMatch2['score'][1], gend, gdur, True)
+    matchIdSemi2 = await add_game_data(semiMatch2['players'][0], semiMatch2['score'][0], semiMatch2['players'][1], semiMatch2['score'][1], gend, gdur, True)
     gend = datetime.fromtimestamp(finalMatch['endTime'])
     gdur = finalMatch['endTime'] - finalMatch['startTime']
-    matchIdFinal = add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
+    matchIdFinal = await add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
     tend = (pytz.timezone('UTC')).localize(tend)
-    hash = '#hash'
+    # hash = '#hash'
+    tour_result = str(matchIdSemi1) + ", " + str(matchIdSemi2) + ", " + str(matchIdFinal) + ", " + str(playersRank)
+    tx_hash = await deploy_sepo(tour_result)
     tournament_data = TournamentData(
         match_id_semi_1=matchIdSemi1,
         match_id_semi_2=matchIdSemi2,
@@ -127,10 +132,14 @@ def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, t
         tournament_end_timestamp=tend,
         tournament_duration_secs=tdur,
         player_ranking = playersRank,
-        blockchain_hash=hash
+        # blockchain_hash = "xiixixixixxi"
+        blockchain_hash=tx_hash,
     )
-    tournament_data.save()
-
+    try:
+        tournament_data.save()
+        await TournamentData.commit()
+    except Exception as e:
+        print(f"Error saving tournament data: {e}")
 
 # NEW FOR DASHBOARD:
     
@@ -249,17 +258,26 @@ def get_dashboardMatch_data(request):
     
     nbr_matches = game_data.count()
 
-    match_time = game_data.aggregate(total_match_time=Sum('game_duration_secs')).get('total_match_time', 0)
+    # match_time = game_data.aggregate(total_match_time=Sum('game_duration_secs')).get('total_match_time', 0)
+    match_time_aggregate = game_data.aggregate(total_match_time=Sum('game_duration_secs'))
+    match_time = match_time_aggregate.get('total_match_time', 0) if match_time_aggregate is not None else 0
+    # match_time = match_time_aggregate['total_match_time'] if match_time_aggregate['total_match_time'] is not None else 0
     total_match_time = {
-        'hours': match_time // 3600,
-        'minutes': (match_time % 3600) // 60,
-        'seconds': (match_time % 3600) % 60
+        'hours': match_time // 3600 if match_time is not None else 0,
+        # 'minutes': (match_time % 3600) // 60,
+        # 'seconds': (match_time % 3600) % 60
+        'minutes': divmod(match_time % 3600, 60) if match_time is not None else 0,
+        'seconds': match_time % 60 if match_time is not None else 0,
     }
-
+    # total_match_time = {
+    #     'hours': 2,
+    #     'minutes': 2,
+    #     'seconds': 15,
+    # }
     single_match_time = game_data.aggregate(longest_match_time=Max('game_duration_secs')).get('longest_match_time', 0)
     longest_match_time = {
-        'minutes': single_match_time // 60,
-        'seconds': single_match_time % 60
+        'minutes': single_match_time // 60 if single_match_time is not None else 0,
+        'seconds': single_match_time % 60 if single_match_time is not None else 0,
     }
 
     """ Player with most wins """
@@ -271,10 +289,20 @@ def get_dashboardMatch_data(request):
         )
     ).values_list('winner_name', flat=True)
     succ_player = Counter(winner_names).most_common(1)
-    bestPlayer = {
-        'alias': succ_player[0][0],
-        'wins': succ_player[0][1]
-    }
+    if succ_player:
+        bestPlayer = {
+            'alias': succ_player[0][0],
+            'wins': succ_player[0][1]
+        }
+    else:
+        bestPlayer = {
+            'alias': "Unknown",
+            'wins': 0  # You can choose an appropriate default value
+        }
+    # bestPlayer = {
+    #     'alias': succ_player[0][0],
+    #     'wins': succ_player[0][1]
+    # }
 
     """ Player with highest play time """
     # Aggregate the total playing time for player1_name and player2_name and combine the datasets
@@ -295,15 +323,17 @@ def get_dashboardMatch_data(request):
     for data in combined_data:
         player_name = data['player1_name'] if 'player1_name' in data else data['player2_name']
         player_durations[player_name] = player_durations.get(player_name, 0) + data['total_time']
-    highest_time_player = {
-        'alias': max(player_durations, key=player_durations.get),
-        'time': {
-            'minutes': player_durations[max(player_durations, key=player_durations.get)] // 60,
-            'seconds': player_durations[max(player_durations, key=player_durations.get)] % 60
-        }
+    if player_durations:
+        highest_time_player = {
+            'alias': max(player_durations, key=player_durations.get),
+            'time': {
+                'minutes': player_durations[max(player_durations, key=player_durations.get)] // 60,
+                'seconds': player_durations[max(player_durations, key=player_durations.get)] % 60
+            }
     }
 
     # Prepare the response and return it as JSON
+    highest_time_player = {}
     response_data = {
         'barChart1': bar_chart_data,
         'areaChart1': area_chart_data,
@@ -360,28 +390,48 @@ def get_dashboardTournament_data(request):
     nbr_tournaments = tournament_data.count()
     print(f'nbr_tournaments={nbr_tournaments}')
 
-    # "Total Tournament Time"
-    match_time = tournament_data.aggregate(total_match_time=Sum('tournament_duration_secs')).get('total_match_time', 0)
+    # match_time = tournament_data.aggregate(total_match_time=Sum('tournament_duration_secs')).get('total_match_time', 0)
+    match_time_aggregate = tournament_data.aggregate(total_tournament_time=Sum('tournament_duration_secs'))
+    match_time = match_time_aggregate.get('total_match_time', 0) if match_time_aggregate is not None else 0
+    # match_time = match_time_aggregate['total_match_time'] if match_time_aggregate['total_match_time'] is not None else 0
     total_tournament_time = {
         'hours': match_time // 3600,
-        'minutes': (match_time % 3600) // 60,
-        'seconds': (match_time % 3600) % 60
+        'minutes': divmod(match_time % 3600, 60) if match_time is not None else 0,
+        'seconds': match_time % 60,
+        # 'minutes': (match_time % 3600) // 60,
+        # 'seconds': (match_time % 3600) % 60
     }
+    # total_tournament_time = {
+    #     'hours': 2,
+    #     'minutes': 2,
+    #     'seconds': 15,
+    # }
 
     # "Longest Tournament"
     single_match_time = tournament_data.aggregate(longest_match_time=Max('tournament_duration_secs')).get('longest_match_time', 0)
     longest_tournament_time = {
-        'minutes': single_match_time // 60,
-        'seconds': single_match_time % 60
+        'minutes': single_match_time // 60 if single_match_time is not None else 0,
+        'seconds': single_match_time % 60 if single_match_time is not None else 0,
     }
 
     # "Player with most wins"
     first_players = [players[0] for players in tournament_data.values_list('player_ranking', flat=True)]
-    player_counts = Counter(first_players).most_common(1)[0]
-    bestPlayer = {
-        'alias': player_counts[0],
-        'wins': player_counts[1]
-    }
+    if first_players:
+        player_counts = Counter(first_players).most_common(1)[0]
+        if player_counts:
+            bestPlayer = {
+            'alias': player_counts[0],
+            'wins': player_counts[1]
+            }
+        else:
+            bestPlayer = {
+            'alias': "Unknown",
+            'wins': 0             
+            }
+    # bestPlayer = {
+    #     'alias': player_counts[0],
+    #     'wins': player_counts[1]
+    # }
 
     # "Player with highest play time"
     aggreagted_duration = (
@@ -393,17 +443,43 @@ def get_dashboardTournament_data(request):
     for data in aggreagted_duration:
         for player in data['player_ranking']:
             player_duration[player] = player_duration.get(player, 0) + data['total_time']
-    max_player = max(player_duration, key=player_duration.get)
-    print(f'max_player={max_player}')
+    if player_duration:
+        max_player = max(player_duration, key=player_duration.get)
+        if max_player:
+            print(f'max_player={max_player}')
 
-    highest_time_player = {
-        'alias': max(player_duration, key=player_duration.get),
-        'time': {
-            'minutes': player_duration[max(player_duration, key=player_duration.get)] // 60,
-            'seconds': player_duration[max(player_duration, key=player_duration.get)] % 60
+    highest_time_player = {}
+    if player_duration:
+        max_player_alias = max(player_duration, key=player_duration.get)
+        max_player_time_minutes = player_duration[max_player_alias] // 60
+        max_player_time_seconds = player_duration[max_player_alias] % 60
+        highest_time_player = {
+            'alias': max_player_alias,
+            'time': {
+                'minutes': max_player_time_minutes,
+                'seconds': max_player_time_seconds,
+            }
         }
-    }
+    else:
+        highest_time_player = {
+            'alias': "Unknown",
+            'time':{
+                'minutes': 0,
+                'seconds': 0
+            }
+        }
+    # highest_time_player = {
+    #     'alias': max(player_duration, key=player_duration.get),
+    #     'time': {
+    #         'minutes': player_duration[max(player_duration, key=player_duration.get)] // 60,
+    #         'seconds': player_duration[max(player_duration, key=player_duration.get)] % 60
+    #     }
+    # }
 
+    bestPlayer = {
+        'alias': "Unknown",
+        'wins': 0
+    }
     # Prepare the response and return it as JSON
     response_data = {
         'barChart1': chart_TournamentsPerDay,

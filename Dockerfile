@@ -16,7 +16,7 @@ RUN pip3 install -r requirements.txt --break-system-packages \
     && apt-get update && apt-get install -y postgresql \
     && apt-get install postgresql-client \
     && pip install psycopg2
-RUN pip install django-cors-headers pytz -r requirements.txt
+RUN pip install pytz -r requirements.txt
 RUN django-admin startproject transcendence
 WORKDIR /transcendence
 RUN python manage.py startapp pong
