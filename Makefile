@@ -29,10 +29,10 @@ remove_image:
 	docker rmi -f postgres
 
 https_test:
-	google-chrome https://127.0.0.1:4443/admin
+	google-chrome https://127.0.0.1:443/admin
 
 https_test_static:
-	google-chrome https://127.0.0.1:4443/static/admin/css/base.css
+	google-chrome https://127.0.0.1:443/static/admin/css/base.css
 
 html_test:
 	google-chrome http://127.0.0.1:8000

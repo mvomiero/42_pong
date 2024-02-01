@@ -1,44 +1,35 @@
-# End goal
+What's happening
 
-We need a Docker-compose.yml, which will have three containers:
-1. Django + Blockchain + Nginx (ssh)
-2. Postgre
-3. ELK
+1. Django formulates a websocket request
 
-# Steps
+var connectionString =
+  "wss://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
+gameSocket = new WebSocket(connectionString);
 
-1. Make one container based on node.js, with django and sql database
-- use the database_test_dockerised as the starting point for the Dockerfile
-- it will run a script to do the database migration, for this we also need an .env file in the root containing
-```
-DJANGO_SUPERUSER_USERNAME=admin
-DJANGO_SUPERUSER_EMAIL=admin@example.com
-DJANGO_SUPERUSER_PASSWORD=adminpassword
-```
+2. The browser reports
 
-Note: `POSTGRES_` entries are for later
+WebSocket connection to 'wss://127.0.0.1:4443/ws/play/match/test/' failed: 
 
-2. install three.js library using node package manager
-- and maybe other stuff?
+3. Nginx reports
 
-3. Add blockchain parts to existing container (YY to do)
-- etherium, solidity
-4. Add https support
-- will require adding nginx or some other https compliant server instead or as well as the existing server
-5. Convert database to postgres (requires a separate container image)
-- we simply pull the postgres image from dockerhub here
+Not Found: /ws/play/match/test/
 
-## What is the name of my app and of my project
+4. Nginx access log reports
 
-Project: transcendence
-App: pong
+/var/log/nginx/access.log reports:
 
-## Copy the files that we need to copy into the docker container into a folder called config
+172.22.0.1 - - [31/Jan/2024:12:58:23 +0000] "GET /ws/play/match/a/ HTTP/1.1" 404 4479 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
-The script `make_config.sh` handles this for us
+Next steps
 
-## What items in requirements.txt are really needed
+https://www.nginx.com/blog/websocket-nginx/
 
-## Do we need a .env file at the moment? Yes, as .entrypoint.sh uses it to setup the database
+# 1. Drop back to nginx non-secure config to see if that works
 
-## Make database persistent?!
+no joy. i tried setting up nginx on port 8100 and forwarding to django on 8000 (wss:// changed back to ws:/ in main.js and hardcoded to 127.0.0.1:8100 so that it goes first to nginx)
+
+i tried a separate location for /ws and just one location as described here: https://www.nginx.com/blog/websocket-nginx/
+
+The endpoint can still not be found, in the same way as before. This suggests issues on the django side.
+
+# 2. Research more about
