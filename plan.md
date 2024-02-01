@@ -33,3 +33,9 @@ i tried a separate location for /ws and just one location as described here: htt
 The endpoint can still not be found, in the same way as before. This suggests issues on the django side.
 
 # 2. Research more about
+
+Right now, the thought running through my head is that your nginx configuration might be matching the “ws” url with the location for your non-ws handler, and passing it along as a GET instead of a CONNECT.
+
+https://forum.djangoproject.com/t/websocket-django-on-production-https/19424/14
+
+Switching back to runserver not gunicorn helped here
