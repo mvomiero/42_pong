@@ -1,41 +1,8 @@
-// documentation here: https://www.notion.so/42wolfsburgberlin/Interface-Frontend-Backend-To-Do-List-eff7e8c582ff4a32b088f6aecf87b626
-
-// TODO: fix paddlecam issues - highlights wrong player and doesn't reset correctly when scores are equal
-// TODO: test reinstating opening and closing titles
-// TODO: bring back random ball height
-// TODO: still some minor ball ghosting - but why does it happen
-// TODO: why does moving bat cause ball to move faster? probably because we're asking for the next animation frame twice somehow
-// TODO: ball gets trapped in top/bottom walls when bat is near top/bottom
-// TODO: make ball square and calculate bat hit and line cross from outside of ball, not centre (low priority)
-// TODO: tron-styling: wireframe, colours etc
-
-// TODO: waiting for players text...
-// TODO: fix minor bat jitter
-// TODO: bug, on end is winningScore + 1 still displayed?
-// TODO: better font...trickier than expected...see font-notes.md
-// TODO: fill database on game end
-// TODO: add text "waiting for opponent to connect...to start screen"
-// TODO: handle duplicate names
-// TODO: only names of max 8 chars should be enterable
-// TODO: rename 'player1' to 'player1name' (also needed on backend part)
-// TODO: three.js elements don't resize when browser window is resized
-// TODO: in final dockerised version, install three.js locally
-// TODO: split back into main.js, keyboardEvents.js, websocket.js
-// TODO: consider making one data structure again
-
-// NOTE: top surface of the table is 0 on the z axis
-// paddles and net are offset positively on z axis by half their depth
-// table is offset negatively by half its depth
-// ball is offset positively by half its size
 
 import * as THREE from 'three';
 import {FontLoader} from 'three/FontLoader';
 import {TextGeometry} from 'three/TextGeometry';
 import {OrbitControls} from 'three/OrbitControls';
-// import {initOpeningTitles} from './openingTitles.js';
-// import {animateOpeningTitles} from './openingTitles.js';
-// import {initClosingTitles} from './closingTitles.js';
-// import {animateClosingTitles} from './closingTitles.js';
 
 const fontLoader = new FontLoader();
 fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_serif_regular.typeface.json', function (font) {
@@ -74,25 +41,21 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
   var ballMesh, minBallZ, maxBallZ;
   const ballSize = 0.4, initBallSpeed = 0.2, minBallSpeed = 0.1, amountToSlow = 0, maxBallSpeedDivider = 4; // amountToSlow = 0.025
-  var leftPaddleMesh, rightPaddleMesh, paddleWidth, paddleHeight, paddleDepth, myPaddleSpeed, leftPaddleSpeed = 0, rightPaddleSpeed = 0, paddleCam = false;
-  var paddleIncreaseKey, paddleDecreaseKey, paddleInterval;
+  var leftPaddleMesh, rightPaddleMesh, paddleWidth, paddleHeight, paddleDepth, leftPaddleSpeed = 0, rightPaddleSpeed = 0, paddleCam = false;
+  var paddleIncreaseKeyLeft, paddleDecreaseKeyLeft, paddleIncreaseKeyRight, paddleDecreaseKeyRight, paddleIntervalLeft, paddleIntervalRight;
   var textHeight, textDepth, textYpos, leftScoreXpos, rightScoreXpos, leftNameOffset, rightNameOffset;
   var scorePlayer1Mesh, scorePlayer2Mesh;
   var namePlayer1Mesh, namePlayer2Mesh;
   var controls;
   var player1, player2;
-  var player = 0;
+  //var player = 0;
   var winnerName;
   var winnerColour;
-  var char_choice;
+  //var char_choice;
   var gameSocket;
   var animationId;
 
   // variables for tournament:
-  var tournament_stage; // show the state of the tournament: "waitingForPlayers", "semifinal", "final", "closing"
-                        // "final" & "semifinal": when activily playing the match
-                        // state: my semifinal is over and the other semifinal is still running -> still in "semifinal" (trigger is match_info with mode "start")
-                        // "closing": when the tournament is over, WebSocket is closed and e.g. the closing titles are shown
   var game_mode; // "local" or "remote" or "tournament"
 
 
@@ -102,8 +65,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // Function to show the name input field
   function showNameInput() {
-    /* document.getElementById('startLocalGameButton').style.display = 'none';
-    document.getElementById('startRemoteGameButton').style.display = 'none'; */
     document.getElementById('pongChooseMode').style.display = 'none';
     document.getElementById('nameInputSectionLocal').style.display = 'block';
   }
@@ -120,22 +81,20 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
         // Connect to the websocket
         var roomCode = "local";
-        /* if (roomCode === "Tournament") {
-            game_mode = "tournament";
-            tournament_stage = "waitingForPlayers";
-        } else if (roomCode === "Match") {
-            game_mode = "remote";
-        } */
-        char_choice = playerName1;
         var connectionString =
           "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + playerName1 + "/" + playerName2 + "/";
         gameSocket = new WebSocket(connectionString);
         console.log("[WebSocket started] connectionString: ", connectionString);
 
-        // start the game
-        //initGame();
+        // set game variables
+        player1 = playerName1;
+        player2 = playerName2;
+        game_mode = roomCode;
 
-        gameSocket.onopen = function (event) {
+        // start the game
+        initGame();
+
+        /* gameSocket.onopen = function (event) {
             console.log("[WebSocket opened] connectionString: ", connectionString);
         
             // Now that the connection is open, you can send data
@@ -149,15 +108,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
                 winner: playerName1,
             };
             gameSocket.send(JSON.stringify(matchInfo));
-        };
+        }; */
 
         // Set the event handlers
-        gameSocket.onmessage = handleWebSocketOpen;
+        //gameSocket.onmessage = handleWebSocketOpen;
         gameSocket.onclose = handleWebSocketClose;
         gameSocket.onerror = handleWebSocketError;
-
-        console.log("gameSocket: ", gameSocket);
-        //testingSendMatchInfo();
 
     } else if (playerName.length > 10) {
         alert('Name too long - Please enter a valid name.');
@@ -203,8 +159,22 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     initCamera();
     initTable();
     createTable();
+    initStart();
     renderer.render(scene, camera);
     startAnimationLoop();
+  }
+
+  function initStart() {
+    createLeftPaddle();
+    createRightPaddle();
+    initTextParams();
+    createP1ScoreText();
+    createP2ScoreText();
+    createP1NameText();
+    createP2NameText();
+    renderer.render(scene, camera);
+    sceneProperties.currentScene = "game";
+    initBall();
   }
 
   function initCamera() {
@@ -408,7 +378,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       ball.height = minBallZ;
       // adjust ball speed according to paddle speed:
       let newBallSpeed = ball.speed - amountToSlow; // ball first slows a bit on each paddle hit
-      if (myPaddleSpeed > 0) // if the paddle is moving, it adds to the ball speed, if it is not moving the ball will slow a little
+      //leftPaddleSpeed, rightPaddleSpeed
+      if (paddleSpeed > 0) // if the paddle is moving, it adds to the ball speed, if it is not moving the ball will slow a little
         newBallSpeed = newBallSpeed + paddleSpeed / maxBallSpeedDivider; // divider controls overall max ball speed
       if (newBallSpeed < minBallSpeed) // we check that the final ball speed doesn't fall below a minimum threshold
         newBallSpeed = minBallSpeed;
@@ -417,12 +388,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   function reinitialise() {
     animationId = undefined;
-    /* if (tournament_stage === undefined) {
-        console.log("tournament_stage: ", tournament_stage);
-        char_choice = undefined;
-        gameSocket = undefined;
-        animationId = undefined;
-    } */
     scorePlayer1 = 0;
     scorePlayer2 = 0;
     leftPaddleSpeed = 0;
@@ -430,7 +395,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     paddleCam = false;
     player1 = undefined;
     player2 = undefined;
-    player = undefined;
     winnerName = undefined;
     winnerColour = undefined;
     sceneProperties.currentScene = "waitingForPlayers";
@@ -438,6 +402,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   function checkForWin(score, thisPlayer, playerColour) {
     if (score === winningScore) {
+      sceneProperties.currentScene = "none";
       winnerName = thisPlayer;
       winnerColour = playerColour;
       removeAndDisposeAndMakeUndefined(ballMesh);
@@ -455,76 +420,48 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       removeAndDisposeAndMakeUndefined(controls);
       renderer.render(scene, camera);
       cancelAnimationFrame(animationId);
-      /* if (tournament_stage === undefined) {
-          cancelAnimationFrame(animationId);
-      } */
-      setTimeout(function() {
-        console.log("sending match info");
-        sendMatchInfo(); // send "end" command to add gameData to database
-        console.log("reinitialising");
-        reinitialise();
-      }, 500);
-      console.log("[checkForWin] gameSocket: ", gameSocket);
+      
+      console.log("sending match info");
+      sendMatchInfo(); // send "end" command to add gameData to database
+      console.log("reinitialising");
+      reinitialise();
+      
       // initClosingTitles(sceneProperties);
     }
   }
 
   function setNormalCam() {
     controls.enabled = true;
-    paddleIncreaseKey = "W";
-    paddleDecreaseKey = "S";
+    paddleIncreaseKeyLeft = "W";
+    paddleDecreaseKeyLeft = "S";
+    paddleIncreaseKeyRight = "ArrowUp";
+    paddleDecreaseKeyRight = "ArrowDown";
     sceneProperties.camera.position.set(0, 0, 11);
     sceneProperties.camera.rotation.set(0, 0, 0);   
   }
 
-  function setPaddleCam(player) {
-    const halfPaddleDepth = paddleDepth / 2;
-    if (player === 1) {
-      controls.enabled = false;
-      paddleIncreaseKey = "D";
-      paddleDecreaseKey = "A";
-      sceneProperties.camera.position.set(leftPaddleMesh.position.x, leftPaddleMesh.position.y, halfPaddleDepth);
-      sceneProperties.camera.rotation.set(Math.PI / 2, -Math.PI / 2, 0);    
-    }
-    if (player === 2) {
-      controls.enabled = false;
-      paddleIncreaseKey = "D";
-      paddleDecreaseKey = "A";
-      sceneProperties.camera.position.set(rightPaddleMesh.position.x, rightPaddleMesh.position.y, halfPaddleDepth);
-      sceneProperties.camera.rotation.set(Math.PI / 2, Math.PI / 2, 0);    
-    }
-  }
-
-  function setPaddleCamForLeadingPlayer() {
-    if (scorePlayer1 > scorePlayer2) {
-      if (player === 1)
-        setPaddleCam(player);
-      if (player === 2)
-        setNormalCam();
-    }
-    else if (scorePlayer1 < scorePlayer2) {
-      if (player === 1)
-        setNormalCam();
-      if (player === 2)
-        setPaddleCam(player);
-    }
-    else if (scorePlayer1 == scorePlayer2) {
-      setNormalCam(); // both players
-    }
+  function initBall() {
+    var geometry = new THREE.SphereGeometry(ballSize, 50);
+    var material = new THREE.MeshPhongMaterial({color: sceneProperties.ballColour});
+    ballMesh = new THREE.Mesh(geometry, material);
+    const halfBallSize = ballSize / 2;
+    ballMesh.position.set(0, 0, halfBallSize + minBallZ);
+    // ball.height = generateRandomBallHeight();
+    ball.dx = Math.random() < 0.5 ? 1 : -1;
+    ball.dy = (Math.random() * 2) - 1;
+    ball.height = minBallZ;
+    ball.speed = initBallSpeed;
+    sceneProperties.scene.add(ballMesh);
   }
 
   function ballPassedLeftPaddle() {
     scorePlayer2++;
     removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
     createP2ScoreText();
-    removeAndDisposeAndMakeUndefined(ballMesh);  
-    // setPaddleCamForLeadingPlayer();
+    removeAndDisposeAndMakeUndefined(ballMesh);
     renderer.render(scene, camera);
+    initBall();
     checkForWin(scorePlayer2, player2, sceneProperties.p2Colour);
-    sceneProperties.currentScene = "none";
-    if (player === 2) {
-      sendInitBall();
-    }
   }
 
   function ballPassedRightPaddle() {
@@ -532,161 +469,21 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     removeAndDisposeAndMakeUndefined(scorePlayer1Mesh);
     createP1ScoreText();
     removeAndDisposeAndMakeUndefined(ballMesh);
-    // setPaddleCamForLeadingPlayer();
     renderer.render(scene, camera);
+    initBall();
     checkForWin(scorePlayer1, player1, sceneProperties.p1Colour);
-    sceneProperties.currentScene = "none";
-    if (player === 1) {
-      sendInitBall();
-    }
   }
 
   function updateBall() {
-    var ballX, ballY;
-    ballX = ballMesh.position.x + ball.dx * ball.speed;
-    ballY = ballMesh.position.y + ball.dy * ball.speed;
-    // p1 sends when ball is in left half of table, p2 when ball is in right half
-    const tableMiddleX = 0;
-    if (player === 1 && ballMesh.position.x < tableMiddleX) {
-      // console.log("p1 sending ball data");
-      sendBallData(ballX, ballY);
-    }
-    else if (player === 2 && ballMesh.position.x >= tableMiddleX) {
-      // console.log("p1 sending ball data");
-      sendBallData(ballX, ballY);
-    }
+    ballMesh.position.x = ballMesh.position.x + ball.dx * ball.speed;
+    ballMesh.position.y = ballMesh.position.y + ball.dy * ball.speed;
+    // calculate z based on ball.height
+    const standardDeviation = tableWidth / 4;
+    const mean = 0;
+    const exponent = -((ballMesh.position.x - mean) ** 2) / (2 * standardDeviation ** 2);
+    const halfBallSize = ballSize / 2;
+    ballMesh.position.z = halfBallSize + ball.height * Math.exp(exponent);
   }
-
-  function sendPaddleUpdate(incDec) {
-    let paddleMesh;
-    if (player === 1)
-      paddleMesh = leftPaddleMesh;
-    else if (player === 2)
-      paddleMesh = rightPaddleMesh;
-    // ensure paddle y cannot exceed table top/bottom
-    let newPaddleY, limit;
-    myPaddleSpeed = myPaddleSpeed + 0.05;
-    if (incDec === "increase") {
-      newPaddleY = paddleMesh.position.y + myPaddleSpeed;
-      limit = tableHeight / 2 - paddleHeight / 2;
-      if (newPaddleY > limit) {
-        newPaddleY = limit;
-        clearInterval(paddleInterval);
-        myPaddleSpeed = 0;
-      }
-    }
-    if (incDec === "decrease") {
-      newPaddleY = paddleMesh.position.y - myPaddleSpeed;
-      limit = -tableHeight / 2 + paddleHeight / 2;
-      if (newPaddleY < limit) {
-        newPaddleY = limit;
-        clearInterval(paddleInterval);
-        myPaddleSpeed = 0;
-      }
-    }
-    
-    // determine which paddle to update
-    var command;
-    if (player === 1)
-      command = "updateLeftPaddle";
-    if (player === 2)
-      command = "updateRightPaddle";
-    var paddleData = {
-      command: command,
-      y: newPaddleY,
-      speed: myPaddleSpeed
-    };
-    gameSocket.send(JSON.stringify(paddleData));
-  }
-
-  // KEYBOARD EVENTS
-
-  // listen to keyboard events to move the paddles
-  document.addEventListener("keydown", function (e) {
-    if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-        e.preventDefault();
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKey.toLowerCase()) {
-      clearInterval(paddleInterval);
-      myPaddleSpeed = 0;
-      paddleInterval = setInterval(() => {
-        sendPaddleUpdate("increase");
-      }, intervalUpdateRateMs);
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKey.toLowerCase()) {
-      clearInterval(paddleInterval);
-      myPaddleSpeed = 0;
-      paddleInterval = setInterval(() => {
-        sendPaddleUpdate("decrease");
-      }, intervalUpdateRateMs);
-    }
-  });
-
-  // listen to keyboard events to stop the paddle if key is released
-  document.addEventListener("keyup", function (e) {
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKey.toLowerCase()) {
-      if (player === 1)
-        clearInterval(paddleInterval);
-        myPaddleSpeed = 0;
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKey.toLowerCase()) {
-      if (player === 2)
-        clearInterval(paddleInterval);
-        myPaddleSpeed = 0;
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKey.toLowerCase()) {
-      if (player === 1)
-        clearInterval(paddleInterval);
-        myPaddleSpeed = 0;
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKey.toLowerCase()) {
-      if (player === 2)
-        clearInterval(paddleInterval);
-        myPaddleSpeed = 0;
-    }    
-  });
-
-  // WEBSOCKET CODE
-
-  function sendInitBall() {
-    var initBallData = {
-      command: "initBall",
-      dx: Math.random() < 0.5 ? 1 : -1,
-      dy: (Math.random() * 2) - 1
-    };
-    // setTimeout(function() {
-    gameSocket.send(JSON.stringify(initBallData));
-    // }, 500); // 1000 milliseconds (1 second) delay
-  }    
-
-  function sendBallData(ballX, ballY) {
-    var ballData = {
-      command: "updateBall",
-      x: ballX,
-      y: ballY,
-      dx: ball.dx,
-      dy: ball.dy,
-      height: ball.height,
-      speed: ball.speed
-    };
-    gameSocket.send(JSON.stringify(ballData));
-  }
-
-  function sendMatchInfo() {
-    if (player === 0) // needed?
-      return;
-    var matchInfo = {
-      command: "match_info",
-      mode: "end",
-      score: {
-        player1: scorePlayer1,
-        player2: scorePlayer2,
-      },
-      winner: winnerName
-    };
-    gameSocket.send(JSON.stringify(matchInfo));
-  }
-  // RECEIVING DATA
 
   function startAnimationLoop() {
     animationId = requestAnimationFrame(startAnimationLoop);
@@ -705,128 +502,144 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     // }
   }
 
-  function handleWebSocketOpen(event) {
-    try {
-      // console.log("RECEIVED DATA:", event.data);
-      var data = JSON.parse(event.data);
-      /* console.log("ed", event.data);
-      console.log("currentScene", sceneProperties.currentScene); */
-
-      if (sceneProperties.currentScene === "waitingForPlayers" && data.command === "set_player") {
-        console.log("set player", data.player);
-        createLeftPaddle();
-        char_choice = data.player;
+  function paddleUpdateLeft(incDec) {
+    let newPaddleY, limit;
+    
+    leftPaddleSpeed = leftPaddleSpeed + 0.05;
+    if (incDec === "increase") {
+      newPaddleY = leftPaddleMesh.position.y + leftPaddleSpeed;
+      limit = tableHeight / 2 - paddleHeight / 2;
+      if (newPaddleY > limit) {
+        newPaddleY = limit;
+        clearInterval(paddleIntervalLeft);
+        leftPaddleSpeed = 0;
       }
-
-      if (data.command === "match_info") {
-        console.log("match_info", data);
-      }
-      if (sceneProperties.currentScene === "waitingForPlayers" && data.command === "match_info") {
-        if (data.mode === "start") {
-          if (tournament_stage === "final") {
-            initGame();
-            createLeftPaddle();
-          }
-          player1 = data.player1;
-          player2 = data.player2;
-          if (char_choice === player1) {
-            player = 1;
-            console.log("Player 1 set");
-          }
-          else if (char_choice === player2) {
-            player = 2;
-            console.log("Player 2 set");
-          }
-          else {
-            player = 0;
-            console.log("player set to 0");
-          }
-          console.log("starting game");
-          createRightPaddle();
-          initTextParams();
-          createP1ScoreText();
-          createP2ScoreText();
-          createP1NameText();
-          createP2NameText();
-          renderer.render(scene, camera);
-          sendInitBall();
-          // initOpeningTitles(sceneProperties, player1, player2);
-        }
-      }
-
-      if (data.command === "initBall") {
-        if (ballMesh)
-          removeAndDisposeAndMakeUndefined(ballMesh);
-        sceneProperties.currentScene = "game";
-        var geometry = new THREE.SphereGeometry(ballSize, 50);
-        var material = new THREE.MeshPhongMaterial({color: sceneProperties.ballColour});
-        ballMesh = new THREE.Mesh(geometry, material);
-        const halfBallSize = ballSize / 2;
-        ballMesh.position.set(0, 0, halfBallSize + minBallZ);
-        // ball.height = generateRandomBallHeight();
-        ball.dx = data.dx;
-        ball.dy = data.dy;
-        ball.height = minBallZ;
-        ball.speed = initBallSpeed;
-        sceneProperties.scene.add(ballMesh);
-      }
-
-      if (sceneProperties.currentScene === "game" && data.command === "updateBall") {
-        ballMesh.position.x = data.x;
-        ballMesh.position.y = data.y;
-        ball.dx = data.dx;
-        ball.dy = data.dy;
-        ball.height = data.height;
-        ball.speed = data.speed;
-        // calculate z based on ball.height
-        const standardDeviation = tableWidth / 4;
-        const mean = 0;
-        const exponent = -((ballMesh.position.x - mean) ** 2) / (2 * standardDeviation ** 2);
-        const halfBallSize = ballSize / 2;
-        ballMesh.position.z = halfBallSize + ball.height * Math.exp(exponent);
-        // renderer.render(scene, camera);
-      }
-
-      if (sceneProperties.currentScene === "game" && data.command === "updateLeftPaddle") {
-        leftPaddleMesh.position.y = data.y;
-        leftPaddleSpeed = data.speed;
-      }
-
-      if (sceneProperties.currentScene === "game" && data.command === "updateRightPaddle") {
-        rightPaddleMesh.position.y = data.y;
-        rightPaddleSpeed = data.speed;
-      }
-
-      // keeping track of tournament_info states
-      if (data.command === "tournament_info") {
-        console.log("tournament_info: ", data);
-        if (data.mode === "start") {
-            tournament_stage = "semifinal";
-        } else if (data.mode === "update" && data.matchFinal.player1 !== undefined && data.matchFinal.player2 !== undefined) {
-            tournament_stage = "final";
-        } else if (data.mode === "end") {
-            tournament_stage = "closing";
-        }
-        console.log("tournament_stage: ", tournament_stage);
-      }
-
-    } catch (error) {
-      console.error("Error parsing received data:", error);
-      console.log("Received data:", event.data);
     }
-  };
+    else if (incDec === "decrease") {
+      newPaddleY = leftPaddleMesh.position.y - leftPaddleSpeed;
+      limit = -tableHeight / 2 + paddleHeight / 2;
+      if (newPaddleY < limit) {
+        newPaddleY = limit;
+        clearInterval(paddleIntervalLeft);
+        leftPaddleSpeed = 0;
+      }
+    }
+    leftPaddleMesh.position.y = newPaddleY;
+  }
+
+  function paddleUpdateRight(incDec) {
+    let newPaddleY, limit;
+    
+    rightPaddleSpeed = rightPaddleSpeed + 0.05;
+    if (incDec === "increase") {
+      newPaddleY = rightPaddleMesh.position.y + rightPaddleSpeed;
+      limit = tableHeight / 2 - paddleHeight / 2;
+      if (newPaddleY > limit) {
+        newPaddleY = limit;
+        clearInterval(paddleIntervalRight);
+        rightPaddleSpeed = 0;
+      }
+    }
+    else if (incDec === "decrease") {
+      newPaddleY = rightPaddleMesh.position.y - rightPaddleSpeed;
+      limit = -tableHeight / 2 + paddleHeight / 2;
+      if (newPaddleY < limit) {
+        newPaddleY = limit;
+        clearInterval(paddleIntervalRight);
+        rightPaddleSpeed = 0;
+      }
+    }
+    rightPaddleMesh.position.y = newPaddleY;
+  }
+
+
+  /******************************************************/
+  /******************* KEYBOARD EVENTS ******************/
+  /******************************************************/
+
+  // listen to keyboard events to move the paddles
+  document.addEventListener("keydown", function (e) {
+    if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+        e.preventDefault();
+    }
+    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKeyLeft.toLowerCase()) {
+      console.log("paddleIncreaseKeyLeft pressed");
+      clearInterval(paddleIntervalLeft);
+      leftPaddleSpeed = 0;
+      paddleIntervalLeft = setInterval(() => {
+        paddleUpdateLeft("increase");
+      }, intervalUpdateRateMs);
+    }
+    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKeyLeft.toLowerCase()) {
+      clearInterval(paddleIntervalLeft);
+      leftPaddleSpeed = 0;
+      paddleIntervalLeft = setInterval(() => {
+        paddleUpdateLeft("decrease");
+      }, intervalUpdateRateMs);
+    }
+    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKeyRight.toLowerCase()) {
+      clearInterval(paddleIntervalRight);
+      rightPaddleSpeed = 0;
+      paddleIntervalRight = setInterval(() => {
+        paddleUpdateRight("increase");
+      }, intervalUpdateRateMs);
+    }
+    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKeyRight.toLowerCase()) {
+      clearInterval(paddleIntervalRight);
+      rightPaddleSpeed = 0;
+      paddleIntervalRight = setInterval(() => {
+        paddleUpdateRight("decrease");
+      }, intervalUpdateRateMs);
+    }
+  });
+
+  // listen to keyboard events to stop the paddle if key is released
+  document.addEventListener("keyup", function (e) {
+    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKeyLeft.toLowerCase()) {
+      clearInterval(paddleIntervalLeft);
+      leftPaddleSpeed = 0;
+    }
+    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKeyRight.toLowerCase()) {
+      clearInterval(paddleIntervalRight);
+      rightPaddleSpeed = 0;
+    }
+    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKeyLeft.toLowerCase()) {
+      clearInterval(paddleIntervalLeft);
+      leftPaddleSpeed = 0;
+    }
+    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKeyRight.toLowerCase()) {
+      clearInterval(paddleIntervalRight);
+      rightPaddleSpeed = 0;
+    }    
+  });
+
+
+  /******************************************************/
+  /**************** SENDING ON WEBSOCKET ****************/
+  /******************************************************/
+
+  // SENDING DATA TO WEBSOCKET
+  function sendMatchInfo() {
+    var matchInfo = {
+      command: "match_info",
+      mode: "end",
+      score: {
+        player1: scorePlayer1,
+        player2: scorePlayer2,
+      },
+      winner: winnerName
+    };
+    gameSocket.send(JSON.stringify(matchInfo));
+  }
+
+
+  /******************************************************/
+  /************ CLOSING & ERROR OF WEBSOCKET ************/
+  /******************************************************/
 
   // Event handler for connection closure
   function handleWebSocketClose(event) {
     console.log("WebSocket connection closed! (code: " + event.code + ")");
-
-    // set canvas to display none and 'restartPongSection' to display block
-    //document.getElementById('game_board').style.display = 'none';
-    //document.getElementById('restartPongSection').style.display = 'block';
-
-    /*********************************************************/
-    /***************** CHANGES STARTING HERE *****************/
-    /*********************************************************/
 
     setTimeout(function () {
       document.getElementById('game_board').style.display = 'none';
@@ -845,14 +658,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       else if (event.code === 4005 || event.code === 4006) {
         document.getElementById('closing_message').innerHTML = "The connection has been lost.";
       }
-
-
     }, 1000);
-
-    /*********************************************************/
-    /****************** CHANGES ENDING HERE ******************/
-    /*********************************************************/
-
   };
 
   // Error handler for WebSocket errors
