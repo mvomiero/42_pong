@@ -368,7 +368,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     paddleCam = false;
     player1 = undefined;
     player2 = undefined;
-    winnerName = undefined;
+    //winnerName = undefined;
     winnerColour = undefined;
     sceneProperties.currentScene = "waitingForPlayers";
   }
@@ -394,7 +394,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       renderer.render(scene, camera);
       cancelAnimationFrame(animationId);
       
-      console.log("sending match info");
+      console.log("sending match info (winner= " + winnerName + ")");
       sendMatchInfo(); // send "end" command to add gameData to database
       console.log("reinitialising");
       reinitialise();
@@ -607,7 +607,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
 
   /******************************************************/
-  /************ CLOSING & ERROR OF WEBSOCKET ************/
+  /************ CLOSING & ERROR ON WEBSOCKET ************/
   /******************************************************/
 
   // Event handler for connection closure
@@ -617,10 +617,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     setTimeout(function () {
       document.getElementById('game_board').style.display = 'none';
       document.getElementById('end_closing_message').style.display = 'inline-block';
-      document.getElementById('closing_message').style.display = 'block';
+      document.getElementById('closing_message').style.display = 'inline-block';
+
+      document.getElementById('game_info').style.display = 'none';
+      document.getElementById('game_message').style.display = 'none';
 
       if (event.code === 3001 || event.code === 3002) {
-        document.getElementById('closing_message').innerHTML = "GAME OVER";
+        //document.getElementById('closing_message').innerHTML = "GAME OVER";
+        displayResultMessage();
       }
       else if (event.code === 4001) {
         document.getElementById('closing_message').innerHTML = "A duplicate has been detected.";
@@ -640,4 +644,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     // Handle WebSocket errors
   };
 
+  function displayResultMessage() {
+    document.getElementById('img_win').style.display = "block";
+    document.getElementById('closing_message').innerHTML = "🌴🎉 Congratulations, \"" + winnerName + "\" won! 🎉🌴"; 
+    winnerName = undefined;
+  }
+
+
 });
+
