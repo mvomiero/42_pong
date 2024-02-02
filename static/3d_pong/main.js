@@ -381,8 +381,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         ballMesh.position.x = -tableWidth / 2;
         ballHitPaddle(leftPaddleSpeed);
       }
-      else if (sceneProperties.currentScene === "game") {
-        console.log("[left] position: ", ballMesh.position.x, " | currentScene: ", sceneProperties.currentScene);
+      else {
         ballPassedLeftPaddle();
       }
     }
@@ -393,8 +392,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         ballMesh.position.x = tableWidth / 2;
         ballHitPaddle(rightPaddleSpeed);
       }
-      else if (sceneProperties.currentScene === "game") {
-        console.log("[right] position: ", ballMesh.position.x, " | currentScene: ", sceneProperties.currentScene);
+      else {
         ballPassedRightPaddle();
       }
     }
@@ -464,7 +462,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         console.log("reinitialising");
         reinitialise();
       }, 500);
-      // console.log("[checkForWin] gameSocket: ", gameSocket);
       // initClosingTitles(sceneProperties);
     }
   }
@@ -522,8 +519,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     renderer.render(scene, camera);
     checkForWin(scorePlayer2, player2, sceneProperties.p2Colour);
     sceneProperties.currentScene = "none";
-    console.log("[left] current scene changed: ", sceneProperties.currentScene);
     if (player === 2) {
+      console.log("[LEFT] sending init ball");
       setTimeout(sendInitBall, 200);
       //sendInitBall();
     }
@@ -538,8 +535,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     renderer.render(scene, camera);
     checkForWin(scorePlayer1, player1, sceneProperties.p1Colour);
     sceneProperties.currentScene = "none";
-    console.log("[right] current scene changed: ", sceneProperties.currentScene);
     if (player === 1) {
+      console.log("[RIGHT] sending init ball");
       setTimeout(sendInitBall, 200);
       //sendInitBall();
     }
@@ -671,15 +668,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       dx: ball.dx,
       dy: ball.dy,
       height: ball.height,
-      speed: ball.speed,
-      points: scorePlayer1 + scorePlayer2
+      speed: ball.speed
     };
-    if (sceneProperties.currentScene === "game" && (ballX > 7 || ballX < -7)) {
-      console.log("[sendBallData] ballX: ", ballX);
-    }
-    if (sceneProperties.currentScene === "game") {
-      gameSocket.send(JSON.stringify(ballData));
-    }
+    gameSocket.send(JSON.stringify(ballData));
   }
 
   function sendMatchInfo() {
@@ -709,14 +700,34 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     //   animateOpeningTitles(sceneProperties);
     // }
     if (sceneProperties.currentScene === "game") {
+      updateBall();
       checkIfBallHitTopBottomTable();
       checkIfBallHitOrPassedPaddles();
-      updateBall();
       renderer.render(scene, camera);
     }
     // if (sceneProperties.currentScene === "closingTitles") {
     //   animateClosingTitles(sceneProperties);
     // }
+  }
+
+  function displayTournamentMatches(data) {
+    if (data.mode === "start") {
+      document.getElementById('tournament_info').style.display = 'inline-flex';
+      document.getElementById('semiFinal1').innerHTML = data.matchSemi1.player1 + " vs. " + data.matchSemi2.player2;
+      document.getElementById('semiFinal2').innerHTML = data.matchSemi2.player1 + " vs. " + data.matchSemi2.player2;
+      document.getElementById('mode_info').innerHTML = "Tournament: semifinal";
+    } else if (data.mode === "update" && data.matchFinal.player1 !== undefined && data.matchFinal.player2 !== undefined) {
+      tournament_stage = "final";
+      document.getElementById('mode_info').innerHTML = "Tournament: final";
+      document.getElementById('final').innerHTML = data.matchFinal.player1 + " vs. " + data.matchFinal.player2;
+    } else if (data.mode === "end") {
+      tournament_stage = "closing";
+      winMessage.ranking[1] = data.playerRanking.firstPosition;
+      winMessage.ranking[2] = data.playerRanking.secondPosition;
+      winMessage.ranking[3] = data.playerRanking.thirdPosition;
+      winMessage.ranking[4] = data.playerRanking.fourthPosition;
+    }
+    console.log("tournament_stage: ", tournament_stage);
   }
 
   function handleWebSocketOpen(event) {
@@ -772,7 +783,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       if (data.command === "initBall") {
         if (ballMesh)
           removeAndDisposeAndMakeUndefined(ballMesh);
-        //sceneProperties.currentScene = "game";
+        sceneProperties.currentScene = "game";
         var geometry = new THREE.SphereGeometry(ballSize, 50);
         var material = new THREE.MeshPhongMaterial({ color: sceneProperties.ballColour });
         ballMesh = new THREE.Mesh(geometry, material);
@@ -784,14 +795,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         ball.height = minBallZ;
         ball.speed = initBallSpeed;
         sceneProperties.scene.add(ballMesh);
-        sceneProperties.currentScene = "game";
-        console.log("[initBall] position.x: ", ballMesh.position.x, " | current scene changed: ", sceneProperties.currentScene);
       }
 
-      if (sceneProperties.currentScene === "game" && data.command === "updateBall" && data.points === (scorePlayer1 + scorePlayer2)) {
-        if (data.x > 7 || data.x < -7) {
-          console.log("[updateBall] data.x: ", data.x);
-        }
+      if (sceneProperties.currentScene === "game" && data.command === "updateBall") {
         ballMesh.position.x = data.x;
         ballMesh.position.y = data.y;
         ball.dx = data.dx;
@@ -830,6 +836,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           tournament_stage = "closing";
         }
         console.log("tournament_stage: ", tournament_stage);
+        displayTournamentMatches(data);
       }
 
     } catch (error) {
@@ -837,6 +844,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       console.log("Received data:", event.data);
     }
   };
+
 
   function displayResultMessage() {
     console.log("displayResultMessage: ", winMessage.player, winMessage.game_mode, winMessage.ranking);
@@ -849,6 +857,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       else {
         document.getElementById('img_loss').style.display = "block";
         document.getElementById('closing_message').innerHTML = "👽 Unfortunately, you lost! 👽";
+      }
+      if (winMessage.game_mode === "tournament") {
+        document.getElementById('closing_message_ranking').style.display = "block";
+        document.getElementById('closing_message_ranking').innerHTML = "Ranking: <br> 1. " + winMessage.ranking[1] + "<br> 2. " + winMessage.ranking[2] + "<br> 3. " + winMessage.ranking[3] + "<br> 4. " + winMessage.ranking[4];
+        document.getElementById('closing_message').innerHTML = winMessage.ranking[1] + " won the tournament!";
       }
     }
   }
@@ -868,6 +881,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
       document.getElementById('game_info').style.display = 'none';
       document.getElementById('game_message').style.display = 'none';
+      //document.getElementById('tournament_info').style.display = 'none';
 
       
       if (event.code === 3001 || event.code === 3002) {
@@ -906,6 +920,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     document.getElementById('end_closing_message').style.display = 'none';
     document.getElementById('img_win').style.display = 'none';
     document.getElementById('img_loss').style.display = 'none';
+    document.getElementById('closing_message_ranking').style.display = 'none';
   });
 
 });
