@@ -68,7 +68,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   sceneProperties.scene.add(light);
 
   var scorePlayer1 = 0, scorePlayer2 = 0;
-  const winningScore = 2;
+  const winningScore = 11;
   const ball = {};
   const intervalUpdateRateMs = 20;
   var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
@@ -543,6 +543,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   }
 
   function updateBall() {
+    if (sceneProperties.currentScene !== "game")
+      return;
     var ballX, ballY;
     ballX = ballMesh.position.x + ball.dx * ball.speed;
     ballY = ballMesh.position.y + ball.dy * ball.speed;
@@ -700,9 +702,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     //   animateOpeningTitles(sceneProperties);
     // }
     if (sceneProperties.currentScene === "game") {
-      updateBall();
       checkIfBallHitTopBottomTable();
       checkIfBallHitOrPassedPaddles();
+      updateBall();
       renderer.render(scene, camera);
     }
     // if (sceneProperties.currentScene === "closingTitles") {
