@@ -21,13 +21,13 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     zoomedCanvasWidth: canvas.width * zoomFactor,
     zoomedCanvasHeight: canvas.height * zoomFactor,
     currentScene: "waitingForPlayers", // scenes: "openingTitles", "preGame", "game", "closingTitles" and "end"
-    backgroundColour: 0x87CEEB,
-    p1Colour: 0x990000,
+    backgroundColour: 0x000000,
+    p1Colour: 0xb744ff,
     otherTextColour: 0xFFFFAA,
-    p2Colour: 0x009900,
-    ballColour: 0xFF0000,
-    tableColour: 0x46A07E,
-    tableWallsColour: 0x77777E,
+    p2Colour: 0xff00a2,
+    ballColour: 0x00eaff,
+    tableColour: 0x001aff,
+    tableWallsColour: 0x001aff,
     font: font,
   };
   sceneProperties.scene.background = new THREE.Color(sceneProperties.backgroundColour);
@@ -48,10 +48,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   var namePlayer1Mesh, namePlayer2Mesh;
   var controls;
   var player1, player2;
-  //var player = 0;
   var winnerName;
   var winnerColour;
-  //var char_choice;
   var gameSocket;
   var animationId;
 
@@ -60,7 +58,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
 
   /**************************************************/
-  /******************** NEW PART ********************/
+  /************* HANDLING HTML ELEMENTS *************/
   /**************************************************/
 
   // Function to show the name input field
@@ -94,28 +92,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         // start the game
         initGame();
 
-        /* gameSocket.onopen = function (event) {
-            console.log("[WebSocket opened] connectionString: ", connectionString);
-        
-            // Now that the connection is open, you can send data
-            var matchInfo = {
-                command: "match_info",
-                mode: "end",
-                score: {
-                    player1: 11,
-                    player2: 4,
-                },
-                winner: playerName1,
-            };
-            gameSocket.send(JSON.stringify(matchInfo));
-        }; */
-
         // Set the event handlers
-        //gameSocket.onmessage = handleWebSocketOpen;
         gameSocket.onclose = handleWebSocketClose;
         gameSocket.onerror = handleWebSocketError;
 
-    } else if (playerName.length > 10) {
+    } else if (playerName1.length > 10 || playerName2.length > 10) {
         alert('Name too long - Please enter a valid name.');
     } else {
         alert('Please enter a valid name.');
@@ -137,17 +118,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   // Event listener for the Submit Name Button
   document.getElementById('restartGameButton').addEventListener('click', showNameInput2);
 
-  // Function to check if an element is in the viewport
-  function isInViewport(element) {
-  const rect = element.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-  );
-  }
 
   /**************************************************/
-  /**************** END NEW PART ********************/
+  /******************* GAME PART ********************/
   /**************************************************/
 
   function initGame() {
