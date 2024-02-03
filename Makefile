@@ -29,7 +29,7 @@ remove_image:
 	docker rmi -f postgres
 
 https_test:
-	google-chrome https://127.0.0.1:443/admin
+	google-chrome https://127.0.0.1:4443/admin
 
 https_test_static:
 	google-chrome https://127.0.0.1:443/static/admin/css/base.css
@@ -41,7 +41,7 @@ db_test:
 	google-chrome http://127.0.0.1:8000/blockchainTestApp/blockchainTest/graham/1/yy/4/
 	
 db_admin:
-	google-chrome http://127.0.0.1:8000/admin
+	google-chrome https://127.0.0.1:4443/admin
 
 game: 
 	python3 trans_autotest_game.py
@@ -51,3 +51,15 @@ tour:
 
 # install_cors_headers:
 # 	pip3 install corsheaders
+
+set: all
+	sleep 5
+	make game
+	sleep 5
+	make db_admin
+	sleep 3
+	clear
+	make logs_transcendence
+
+setr: decompose
+	make set

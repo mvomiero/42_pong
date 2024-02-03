@@ -88,7 +88,8 @@ async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
         game_result = p1n + ", " + str(p1s) + ", " + p2n + ", " + str(p2s)
         tx_hash = await deploy_sepo(game_result)
-        # tx_hash = "olalal"
+        print("I_am_called!!!!!!!!!!")
+        # tx_hash = "olalal!!!!!!!!!!!!!!!"
         print(f"tx_hash in views.py: {tx_hash} and the game_result is {game_result}!!!!!!!!!!!!!!!!!")
         gend = (pytz.timezone('UTC')).localize(gend)
         game_data = GameData(
@@ -122,7 +123,6 @@ async def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, t
     gdur = finalMatch['endTime'] - finalMatch['startTime']
     matchIdFinal = await add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
     tend = (pytz.timezone('UTC')).localize(tend)
-    # hash = '#hash'
     tour_result = str(matchIdSemi1) + ", " + str(matchIdSemi2) + ", " + str(matchIdFinal) + ", " + str(playersRank)
     tx_hash = await deploy_sepo(tour_result)
     tournament_data = TournamentData(
