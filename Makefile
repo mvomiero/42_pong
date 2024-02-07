@@ -1,3 +1,5 @@
+# keys are in /goinfre/docker/volumes
+
 all: compose
 
 compose:
@@ -15,12 +17,13 @@ logs_transcendence:
 logs_postgres:
 	docker compose logs postgres
 
-copy_CA:
-	docker cp transcendence:/ssl-keys-local/rootCA.pem .
-
 install_CA:
 	google-chrome chrome://settings/certificates
 	
+clean_certs:
+	rm -f ssl_data/*
+	rm -f ssl_keys_local/*
+
 prune:
 	docker system prune -af
 
