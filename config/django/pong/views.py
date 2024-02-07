@@ -233,42 +233,7 @@ def get_dashboardMatch_data(request):
     game_data = GameData.objects.filter(is_tournament_game=False)
 
     if not game_data:
-        # Prepare the response and return it as JSON
-        response_data = {
-            'barChart1': None,
-            'areaChart1': None,
-            'lineChart1': None,
-            'scatteredChart1': None,
-            'lineChart2': None,
-            'allAndHash': None,
-            'cards': {
-                'uniquePlayers': None,
-                'nbrMatches': None,
-                'totalMatchTime': None,
-                'longestMatchTime': None,
-                'bestPlayer': None,
-                'highestTimePlayer': None
-            },
-        }
-        return JsonResponse(response_data)
-
-        # # Prepare the response and return it as JSON
-        # response_data = {
-        #     'areaChart1': None,
-        #     'barChart1': None,
-        #     'cards': {
-        #         'uniquePlayers': None,
-        #         'nbrMatches': None,
-        #         'totalMatchTime': None,
-        #         'longestMatchTime': None,
-        #         'bestPlayer': None,
-        #         'highestTimePlayer': None
-        #     },
-        #     'lineChart1': None,
-        #     'lineChart2': None,
-        #     'scatteredChart1': None,
-        #     },
-        # return JsonResponse(response_data)
+        return JsonResponse({})
 
     """ Chart data: Matches per Day """
     bar_chart_data = chart_entriesPerDay(game_data, 'game_end_timestamp')
@@ -374,28 +339,11 @@ def get_dashboardMatch_data(request):
 # GET request for dashboard 'Tournament' data
 def get_dashboardTournament_data(request):
     # Data for tournament games
-    game_data = GameData.objects.all().filter(is_tournament_game=True)
+    # game_data = GameData.objects.all().filter(is_tournament_game=True)
     tournament_data = TournamentData.objects.all()
 
     if not tournament_data:
-        # Prepare the response and return it as JSON
-        response_data = {
-            'barChart1': None,
-            'areaChart1': None,
-            'lineChart1': None,
-            'scatteredChart1': None,
-            'lineChart2': None,
-            'allAndHash': None,
-            'cards': {
-                'uniquePlayers': None,
-                'nbrMatches': None,
-                'totalMatchTime': None,
-                'longestMatchTime': None,
-                'bestPlayer': None,
-                'highestTimePlayer': None
-            },
-        }
-        return JsonResponse(response_data)
+        return JsonResponse({})
 
 
     """ Chart data: Tournaments per Day """
@@ -510,14 +458,10 @@ def get_dashboardPlayer_list(request):
 def get_dashboard_data_player(request):
     # Retrieve player alias from POST request
     playerAlias = json.loads(request.body.decode('utf-8')).get('playerAlias')
-    # print(f'\n\nplayerAlias={playerAlias}')
 
     # Data for player
     player_matches = GameData.objects.filter(Q(player1_name=playerAlias) | Q(player2_name=playerAlias))
-    # print(f'player_matches={player_matches}')
     player_tournaments = TournamentData.objects.filter(Q(player_ranking__icontains=playerAlias))
-    # print(f'player_tournaments={player_tournaments}')
-    
 
     """ Data for the Chart """
     player_wins = player_matches.annotate(
@@ -628,5 +572,4 @@ def get_dashboard_data_player(request):
             'shortestMatch': shortest_match,
         },
     }
-    print(f'response_data={response_data}')
     return JsonResponse(response_data)
