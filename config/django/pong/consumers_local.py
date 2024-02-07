@@ -69,8 +69,9 @@ class PongConsumerLocal(AsyncJsonWebsocketConsumer):
         gend = datetime.fromtimestamp(time.time())
         gdur = 0
         itg = False
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
+        # loop = asyncio.get_event_loop()
+        # await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
+        await add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg)
 
 
     """ Close Connection of Client """
