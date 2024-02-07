@@ -21,20 +21,11 @@ function fetchMatchDashboard() {
         // Process the retrieved data
         console.log('[Match] Data received from backend: ', data);
         
-        /* // Update cards
-        updateCardsMatch(data.cards);
-
-        // Draw charts
-        drawChart1(data.barChart1, 'chart1');
-        drawLineChart(data.lineChart1, 'chart2');
-        drawAreaChart(data.areaChart1, 'chart3');
-        drawScatteredChart(data.scatteredChart1, data.lineChart2, 'chart4'); */
-
         return data;
 
       })
       .catch(error => {
-        console.error('Fetch error:', error);
+        console.error('fetchMatchDashboard error:', error);
         // Handle errors here
       });
 }
@@ -56,20 +47,11 @@ function fetchTournamentDashboard() {
         // Process the retrieved data
         console.log('[Tournament] Data received from backend: ', data);
         
-        /* // Update cards
-        updateCardsTournament(data.cards);
-
-        // Draw charts
-        drawChart1(data.barChart1, 'chart1');
-        drawLineChart(data.lineChart1, 'chart2');
-        drawAreaChart(data.areaChart1, 'chart3');
-        drawScatteredChart(data.scatteredChart1, data.lineChart2, 'chart4'); */
-
         return data;
 
       })
       .catch(error => {
-        console.error('Fetch error:', error);
+        console.error('fetchTournamentDashboard error:', error);
         // Handle errors here
       });
 }
@@ -102,7 +84,7 @@ function fetchPlayerDashboardList() {
 
       })
       .catch(error => {
-        console.error('Fetch error:', error);
+        console.error('fetchPlayerDashboardList error:', error);
         // Handle errors here
       });
 }

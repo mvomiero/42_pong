@@ -63,8 +63,11 @@ function updateCardsMatch(cardsData) {
 
     const highestPlayingTimeAliasElement = document.getElementById('ma-highestPlayingTimeAlias');
     highestPlayingTimeAliasElement.textContent = cardsData.bestPlayer.alias;
-    const highestPlayingTimeElement = document.getElementById('ma-highestPlayingTimeTime');
-    highestPlayingTimeElement.textContent = 'has the highest playing time (' + cardsData.highestTimePlayer.time.minutes.toString() + ' min ' + cardsData.highestTimePlayer.time.seconds.toString() + ' sec).';
+
+    // if (cardsData.highestTimePlayer.time) {
+        const highestPlayingTimeElement = document.getElementById('ma-highestPlayingTimeTime');
+        highestPlayingTimeElement.textContent = 'has the highest playing time (' + cardsData.highestTimePlayer.time.minutes.toString() + ' min ' + cardsData.highestTimePlayer.time.seconds.toString() + ' sec).';
+    // }
 }
 
 

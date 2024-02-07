@@ -258,26 +258,22 @@ def get_dashboardMatch_data(request):
     
     nbr_matches = game_data.count()
 
-    # match_time = game_data.aggregate(total_match_time=Sum('game_duration_secs')).get('total_match_time', 0)
-    match_time_aggregate = game_data.aggregate(total_match_time=Sum('game_duration_secs'))
-    match_time = match_time_aggregate.get('total_match_time', 0) if match_time_aggregate is not None else 0
+    match_time = game_data.aggregate(total_match_time=Sum('game_duration_secs')).get('total_match_time', 0)
+    # match_time_aggregate = game_data.aggregate(total_match_time=Sum('game_duration_secs'))
+    # match_time = match_time_aggregate.get('total_match_time', 0) if match_time_aggregate is not None else 0
     # match_time = match_time_aggregate['total_match_time'] if match_time_aggregate['total_match_time'] is not None else 0
     total_match_time = {
-        'hours': match_time // 3600 if match_time is not None else 0,
-        # 'minutes': (match_time % 3600) // 60,
-        # 'seconds': (match_time % 3600) % 60
-        'minutes': divmod(match_time % 3600, 60) if match_time is not None else 0,
-        'seconds': match_time % 60 if match_time is not None else 0,
+        # 'hours': match_time // 3600 if match_time is not None else 0,
+        'hours': match_time // 3600,
+        'minutes': (match_time % 3600) // 60,
+        'seconds': (match_time % 3600) % 60
+        # 'minutes': divmod(match_time % 3600, 60) if match_time is not None else 0,
+        # 'seconds': match_time % 60 if match_time is not None else 0,
     }
-    # total_match_time = {
-    #     'hours': 2,
-    #     'minutes': 2,
-    #     'seconds': 15,
-    # }
     single_match_time = game_data.aggregate(longest_match_time=Max('game_duration_secs')).get('longest_match_time', 0)
     longest_match_time = {
-        'minutes': single_match_time // 60 if single_match_time is not None else 0,
-        'seconds': single_match_time % 60 if single_match_time is not None else 0,
+        'minutes': single_match_time // 60,# if single_match_time is not None else 0,
+        'seconds': single_match_time % 60 #if single_match_time is not None else 0,
     }
 
     """ Player with most wins """
@@ -289,20 +285,20 @@ def get_dashboardMatch_data(request):
         )
     ).values_list('winner_name', flat=True)
     succ_player = Counter(winner_names).most_common(1)
-    if succ_player:
-        bestPlayer = {
-            'alias': succ_player[0][0],
-            'wins': succ_player[0][1]
-        }
-    else:
-        bestPlayer = {
-            'alias': "Unknown",
-            'wins': 0  # You can choose an appropriate default value
-        }
-    # bestPlayer = {
-    #     'alias': succ_player[0][0],
-    #     'wins': succ_player[0][1]
-    # }
+    # if succ_player:
+    #     bestPlayer = {
+    #         'alias': succ_player[0][0],
+    #         'wins': succ_player[0][1]
+    #     }
+    # else:
+    #     bestPlayer = {
+    #         'alias': "Unknown",
+    #         'wins': 0  # You can choose an appropriate default value
+    #     }
+    bestPlayer = {
+        'alias': succ_player[0][0],
+        'wins': succ_player[0][1]
+    }
 
     """ Player with highest play time """
     # Aggregate the total playing time for player1_name and player2_name and combine the datasets
@@ -331,15 +327,12 @@ def get_dashboardMatch_data(request):
                 'seconds': player_durations[max(player_durations, key=player_durations.get)] % 60
             }
     }
+    # highest_time_player = {}
 
     # Prepare the response and return it as JSON
-    highest_time_player = {}
     response_data = {
-        'barChart1': bar_chart_data,
         'areaChart1': area_chart_data,
-        'lineChart1': line_chart_data,
-        'scatteredChart1': scattered_chart_data,
-        'lineChart2': line_chart_data2,
+        'barChart1': bar_chart_data,
         'cards': {
             'uniquePlayers': nbr_unique_players,
             'nbrMatches': nbr_matches,
@@ -348,6 +341,9 @@ def get_dashboardMatch_data(request):
             'bestPlayer': bestPlayer,
             'highestTimePlayer': highest_time_player
         },
+        'lineChart1': line_chart_data,
+        'lineChart2': line_chart_data2,
+        'scatteredChart1': scattered_chart_data,
     }
     return JsonResponse(response_data)
 
@@ -357,6 +353,28 @@ def get_dashboardTournament_data(request):
     # Data for tournament games
     game_data = GameData.objects.all().filter(is_tournament_game=True)
     tournament_data = TournamentData.objects.all()
+
+    if not tournament_data:
+        print('!!!!!!!!!!!!!!!!!!!!! tournament_data is empty !!!!!!!!!!!!!!!!!!!!!')
+
+        # Prepare the response and return it as JSON
+        response_data = {
+            'barChart1': None,
+            'areaChart1': None,
+            'lineChart1': None,
+            'scatteredChart1': None,
+            'lineChart2': None,
+            'allAndHash': None,
+            'cards': {
+                'uniquePlayers': None,
+                'nbrMatches': None,
+                'totalMatchTime': None,
+                'longestMatchTime': None,
+                'bestPlayer': None,
+                'highestTimePlayer': None
+            },
+        }
+        return JsonResponse(response_data)
 
 
     """ Chart data: Tournaments per Day """
@@ -383,23 +401,24 @@ def get_dashboardTournament_data(request):
     # "different Players participated"
     players_query = tournament_data.values_list('player_ranking', flat=True)
     all_players = [player for sublist in players_query for player in sublist]
-    # print(f'all_players={all_players}')
     nbr_unique_players = len(list(set(all_players)))
 
     # "Tournaments played"
     nbr_tournaments = tournament_data.count()
     print(f'nbr_tournaments={nbr_tournaments}')
 
+
     # match_time = tournament_data.aggregate(total_match_time=Sum('tournament_duration_secs')).get('total_match_time', 0)
-    match_time_aggregate = tournament_data.aggregate(total_tournament_time=Sum('tournament_duration_secs'))
-    match_time = match_time_aggregate.get('total_match_time', 0) if match_time_aggregate is not None else 0
+    # match_time_aggregate = tournament_data.aggregate(total_tournament_time=Sum('tournament_duration_secs'))
+    # match_time = match_time_aggregate.get('total_match_time', 0) if match_time_aggregate is not None else 0
     # match_time = match_time_aggregate['total_match_time'] if match_time_aggregate['total_match_time'] is not None else 0
+    match_time = tournament_data.aggregate(total_match_time=Sum('tournament_duration_secs')).get('total_match_time', 0)
     total_tournament_time = {
         'hours': match_time // 3600,
-        'minutes': divmod(match_time % 3600, 60) if match_time is not None else 0,
-        'seconds': match_time % 60,
-        # 'minutes': (match_time % 3600) // 60,
-        # 'seconds': (match_time % 3600) % 60
+        # 'minutes': divmod(match_time % 3600, 60) if match_time is not None else 0,
+        # 'seconds': match_time % 60,
+        'minutes': (match_time % 3600) // 60,
+        'seconds': (match_time % 3600) % 60
     }
     # total_tournament_time = {
     #     'hours': 2,
@@ -410,28 +429,31 @@ def get_dashboardTournament_data(request):
     # "Longest Tournament"
     single_match_time = tournament_data.aggregate(longest_match_time=Max('tournament_duration_secs')).get('longest_match_time', 0)
     longest_tournament_time = {
-        'minutes': single_match_time // 60 if single_match_time is not None else 0,
-        'seconds': single_match_time % 60 if single_match_time is not None else 0,
+        'minutes': single_match_time // 60,
+        'seconds': single_match_time % 60
+        # 'minutes': single_match_time // 60 if single_match_time is not None else 0,
+        # 'seconds': single_match_time % 60 if single_match_time is not None else 0,
     }
 
     # "Player with most wins"
     first_players = [players[0] for players in tournament_data.values_list('player_ranking', flat=True)]
-    if first_players:
-        player_counts = Counter(first_players).most_common(1)[0]
-        if player_counts:
-            bestPlayer = {
-            'alias': player_counts[0],
-            'wins': player_counts[1]
-            }
-        else:
-            bestPlayer = {
-            'alias': "Unknown",
-            'wins': 0             
-            }
-    # bestPlayer = {
-    #     'alias': player_counts[0],
-    #     'wins': player_counts[1]
-    # }
+    # if first_players:
+    #     player_counts = Counter(first_players).most_common(1)[0]
+    #     if player_counts:
+    #         bestPlayer = {
+    #         'alias': player_counts[0],
+    #         'wins': player_counts[1]
+    #         }
+    #     else:
+    #         bestPlayer = {
+    #         'alias': "Unknown",
+    #         'wins': 0             
+    #         }
+    player_counts = Counter(first_players).most_common(1)[0]
+    bestPlayer = {
+        'alias': player_counts[0],
+        'wins': player_counts[1]
+    }
 
     # "Player with highest play time"
     aggreagted_duration = (
@@ -443,43 +465,40 @@ def get_dashboardTournament_data(request):
     for data in aggreagted_duration:
         for player in data['player_ranking']:
             player_duration[player] = player_duration.get(player, 0) + data['total_time']
-    if player_duration:
-        max_player = max(player_duration, key=player_duration.get)
-        if max_player:
-            print(f'max_player={max_player}')
+    # if player_duration:
+    #     max_player = max(player_duration, key=player_duration.get)
+    #     if max_player:
+    #         print(f'max_player={max_player}')
+    max_player = max(player_duration, key=player_duration.get)
 
     highest_time_player = {}
-    if player_duration:
-        max_player_alias = max(player_duration, key=player_duration.get)
-        max_player_time_minutes = player_duration[max_player_alias] // 60
-        max_player_time_seconds = player_duration[max_player_alias] % 60
-        highest_time_player = {
-            'alias': max_player_alias,
-            'time': {
-                'minutes': max_player_time_minutes,
-                'seconds': max_player_time_seconds,
-            }
-        }
-    else:
-        highest_time_player = {
-            'alias': "Unknown",
-            'time':{
-                'minutes': 0,
-                'seconds': 0
-            }
-        }
-    # highest_time_player = {
-    #     'alias': max(player_duration, key=player_duration.get),
-    #     'time': {
-    #         'minutes': player_duration[max(player_duration, key=player_duration.get)] // 60,
-    #         'seconds': player_duration[max(player_duration, key=player_duration.get)] % 60
+    # if player_duration:
+    #     max_player_alias = max(player_duration, key=player_duration.get)
+    #     max_player_time_minutes = player_duration[max_player_alias] // 60
+    #     max_player_time_seconds = player_duration[max_player_alias] % 60
+    #     highest_time_player = {
+    #         'alias': max_player_alias,
+    #         'time': {
+    #             'minutes': max_player_time_minutes,
+    #             'seconds': max_player_time_seconds,
+    #         }
     #     }
-    # }
-
-    bestPlayer = {
-        'alias': "Unknown",
-        'wins': 0
+    # else:
+    #     highest_time_player = {
+    #         'alias': "Unknown",
+    #         'time':{
+    #             'minutes': 0,
+    #             'seconds': 0
+    #         }
+    #     }
+    highest_time_player = {
+        'alias': max(player_duration, key=player_duration.get),
+        'time': {
+            'minutes': player_duration[max(player_duration, key=player_duration.get)] // 60,
+            'seconds': player_duration[max(player_duration, key=player_duration.get)] % 60
+        }
     }
+
     # Prepare the response and return it as JSON
     response_data = {
         'barChart1': chart_TournamentsPerDay,
@@ -520,13 +539,13 @@ def get_dashboardPlayer_list(request):
 def get_dashboard_data_player(request):
     # Retrieve player alias from POST request
     playerAlias = json.loads(request.body.decode('utf-8')).get('playerAlias')
-    print(f'\n\nplayerAlias={playerAlias}')
+    # print(f'\n\nplayerAlias={playerAlias}')
 
     # Data for player
     player_matches = GameData.objects.filter(Q(player1_name=playerAlias) | Q(player2_name=playerAlias))
-    print(f'player_matches={player_matches}')
+    # print(f'player_matches={player_matches}')
     player_tournaments = TournamentData.objects.filter(Q(player_ranking__icontains=playerAlias))
-    print(f'player_tournaments={player_tournaments}')
+    # print(f'player_tournaments={player_tournaments}')
     
 
     """ Data for the Chart """
