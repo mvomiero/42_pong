@@ -27,6 +27,9 @@ make_certs: # run with sudo on non-cluster pc
 	cp /root/.local/share/mkcert/rootCA.pem .
 	# chmod 644 $SSL_PATH/localhost_key.pem
 
+copy_cert:
+	cp certs/* ~/goinfre/docker/volumes/42_pong_ssl_keys_local   
+
 clean_certs:
 	rm -f ssl_data/*
 	rm -f ssl_keys_local/*
