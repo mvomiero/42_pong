@@ -33,6 +33,7 @@ COPY ./config/django/pong/urls.py ./pong/
 COPY ./config/django/pong/views.py ./pong/
 COPY ./config/django/pong/webSocket_msg_create.py ./pong/
 COPY ./config/django/pong/consumers.py ./pong/
+COPY ./config/django/pong/consumers_local.py ./pong/
 COPY ./config/django/requirements.txt ./
 COPY ./config/django/transcendence/asgi.py ./transcendence/
 COPY ./config/django/transcendence/urls.py ./transcendence/
@@ -44,6 +45,10 @@ COPY ./config/django/static/assets/img/42_Logo.svg ./static/assets/img/
 COPY ./config/django/static/assets/img/galaxy.jpg ./static/assets/img/
 COPY ./config/django/static/assets/img/landscape.png ./static/assets/img/
 COPY ./config/django/static/assets/img/landscape_pool.png ./static/assets/img/
+COPY ./config/django/static/assets/img/results/loss1.png ./static/assets/img/results/
+COPY ./config/django/static/assets/img/results/loss2.png ./static/assets/img/results/
+COPY ./config/django/static/assets/img/results/win1.png ./static/assets/img/results/
+COPY ./config/django/static/assets/img/results/win2.png ./static/assets/img/results/
 COPY ./config/django/static/assets/img/team/flo1.png ./static/assets/img/team/
 COPY ./config/django/static/assets/img/team/flo2.png ./static/assets/img/team/
 COPY ./config/django/static/assets/img/team/gb1.png ./static/assets/img/team/
@@ -64,6 +69,7 @@ COPY ./config/django/static/js_dashboard/playerDaschboard.js ./static/js_dashboa
 COPY ./config/django/static/js_dashboard/updateCards.js ./static/js_dashboard/
 COPY ./config/django/static/js_dashboard/fetchData.js ./static/js_dashboard/
 COPY ./config/django/static/3d_pong/main.js ./static/3d_pong/
+COPY ./config/django/static/3d_pong/main_local.js ./static/3d_pong/
 COPY ./config/blockchain/trans.sol ./pong/
 COPY ./config/blockchain/trans.abi ./pong/
 COPY ./config/blockchain/trans.bin ./pong/

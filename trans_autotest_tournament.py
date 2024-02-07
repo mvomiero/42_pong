@@ -60,10 +60,10 @@ def open_chrome_and_start_game(url, player_name):
         print("It's end")
     
 with ThreadPoolExecutor(max_workers=4) as executor:
-    futures = [executor.submit(open_chrome_and_start_game, 'http://127.0.0.1:8000/', "p1"),
-               executor.submit(open_chrome_and_start_game, 'http://127.0.0.1:8000/', "p2"),
-               executor.submit(open_chrome_and_start_game, 'http://127.0.0.1:8000/', "p3"),
-               executor.submit(open_chrome_and_start_game, 'http://127.0.0.1:8000/', "p4"),
+    futures = [executor.submit(open_chrome_and_start_game, 'https://127.0.0.1:4443/', "p1"),
+               executor.submit(open_chrome_and_start_game, 'https://127.0.0.1:4443/', "p2"),
+               executor.submit(open_chrome_and_start_game, 'https://127.0.0.1:4443/', "p3"),
+               executor.submit(open_chrome_and_start_game, 'https://127.0.0.1:4443/', "p4"),
                ]
     wait(futures, return_when=ALL_COMPLETED)
 

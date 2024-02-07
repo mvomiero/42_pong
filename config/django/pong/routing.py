@@ -1,9 +1,11 @@
 from django.urls import re_path
 from pong.consumers import PongConsumer
+from pong.consumers_local import PongConsumerLocal
 
 websocket_urlpatterns = [
     # re_path(r'^ws/play/(?P<room_code>\w+)/$', PongConsumer.as_asgi()),
     re_path(r'^ws/play/(?P<game_mode>\w+)/(?P<player>\w+)/$', PongConsumer.as_asgi()),
+    re_path(r'^ws/play/(?P<game_mode>\w+)/(?P<player1>\w+)/(?P<player2>\w+)/$', PongConsumerLocal.as_asgi()),
 ]
     # http://127.0.0.1:8000/play/?&mode=match?&choice=flo
         # match OR tournament

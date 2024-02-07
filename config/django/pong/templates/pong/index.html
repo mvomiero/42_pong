@@ -26,6 +26,8 @@
         type="text/css" />
     <link href="https://fonts.googleapis.com/css?family=DotGothic16:300,400,700&display=swap" rel="stylesheet"
         type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Orbitron:300,400,700&display=swap" rel="stylesheet"
+        type="text/css" />
 
     <!-- Include Chart.js library -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script> -->
@@ -109,9 +111,10 @@
                         tournament against other players.
                     </p>
 
-                    <div>
+                    <div id="pongChooseMode">
                         <!-- Buttons to start the game -->
                         <button id="startRemoteGameButton" class="btn-vaporwave">Start Remote Game</button>
+                        <button id="startLocalGameButton" class="btn-vaporwave">Start Locale Game</button>
                     </div>
 
                     <!-- Name input field and Submit Button -->
@@ -126,9 +129,56 @@
                         <button id="submitNameButton" class="btn-vaporwave btn-vaporwave-submit">Submit</button>
                     </div>
 
+                    <!-- Closing images and messages -->
+
+                    <div id="img_win" class="align-items-center" style="display: none;">
+                        <img class="mx-auto rounded-circle smaller-image image-results animation win" src="{% static 'assets/img/results/win1.png' %}" alt="..." />
+                    </div>
+
+                    <div id="img_loss" class="align-items-center" style="display: none;">
+                        <img class="mx-auto rounded-circle smaller-image image-results animation loss" src="{% static 'assets/img/results/loss1.png' %}" alt="..." />
+                    </div>
+
+                    <div id="closing_message" class="info animation align-items-center" style="display: none;">Hola</div>
+                    <div id="closing_message_ranking" class="info animation align-items-center" style="display: none;">Hola</div>
+                    <div class=>
+                        <button id="end_closing_message" class="info" style="display: none;">OK</button>
+                    </div>
+
+                    <!-- Name input field and Submit Button -->
+                    <div id="nameInputSectionLocal" style="display: none;">
+                        <!-- <input type="text" id="playerName" placeholder="Enter your name"> -->
+                        <input class="btn-vaporwave" type="text" id="playerName1" placeholder="Enter Player 1">
+                        <input class="btn-vaporwave" type="text" id="playerName2" placeholder="Enter Player 2">
+                        <button id="submitNameButtonLocal" class="btn-vaporwave btn-vaporwave-submit">Submit</button>
+                    </div>
+
+                    <!-- player and mode info -->
+                    <div id="game_info" class="game row justify-content-between" style="display: none;">
+                        <div id="player_info" class="info col-md-6 text-left">Player</div>
+                        <div id="mode_info" class="info col-md-6 text-right">Mode</div>
+                    </div>
+
                     <!-- Canvas initially hidden -->
                     <div id="game_board" room_code="match" char_choice="player_alias" style="display: none;">
                         <canvas class="pongCanvas" width="750" height="485" id="gameCanvas"></canvas>
+                    </div>
+
+                    <!-- message info -->
+                    <div id="game_message" class="game row justify-content-between" style="display: none;">
+                        <div id="message_info" class="info col-md-6 text-left">Info</div>
+                    </div>
+                    <!-- tornament info -->
+                    <div id="tournament_info" class="game row justify-content-between" style="display: none;">
+                        <div class="info col-md-6 text-center info_tournament">SEMIFINAL 1
+                            <div id="semiFinal1" > yolo</div>
+                        </div>
+                        <div class="info col-md-6 text-center info_tournament">SEMIFINAL 2
+                            <div id="semiFinal2" > yolo</div>
+                        </div>
+                        <div class="info col-md-12 text-center info_tournament">FINAL
+                            <div id="final" >waiting for the semifinals to be completed...</div>
+                        </div>
                     </div>
 
                     <!-- Restart selection process -->
@@ -604,6 +654,7 @@
 
         <!-- Pong Game-->
         <script type="module" src="{% static '3d_pong/main.js' %}"></script>
+        <script type="module" src="{% static '3d_pong/main_local.js' %}"></script>
         <!-- <script type="text/javascript" src ="{% static '3d_pong/keyboardEvents.js' %}"></script>
         <script type="text/javascript" src ="{% static '3d_pong/webSocket.js' %}"></script> -->
         

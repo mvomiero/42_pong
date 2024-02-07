@@ -17,8 +17,8 @@ def on_post_migrate(sender, **kwargs):
 
 async def initialize_database(sender, **kwargs):
 
-    GameData.objects.all().delete()
-    TournamentData.objects.all().delete()
+    # GameData.objects.all().delete()
+    # TournamentData.objects.all().delete()
 
     print(f"Database initialization (nbr objects match: {GameData.objects.count()} | nbr objects tournament: {TournamentData.objects.count()})")
 
@@ -29,7 +29,7 @@ async def initialize_database(sender, **kwargs):
 
     # add entries to have 100 matches in database
     size_GameData = GameData.objects.count()
-    while size_GameData < 200:
+    while size_GameData < 5:
         await add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
         size_GameData += 1
         #size_GameData = GameData.objects.count()
@@ -37,7 +37,7 @@ async def initialize_database(sender, **kwargs):
     
     # add entries to have 10 tournaments in database
     size_TournamentData = TournamentData.objects.count()
-    while size_TournamentData < 20:
+    while size_TournamentData < 2:
         await add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData))
         size_TournamentData += 1
         #size_TournamentData = TournamentData.objects.count()
