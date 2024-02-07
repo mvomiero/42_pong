@@ -9,6 +9,9 @@ import calendar
 import random
 # from asgiref.sync import sync_to_async
 from asgiref.sync import async_to_sync
+import asyncio
+import threading
+from time import sleep
 
 @receiver(post_migrate)
 def on_post_migrate(sender, **kwargs):
@@ -16,6 +19,8 @@ def on_post_migrate(sender, **kwargs):
     async_init_database(sender, **kwargs)
 
 async def initialize_database(sender, **kwargs):
+# @receiver(post_migrate)
+# def initialize_database(sender, **kwargs):
 
     # GameData.objects.all().delete()
     # TournamentData.objects.all().delete()
@@ -30,7 +35,9 @@ async def initialize_database(sender, **kwargs):
     # add entries to have 100 matches in database
     size_GameData = GameData.objects.count()
     while size_GameData < 0:
+        # asyncio.run_coroutine_threadsafe(add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData)), loop=asyncio.get_event_loop())
         await add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
+        sleep(1)
         size_GameData += 1
         #size_GameData = GameData.objects.count()
     
@@ -38,6 +45,8 @@ async def initialize_database(sender, **kwargs):
     # add entries to have 10 tournaments in database
     size_TournamentData = TournamentData.objects.count()
     while size_TournamentData < 0:
+        print(f"Adding tournament {size_TournamentData}")
+        # asyncio.run_coroutine_threadsafe(add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData)), loop=asyncio.get_event_loop())
         await add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData))
         size_TournamentData += 1
         #size_TournamentData = TournamentData.objects.count()

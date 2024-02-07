@@ -365,8 +365,9 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             itg = True
         else:
             itg = False
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
+        # loop = asyncio.get_event_loop()
+        # await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
+        await add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg)
 
     """ Send tournament data to database """
     async def send_tournamentToDatabase(self, tournament):
@@ -376,8 +377,9 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         playersRank = tournament['playersRank']
         tdur = tournament['endTime'] - tournament['startTime']
         tend = datetime.fromtimestamp(tournament['endTime'])
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, lambda: add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur))
+        # loop = asyncio.get_event_loop()
+        # await loop.run_in_executor(None, lambda: add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur))
+        await add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur)
 
 
     """ Delete a player from connected_users and close connection """

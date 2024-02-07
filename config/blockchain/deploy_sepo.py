@@ -65,6 +65,7 @@ async def deploy_sepo(result):
     #     return "Error"
 
     if tx_create: 
+        print(f"the tx_create is {tx_create}")
         tx_hash = web3.eth.send_raw_transaction(tx_create.rawTransaction)
         return tx_hash.hex()
     else:
