@@ -104,8 +104,8 @@ window.addEventListener('DOMContentLoaded', event => {
 function initDataTableTournament(tournamentList) {
     for (const [key, value] of Object.entries(tournamentList)) {
         console.log(`${key}: ${value}`);
-        var newRow = [key, `<a class="btn btn-vaporwave btn-choose" href="https://ecosia.org" target="_blank">${value}</a>`];
-
+        var newRow = [key, `<a class="btn btn-vaporwave btn-choose" href="https://sepolia.etherscan.io/tx/${value}" target="_blank">${value}</a>`];
+        
         dataTableTournament.rows.add(newRow);
     }
     

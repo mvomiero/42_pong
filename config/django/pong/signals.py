@@ -34,7 +34,7 @@ async def initialize_database(sender, **kwargs):
 
     # add entries to have 100 matches in database
     size_GameData = GameData.objects.count()
-    while size_GameData < 0:
+    while size_GameData < 2:
         # asyncio.run_coroutine_threadsafe(add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData)), loop=asyncio.get_event_loop())
         add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
         sleep(1)
@@ -44,7 +44,7 @@ async def initialize_database(sender, **kwargs):
     
     # add entries to have 10 tournaments in database
     size_TournamentData = TournamentData.objects.count()
-    while size_TournamentData < 2:
+    while size_TournamentData < 1:
         print(f"Adding tournament {size_TournamentData}")
         # asyncio.run_coroutine_threadsafe(add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData)), loop=asyncio.get_event_loop())
         await add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData))
