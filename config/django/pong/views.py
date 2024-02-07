@@ -16,6 +16,8 @@ from django.db.models import Subquery, OuterRef
 
 from .deploy_sepo import deploy_sepo
 from asgiref.sync import sync_to_async
+import random
+
 
 def index(request):
 	return render(request, "pong/index.html")
@@ -84,13 +86,9 @@ def error_disconnection(request):
 # format dates:
 #     games (gend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. gdur) = number (e.g. 10)
-async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
+def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
         game_result = p1n + ", " + str(p1s) + ", " + p2n + ", " + str(p2s)
-        tx_hash = await deploy_sepo(game_result)
-        print("I_am_called!!!!!!!!!!")
-        # tx_hash = "olalal!!!!!!!!!!!!!!!"
-        print(f"tx_hash in views.py: {tx_hash} and the game_result is {game_result}!!!!!!!!!!!!!!!!!")
         gend = (pytz.timezone('UTC')).localize(gend)
         game_data = GameData(
             player1_name=p1n,
@@ -100,7 +98,6 @@ async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
             game_end_timestamp=gend,
             game_duration_secs=gdur,
             is_tournament_game=itg,
-            blockchain_hash=tx_hash,
         )
         try:
             game_data.save()
@@ -113,32 +110,31 @@ async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
 async def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur):
-    print("I_am_called!!!!!!!!!!")
     gend = datetime.fromtimestamp(semiMatch1['endTime'])
     gdur = semiMatch1['endTime'] - semiMatch1['startTime']
-    matchIdSemi1 = await add_game_data(semiMatch1['players'][0], semiMatch1['score'][0], semiMatch1['players'][1], semiMatch1['score'][1], gend, gdur, True)
+    matchIdSemi1 = add_game_data(semiMatch1['players'][0], semiMatch1['score'][0], semiMatch1['players'][1], semiMatch1['score'][1], gend, gdur, True)
     gend = datetime.fromtimestamp(semiMatch2['endTime'])
     gdur = semiMatch2['endTime'] - semiMatch2['startTime']
-    matchIdSemi2 = await add_game_data(semiMatch2['players'][0], semiMatch2['score'][0], semiMatch2['players'][1], semiMatch2['score'][1], gend, gdur, True)
+    matchIdSemi2 = add_game_data(semiMatch2['players'][0], semiMatch2['score'][0], semiMatch2['players'][1], semiMatch2['score'][1], gend, gdur, True)
     gend = datetime.fromtimestamp(finalMatch['endTime'])
     gdur = finalMatch['endTime'] - finalMatch['startTime']
-    matchIdFinal = await add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
+    matchIdFinal = add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
     tend = (pytz.timezone('UTC')).localize(tend)
-    tour_result = str(matchIdSemi1) + ", " + str(matchIdSemi2) + ", " + str(matchIdFinal) + ", " + str(playersRank)
+    tourID = random.randint(0, 9999)
+    tour_result = str(tourID) + " " + str(playersRank)
     tx_hash = await deploy_sepo(tour_result)
     tournament_data = TournamentData(
+        tour_id=tourID,
         match_id_semi_1=matchIdSemi1,
         match_id_semi_2=matchIdSemi2,
         match_id_final=matchIdFinal,
         tournament_end_timestamp=tend,
         tournament_duration_secs=tdur,
         player_ranking = playersRank,
-        # blockchain_hash = "xiixixixixxi"
         blockchain_hash=tx_hash,
     )
     try:
         tournament_data.save()
-        await TournamentData.commit()
     except Exception as e:
         print(f"Error saving tournament data: {e}")
 

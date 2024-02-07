@@ -354,7 +354,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         self.set_matches[match_id]['score'][1] = score['player2']
 
     """ Send match data to database """
-    async def send_matchToDatabase(self, match):
+    def send_matchToDatabase(self, match):
         p1n = match['players'][0]
         p2n = match['players'][1]
         p1s = match['score'][0]
@@ -367,7 +367,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             itg = False
         # loop = asyncio.get_event_loop()
         # await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
-        await add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg)
+        add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg)
 
     """ Send tournament data to database """
     async def send_tournamentToDatabase(self, tournament):
@@ -535,7 +535,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 print(f"\nFINISHED MATCH: {self.set_matches[self.match_id]}")
                 if self.tournament_id is None:
                     # [store in database]
-                    await self.send_matchToDatabase(self.set_matches[self.match_id])
+                    self.send_matchToDatabase(self.set_matches[self.match_id])
                     otherPlayer = self.set_matches[self.match_id]['players'][0] if self.set_matches[self.match_id]['players'][0] != self.player else self.set_matches[self.match_id]['players'][1]
                     await PongConsumer.delete_connectedUsers(self.connected_users[otherPlayer]['self'], 3001)
                     await self.delete_match(self.match_id)

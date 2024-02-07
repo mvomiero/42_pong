@@ -49,7 +49,7 @@ class PongConsumerLocal(AsyncJsonWebsocketConsumer):
 
         # [match_info "end"]
         if received_data['command'] == "match_info" and received_data['mode'] == "end":
-            await self.send_matchToDatabase(received_data)
+            self.send_matchToDatabase(received_data)
             await self.closeConnection(3001)
         # [other message]
         else:
@@ -61,7 +61,7 @@ class PongConsumerLocal(AsyncJsonWebsocketConsumer):
     # ************************************************************ #
             
     """ Send match data to database """
-    async def send_matchToDatabase(self, data):
+    def send_matchToDatabase(self, data):
         p1n = self.player1
         p2n = self.player2
         p1s = data['score']['player1']
@@ -71,7 +71,7 @@ class PongConsumerLocal(AsyncJsonWebsocketConsumer):
         itg = False
         # loop = asyncio.get_event_loop()
         # await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
-        await add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg)
+        add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg)
 
 
     """ Close Connection of Client """
