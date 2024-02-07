@@ -76,3 +76,8 @@ set: all
 
 setr: decompose
 	make set
+
+check: decompose
+	make all
+	clear
+	make logs_transcendence
