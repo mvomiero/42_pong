@@ -36,7 +36,7 @@ async def initialize_database(sender, **kwargs):
     size_GameData = GameData.objects.count()
     while size_GameData < 0:
         # asyncio.run_coroutine_threadsafe(add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData)), loop=asyncio.get_event_loop())
-        await add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
+        add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
         sleep(1)
         size_GameData += 1
         #size_GameData = GameData.objects.count()
