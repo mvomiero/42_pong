@@ -19,7 +19,14 @@ logs_postgres:
 
 install_CA:
 	google-chrome chrome://settings/certificates
-	
+
+make_certs:
+	apt update
+	apt install mkcert
+	mkcert -install
+	mkcert -cert-file /ssl-keys-local/localhost.pem -key-file /ssl-keys-local/localhost-key.pem 10.15.203.1
+	# chmod 644 $SSL_PATH/localhost_key.pem
+
 clean_certs:
 	rm -f ssl_data/*
 	rm -f ssl_keys_local/*

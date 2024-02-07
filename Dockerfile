@@ -6,11 +6,6 @@ RUN apt upgrade && apt update && apt install -y nano \
     && apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev \
     && pip3 install django-cors-headers --break-system-packages \
     && rm -rf /var/lib/apt/lists/*
-RUN apt update && apt install mkcert &&\
-    mkdir ./ssl-keys-local &&\
-    export CAROOT=/ssl-keys-local &&\
-	mkcert -install &&\
-    mkcert -cert-file /ssl-keys-local/localhost.pem -key-file /ssl-keys-local/localhost-key.pem 10.15.203.1
 COPY config/django/requirements.txt .
 RUN pip3 install -r requirements.txt --break-system-packages \
     && apt-get update && apt-get install -y postgresql \
