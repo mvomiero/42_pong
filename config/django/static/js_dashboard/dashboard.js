@@ -21,28 +21,58 @@ fetchPlayerDashboardList();
 /***************************************************/
 
 function createMatchDashboard() {
+    if (Object.keys(globalMatchData).length === 0)
+        return;
+
     // Update cards
-    updateCardsMatch(globalMatchData.cards);
+    if ('cards' in globalMatchData && globalMatchData.cards !== null) {
+        updateCardsMatch(globalMatchData.cards);
+    }
 
     // Draw charts
-    drawChart1(globalMatchData.barChart1, 'match-chart1', 'Matches per Day');
-    drawLineChart(globalMatchData.lineChart1, 'match-chart2', 'Matches per Hour');
-    drawAreaChart(globalMatchData.areaChart1, 'match-chart3', 'Accumulated Playing Time');
-    drawScatteredChart(globalMatchData.scatteredChart1, globalMatchData.lineChart2, 'match-chart4', 'Match Duration (Average & Seperately)');
+    if ('barChart1' in globalMatchData && globalMatchData.barChart1 !== null) {
+        drawChart1(globalMatchData.barChart1, 'match-chart1', 'Matches per Day');
+    }
+    if ('lineChart1' in globalMatchData && globalMatchData.lineChart1 !== null) {
+        drawLineChart(globalMatchData.lineChart1, 'match-chart2', 'Matches per Hour');
+    }
+    if ('areaChart1' in globalMatchData && globalMatchData.areaChart1 !== null) {
+        drawAreaChart(globalMatchData.areaChart1, 'match-chart3', 'Accumulated Playing Time');
+    }
+    if (('scatteredChart1' in globalMatchData && globalMatchData.scatteredChart1 !== null)
+            && ('lineChart2' in globalMatchData && globalMatchData.lineChart2 !== null)) {
+        drawScatteredChart(globalMatchData.scatteredChart1, globalMatchData.lineChart2, 'match-chart4', 'Match Duration (Average & Seperately)');
+    }
 }
 
 function createTournamentDashboard() {
+    if (Object.keys(globalTournamentData).length === 0)
+        return;
+
     // Update cards
-    updateCardsTournament(globalTournamentData.cards);
+    if ('cards' in globalTournamentData && globalTournamentData.cards !== null) {
+        updateCardsTournament(globalTournamentData.cards);
+    }
 
     // Draw charts
-    drawChart1(globalTournamentData.barChart1, 'tournament-chart1', 'Tournaments per Day');
-    drawLineChart(globalTournamentData.lineChart1, 'tournament-chart2', 'Tournaments per Hour');
-    drawAreaChart(globalTournamentData.areaChart1, 'tournament-chart3', 'Accumulated Playing Time');
-    drawScatteredChart(globalTournamentData.scatteredChart1, globalTournamentData.lineChart2, 'tournament-chart4', 'Tournament Duration (Average & Seperately)');
+    if ('barChart1' in globalTournamentData && globalTournamentData.barChart1 !== null) {
+        drawChart1(globalTournamentData.barChart1, 'tournament-chart1', 'Tournaments per Day');
+    }
+    if ('lineChart1' in globalTournamentData && globalTournamentData.lineChart1 !== null) {
+        drawLineChart(globalTournamentData.lineChart1, 'tournament-chart2', 'Tournaments per Hour');
+    }
+    if ('areaChart1' in globalTournamentData && globalTournamentData.areaChart1 !== null) {
+        drawAreaChart(globalTournamentData.areaChart1, 'tournament-chart3', 'Accumulated Playing Time');
+    }
+    if (('scatteredChart1' in globalTournamentData && globalTournamentData.scatteredChart1 !== null) 
+            && ('lineChart2' in globalTournamentData && globalTournamentData.lineChart2 !== null)) {
+        drawScatteredChart(globalTournamentData.scatteredChart1, globalTournamentData.lineChart2, 'tournament-chart4', 'Tournament Duration (Average & Seperately)');
+    }
 
     // Draw table
-    initDataTableTournament(globalTournamentData.allAndHash); // tournamentsHash
+    if ('allAndHash' in globalTournamentData && globalTournamentData.allAndHash !== null) {
+        initDataTableTournament(globalTournamentData.allAndHash);    // tournamentsHash
+    }
 }
 
 
