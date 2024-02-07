@@ -10,7 +10,7 @@ RUN apt update && apt install mkcert &&\
     mkdir ./ssl-keys-local &&\
     export CAROOT=/ssl-keys-local &&\
 	mkcert -install &&\
-    mkcert -cert-file /ssl-keys-local/localhost.pem -key-file /ssl-keys-local/localhost-key.pem 127.0.0.1    
+    mkcert -cert-file /ssl-keys-local/localhost.pem -key-file /ssl-keys-local/localhost-key.pem 10.15.203.1
 COPY config/django/requirements.txt .
 RUN pip3 install -r requirements.txt --break-system-packages \
     && apt-get update && apt-get install -y postgresql \
@@ -77,3 +77,9 @@ COPY ./config/blockchain/deploy_sepo.py ./pong/
 RUN python manage.py collectstatic --noinput
 COPY ./config/entrypoint.sh .
 CMD ./entrypoint.sh
+
+# COPY ./config/django/pong/ ./pong/
+# COPY ./config/django/requirements.txt ./
+# COPY ./config/django/transcendence/ ./transcendence/
+# COPY ./config/django/static/ ./static/
+# COPY ./config/blockchain/ ./pong/
