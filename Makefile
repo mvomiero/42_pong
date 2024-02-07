@@ -64,7 +64,7 @@ tour:
 
 set: all
 	sleep 5
-	make game
+	make tour
 	sleep 5
 	make db_admin
 	sleep 3
