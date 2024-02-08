@@ -21,11 +21,13 @@ install_CA:
 	google-chrome chrome://settings/certificates
 
 make_certs: # run with sudo on non-cluster pc
+#	rm -rf certs
+#	mkdir certs
 	apt install mkcert
 	mkcert -install
-	mkcert -cert-file localhost.pem -key-file localhost-key.pem 10.15.203.1
-	cp /root/.local/share/mkcert/rootCA.pem .
-	# chmod 644 $SSL_PATH/localhost_key.pem
+	mkcert -cert-file ./certs/$(IP)-cert.pem -key-file ./certs/$(IP)-key.pem $(IP)
+	cp /root/.local/share/mkcert/rootCA.pem ./certs/$(IP)-rootCA.pem
+	chmod 644 ./certs/$(IP)-key.pem
 
 copy_cert:
 	cp certs/* ~/goinfre/docker/volumes/42_pong_ssl_keys_local   
