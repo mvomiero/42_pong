@@ -68,7 +68,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   sceneProperties.scene.add(light);
 
   var scorePlayer1 = 0, scorePlayer2 = 0;
-  const winningScore = 2;
+  const winningScore = 15;
   const ball = {};
   const intervalUpdateRateMs = 20;
   var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
@@ -655,7 +655,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     var initBallData = {
       command: "initBall",
       dx: Math.random() < 0.5 ? 1 : -1,
-      dy: (Math.random() * 2) - 1
+      // dy: (Math.random() * 2) - 1
+      dy: 0
     };
     // setTimeout(function() {
     gameSocket.send(JSON.stringify(initBallData));
@@ -748,6 +749,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       if (data.command === "match_info") {
         console.log("match_info", data);
       }
+      
       if (sceneProperties.currentScene === "waitingForPlayers" && data.command === "match_info") {
         if (data.mode === "start") {
           document.getElementById('message_info').style.display = 'none';
