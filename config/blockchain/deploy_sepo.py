@@ -1,3 +1,4 @@
+import os
 import json
 from web3 import Web3
 
@@ -13,7 +14,7 @@ async def deploy_sepo(result):
     web3 = Web3(Web3.HTTPProvider(provider_rpc["sepolia"]))
 
     account_from = {
-        'private_key': '4ae1cc01b339a6e3691f3df17392a1b49b25111ea4a828fc54edad7d29c111b2',
+        'private_key': os.getenv("BLOCKCHAIN_PRIVATE_KEY"),
         'address': '0xD20D8879EdC62684Ba82ebE37e97984Dd5Aae287',
     }
     address_to = '0x0C7f3ff8EFEB99053BEa51b041ec954BA26c4FD6'

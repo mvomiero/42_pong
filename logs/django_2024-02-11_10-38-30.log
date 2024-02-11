@@ -1594,3 +1594,4 @@ File /usr/local/lib/python3.12/site-packages/django/contrib/staticfiles/storage.
 File /usr/local/lib/python3.12/site-packages/django/contrib/auth/context_processors.py first seen with mtime 1707639129.783274
 WebSocket HANDSHAKING /ws/play/match/dsds/ [127.0.0.1:57330]
 WebSocket CONNECT /ws/play/match/dsds/ [127.0.0.1:57330]
+WebSocket DISCONNECT /ws/play/match/dsds/ [127.0.0.1:57330]
