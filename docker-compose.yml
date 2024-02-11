@@ -9,11 +9,11 @@ services:
       - "4443:4443"
     env_file:
       - .env
-    # volumes:
-    #   - ssl_keys_local:/ssl-keys-local
     depends_on:
       postgres:
-        condition: service_healthy  
+        condition: service_healthy
+    volumes:
+        - ./logs:/logs
     networks:
       - network
 
@@ -43,6 +43,7 @@ services:
   #     - transcendence
   #   volumes:
   #     - ssl_data:/etc/elasticsearch/ssl
+  #     - ./logs:/logs
   #   restart: always
   #   networks:
   #     - network
@@ -60,7 +61,7 @@ services:
   #     - elasticsearch
   #   volumes:
   #     - ssl_data:/etc/kibana/ssl
-  #     # - ssl_keys_local:/ssl-keys-local
+  #     - ./logs:/logs
   #   networks:
   #     - network
 
@@ -75,6 +76,7 @@ services:
   #     - elasticsearch
   #   volumes:
   #     - ssl_data:/etc/logstash/ssl
+  #     - ./logs:/logs
   #   networks:
   #     - network
   
@@ -82,8 +84,8 @@ services:
   #   container_name: filebeat
   #   build: ./Filebeat
   #   volumes:
-  #     - ${HOME}/logs:/logs
   #     - ssl_data:/etc/filebeat/ssl
+  #     - ./logs:/logs
   #   depends_on:
   #     - elasticsearch
   #   networks:
@@ -91,7 +93,7 @@ services:
 
 volumes:
   ssl_data:
-  # ssl_keys_local:
+  logs:
     
 networks:
   network:

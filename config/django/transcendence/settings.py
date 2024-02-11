@@ -190,3 +190,38 @@ CORS_ALLOW_ALL_ORIGINS = True  # Allow requests from all origins (for developmen
 # LOGOUT_REDIRECT_URL = "dashboard"
 
 # AUTH_USER_MODEL = 'users.CustomUser'
+
+import os
+import datetime
+
+# Define the directory and filename
+log_dir = '/logs'
+timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+filename = f'{log_dir}/django_{timestamp}.log'
+print(filename)
+
+# Check if the directory exists and is writable
+if os.path.exists(log_dir) and os.access(log_dir, os.W_OK):
+    print(f"The directory {log_dir} exists and is writable.")
+    print(f"The log file will be {filename}")
+else:
+    print(f"The directory {log_dir} does not exist or is not writable.")
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': filename,
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

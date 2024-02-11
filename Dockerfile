@@ -12,6 +12,7 @@ RUN pip3 install -r requirements.txt --break-system-packages \
     && apt-get install postgresql-client \
     && pip install psycopg2
 RUN pip install pytz -r requirements.txt
+RUN mkdir logs
 COPY ./certs/127.0.0.1-key.pem ./certs/127.0.0.1-key.pem
 COPY ./certs/127.0.0.1-cert.pem ./certs/127.0.0.1-cert.pem
 RUN django-admin startproject transcendence
