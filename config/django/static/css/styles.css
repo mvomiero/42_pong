@@ -3195,6 +3195,13 @@ form-control
   --bs-btn-border-radius: 0.5rem;
 }
 
+.btn-md, .btn-group-md > .btn {
+    --bs-btn-padding-y: 0.35rem;
+    --bs-btn-padding-x: 0.4rem;
+    --bs-btn-font-size: 0.875rem;
+    --bs-btn-border-radius: 0.25rem;
+}
+
 .btn-sm, .btn-group-sm > .btn {
   --bs-btn-padding-y: 0.25rem;
   --bs-btn-padding-x: 0.5rem;
@@ -6103,11 +6110,13 @@ form-control
 }
 
 .pongCanvas {
-  background-color: rgba(var(--bs-secondary-rgb)) !important;;
-  opacity: 1;
-  width: 100%;
-  height: auto;
-}
+    background-color: rgba(var(--bs-secondary-rgb)) !important;;
+    opacity: 1;
+    width: 100%;
+    height: auto;
+    border: 1px solid #001aff;
+    /* box-shadow: 2px 0px magenta; */
+  }
 .dashboardCanvas1 {
   background-color: rgba(var(--bs-primary-rgb)) !important;;
   opacity: 0;
