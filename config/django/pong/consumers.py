@@ -619,14 +619,9 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         else:
             finalRank.append(matchFinal['players'][1])
             finalRank.append(matchFinal['players'][0])
-        if matchSemi1['score'][0] > matchSemi1['score'][1]:
-            finalRank.append(matchSemi1['players'][0])
-        else:
-            finalRank.append(matchSemi1['players'][1])
-        if matchSemi2['score'][0] > matchSemi2['score'][1]:
-            finalRank.append(matchSemi2['players'][0])
-        else:
-            finalRank.append(matchSemi2['players'][1])
+        finalRank.append(matchSemi1['players'][0]) if matchSemi1['score'][1] > matchSemi1['score'][0] else finalRank.append(matchSemi1['players'][1])
+        finalRank.append(matchSemi2['players'][0]) if matchSemi2['score'][1] > matchSemi2['score'][0] else finalRank.append(matchSemi2['players'][1])
+    
         return finalRank
 
 
