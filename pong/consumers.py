@@ -8,6 +8,7 @@ from .webSocket_msg_create import *
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from pong.views import add_game_data
 from pong.views import add_tournament_data
+from pong.match import MatchConsumer
 
 # 1) 1. player joins -> create group_tournament && send message to player1 with player ID
 # 2) 2. & 3. player join -> add to group_tournament
@@ -112,8 +113,9 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
 
         # Add the player to a match or tournament
         if self.room_code == "match":
-            if not await self.add_playerRemoteMatch(self.room_code):
-                return
+            await self.playerAndMatch(self.room_code)
+            #if not await self.add_playerRemoteMatch(self.room_code):
+            #    return
         elif self.room_code == "tournament":
             if not await self.add_player_to_tournament(self.room_code):
                 return
@@ -121,6 +123,21 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # group_size = len(self.channel_layer.groups.get(self.group_name_match, {}).items())
         # print(f"The size of group '{self.group_name_match}' is: {group_size}")
 
+
+    async def playerAndMatch(self, room_code):
+        
+        # Create a YourConsumer instance and store the reference
+        match = MatchConsumer()
+        self.matchConsumer = match
+
+        # Connect the YourConsumer instance
+        await match.connect()
+
+        # Add the player to the match
+        match.addPlayer(self)
+
+        # Add the player to the group_name_match
+        await match.join_group(self.group_name_match)
 
 
     # ************************************************************ #
