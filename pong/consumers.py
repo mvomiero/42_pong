@@ -391,6 +391,11 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # print("Received JSON data:", received_data)
 
         # !!!!!!!!!!!!!NEW MESSAGES!!!!!!!!!!!!!
+        """
+        Format of received_data / message:
+        received_data = {
+            'command': 'player_paddle_up_keystate',
+        } """
         if received_data['command'] == "player_paddle_up_keystate":
             self.paddle.paddle_up()
             # update paddle speed
