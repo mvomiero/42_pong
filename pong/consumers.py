@@ -10,27 +10,31 @@ from pong.views import add_game_data
 from pong.views import add_tournament_data
 from pong.match import MatchConsumer
 import random
+import math
 
 class Ball:
     def __init__(self):
+        self.size = 0.1
         self.x = 0.5
         self.y = 0.5
         self.dx = 1 if random.random() < 0.5 else -1
         self.dy = (random.uniform(0, 2)) - 1
         self.speed = 0.01
-        self.height = random.random()
+        self.max_z = random.random()
 
     def update_ball(self):
         self.x += self.dx * self.speed
         self.y += self.dy * self.speed
-    
+        # calculate ball z based on ball x so that it reaches max_z when crossing the net and 0 at either paddle
+        self.z = self.size / 2 + self.max_z * math.exp(-((self.x - 0) ** 2) / (2 * (1/4) ** 2))  # where '0' is mean and 1/4 is standard_deviation
+
     def check_if_ball_hit_top_bottom_table(self):
         if self.y < 0 or self.y >= 1:
             self.dy = -self.dy
 
     def ball_hit_paddle(self):
         self.dx = -self.dx
-        self.height = random.random()
+        self.max_z = random.random()
         # # adjust ball speed according to paddle speed:
         # new_ball_speed = self.speed - amount_to_slow  # ball first slows a bit on each paddle hit
         # if my_paddle_speed > 0:  # if the paddle is moving, it adds to the ball speed, if it is not moving the ball will slow a little
@@ -396,15 +400,14 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         received_data = {
             'command': 'player_paddle_up_keystate',
         } """
-        if received_data['command'] == "player_paddle_up_keystate":
+        if received_data['command'] == "player1PaddleUpKeyPressed":
             self.paddle.paddle_up()
-            # update paddle speed
-            # didn't understand the True and False thing...
-        elif received_data['command'] == "player_paddle_down_keystate":
+        elif received_data['command'] == "player2PaddleUpKeyPressed":
             self.paddle.paddle_down()
-            # update paddle speed
-            # didn't understand the True and False thing...
-
+        elif received_data['command'] == "player1PaddleDownKeyPressed":
+            # ???
+        elif received_data['command'] == "player1PaddleDownKeyPressed":
+            # ???
 
         # [Match (Remote & Tournament)] broadcast match_info (update & end) to all players in the match_group
         if self.match_id is not None and received_data['command'] == "match_info" and (received_data['mode'] == "update" or received_data['mode'] == "end") and not self.set_matches[self.match_id]['finished']:
@@ -424,11 +427,9 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         # [Broadcast match game-data]
         if (self.match_id is not None 
             and (
-                received_data['command'] == "updateLeftPaddle" or
-                received_data['command'] == "updateRightPaddle" or
+                received_data['command'] == "updatePlayer1Paddle" or
+                received_data['command'] == "updatePlayer2Paddle" or
                 received_data['command'] == "updateBall" or
-                received_data['command'] == "initBall" or
-                received_data['command'] == "gamePause"
             )
             and self.set_matches[self.match_id]['finished'] == False):
             await self.send_to_group(text_data, self.group_name_match)
