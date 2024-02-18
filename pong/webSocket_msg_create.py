@@ -1,6 +1,24 @@
 
 import json
 
+def match_data(ball, score, paddleLeft, paddleRight):
+    list = {
+        'command': 'match_data',
+        'ball': {
+            'x': ball.x,
+            'y': ball.y,
+            'dx': ball.dx,
+            'dy': ball.dy,
+            'speed': ball.speed,
+        },
+        'score': {
+            'player1': score[0],
+            'player2': score[1],
+        },
+        'paddleLeft': paddleLeft.y,
+        'paddleRight': paddleRight.y,
+    }
+    return json.dumps(list)
 
 def set_player(player_name):        # send after accepting the WebSocket connection
     list = {
