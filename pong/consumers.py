@@ -101,8 +101,8 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'endTime':    <timestamp>,
                     #     'finished':   [True]
                     #     'ball':       ::Ball,
-                    #     'paddleLeft':  ::Paddle,
-                    #     'paddleRight': ::Paddle,
+                    #     'paddleLeft':  ::Paddle,  # first instance of PongConsumer paddle
+                    #     'paddleRight': ::Paddle,  # second instance of PongConsumer paddle
                     # },
 
     # ************************************************************ #
@@ -185,7 +185,21 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             await self.send_to_group(match_info('start', self.set_matches[match_id]['players']), self.set_matches[match_id]['group_name'])
             self.set_matches[match_id]['startMatchTrigger'] = True
 
-        await self.match_loop()            
+        """ print("+++ GOOD NIGHT +++")
+        time.sleep(5)
+        print("+++ GOOD MORNING +++")
+        await self.match_loop() """
+
+        if self.playerNbr == 1:
+            group_size = len(self.channel_layer.groups.get(self.group_name_match, {}).items())
+            print(f"The size of group '{self.group_name_match}' is: {group_size}")
+            group_items = self.channel_layer.groups.get(self.group_name_match, {}).items()
+            print(f"The items of group '{self.group_name_match}' are: {group_items}")
+            print(f"self.channel_name: {self.channel_name}")
+            time.sleep(1)
+            asyncio.ensure_future(self.match_loop())
+            # await self.match_loop()
+            # self.match_loop()
 
         return True
 
@@ -240,6 +254,7 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
 
     """ Add a player to a group / room """
     async def add_playerToGroup(self, group_name):
+        print(f'Adding player to group {group_name}')
         if group_name is not None:
             await self.channel_layer.group_add(
                 group_name,
@@ -400,14 +415,10 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
         received_data = {
             'command': 'player_paddle_up_keystate',
         } """
-        if received_data['command'] == "player1PaddleUpKeyPressed":
+        if received_data['command'] == "paddleUpKeyPressed":
             self.paddle.paddle_up()
-        elif received_data['command'] == "player2PaddleUpKeyPressed":
+        elif received_data['command'] == "paddleUpKeyPressed":
             self.paddle.paddle_down()
-        elif received_data['command'] == "player1PaddleDownKeyPressed":
-            # ???
-        elif received_data['command'] == "player1PaddleDownKeyPressed":
-            # ???
 
         # [Match (Remote & Tournament)] broadcast match_info (update & end) to all players in the match_group
         if self.match_id is not None and received_data['command'] == "match_info" and (received_data['mode'] == "update" or received_data['mode'] == "end") and not self.set_matches[self.match_id]['finished']:
@@ -423,58 +434,60 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                 await PongConsumer.delete_connectedUsers(self.connected_users[otherPlayer]['self'], 3001)
                 await self.delete_match(self.match_id)
                 await PongConsumer.delete_connectedUsers(self, 3001)
-        
-        # [Broadcast match game-data]
-        if (self.match_id is not None 
-            and (
-                received_data['command'] == "updatePlayer1Paddle" or
-                received_data['command'] == "updatePlayer2Paddle" or
-                received_data['command'] == "updateBall" or
-            )
-            and self.set_matches[self.match_id]['finished'] == False):
-            await self.send_to_group(text_data, self.group_name_match)
-
 
     async def send_to_self(self, data):
+        # print(f"Sending to self: {data}")
+        # print(f"Sending to self: {self.channel_name}")
         """ Send message to self """
-        await self.channel_layer.send(self.channel_name, {
-            'type': 'send_message',
-            'data': data
-        })
+        try:
+            await self.channel_layer.send(self.channel_name, {
+                'type': 'send_message',
+                'data': data
+            })
+        except Exception as e:
+            print(f"Error sending message to self: {e}")
 
     async def send_to_group(self, data, group_name):
-        if group_name is not None:
+        print(f"Sending to group {self.channel_name}")
+        # Print the current group members
+                
+        try:
             await self.channel_layer.group_send(group_name, {
                 'type': 'send_message',
                 'data': data
             })
+        except Exception as e:
+            print(f"Error sending message to group: {e}")
 
     async def send_message(self, event):
         """ Send the group message to clients """
         # Retrieve the message from the event
         message = event['data']
-        # Send the message to the client WebSocket
-        # print(f"Sending message: {message}")
         try:
             await self.send(text_data=message)
         except Exception as e:
             print(f"Error sending message: {e}")
 
     async def match_loop(self):
-        while self.set_matches[self.match_id]['startMatchTrigger'] == False:
-            await asyncio.sleep(0.01)
-        
-        while self.set_matches[self.match_id]['startMatchTrigger'] == True:
-            print("++++++++++++ IN LOOP ++++++++++++")
-            ball = self.set_matches[self.match_id]['ball']
-            ball.update_ball()
-            ball.check_if_ball_hit_top_bottom_table()
-            if ball.x < 0:
-                await self.check_if_ball_hit_or_passed_paddle(ball)
-            elif ball.x > 1:
-                await self.check_if_ball_hit_or_passed_paddle(ball)
-            await self.send_to_self(match_data(ball, self.set_matches[self.match_id]['score'], self.set_matches[self.match_id]['paddleLeft'], self.set_matches[self.match_id]['paddleRight']))
-            await asyncio.sleep(0.02)
+        # while self.set_matches[self.match_id]['startMatchTrigger'] == False:
+        #     await asyncio.sleep(0.01)
+        print("Starting match loop")
+        # while self.set_matches[self.match_id]['startMatchTrigger'] == True:
+        while True:
+            # print("++++++++++++ IN LOOP ++++++++++++")
+            # ball = self.set_matches[self.match_id]['ball']
+            # ball.update_ball()
+            # ball.check_if_ball_hit_top_bottom_table()
+            # if ball.x < 0:
+            #     await self.check_if_ball_hit_or_passed_paddle(ball)
+            # elif ball.x > 1:
+            #     await self.check_if_ball_hit_or_passed_paddle(ball)
+            # await self.send_to_self(match_data(ball, self.set_matches[self.match_id]['score'], self.set_matches[self.match_id]['paddleLeft'], self.set_matches[self.match_id]['paddleRight']))
+            # print(f"[In Loop] Sending to group {self.set_matches[self.match_id]['group_name']}")
+            # await self.send_to_group(match_data(ball, self.set_matches[self.match_id]['score'], self.set_matches[self.match_id]['paddleLeft'], self.set_matches[self.match_id]['paddleRight']), self.set_matches[self.match_id]['group_name'])
+            
+            print("in loop")
+            # await asyncio.sleep(0.02)
 
     async def check_if_ball_hit_or_passed_paddle(self, ball):
         half_paddle_height = self.paddle.height / 2

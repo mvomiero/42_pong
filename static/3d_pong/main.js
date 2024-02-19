@@ -145,6 +145,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   /**************************************************/
 
   function initGame() {
+    console.log("initGame");
     paddleWidth = sceneProperties.zoomedCanvasWidth * 0.02;
     paddleHeight = sceneProperties.zoomedCanvasWidth * 0.2;
     paddleDepth = sceneProperties.zoomedCanvasHeight * 0.05;
@@ -154,7 +155,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     initTable();
     createTable();
     renderer.render(scene, camera);
-    startAnimationLoop();
   }
 
   function initCamera() {
@@ -310,22 +310,21 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // DESTRUCTION OF MESHES
 
-  function removeElements { // not currently called from anywhere
-      removeAndDisposeAndMakeUndefined(ballMesh);
-      removeAndDisposeAndMakeUndefined(scorePlayer1Mesh);
-      removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
-      removeAndDisposeAndMakeUndefined(namePlayer1Mesh);
-      removeAndDisposeAndMakeUndefined(namePlayer2Mesh);
-      removeAndDisposeAndMakeUndefined(leftPaddleMesh);
-      removeAndDisposeAndMakeUndefined(rightPaddleMesh);
-      removeAndDisposeAndMakeUndefined(tableMesh);
-      removeAndDisposeAndMakeUndefined(tableMesh);
-      removeAndDisposeAndMakeUndefined(tableUpperWallMesh);
-      removeAndDisposeAndMakeUndefined(tableLowerWallMesh);
-      removeAndDisposeAndMakeUndefined(netMesh);
-      removeAndDisposeAndMakeUndefined(controls);
-      renderer.render(scene, camera);
-    }
+  function removeElements() { // not currently called from anywhere
+    removeAndDisposeAndMakeUndefined(ballMesh);
+    removeAndDisposeAndMakeUndefined(scorePlayer1Mesh);
+    removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
+    removeAndDisposeAndMakeUndefined(namePlayer1Mesh);
+    removeAndDisposeAndMakeUndefined(namePlayer2Mesh);
+    removeAndDisposeAndMakeUndefined(leftPaddleMesh);
+    removeAndDisposeAndMakeUndefined(rightPaddleMesh);
+    removeAndDisposeAndMakeUndefined(tableMesh);
+    removeAndDisposeAndMakeUndefined(tableMesh);
+    removeAndDisposeAndMakeUndefined(tableUpperWallMesh);
+    removeAndDisposeAndMakeUndefined(tableLowerWallMesh);
+    removeAndDisposeAndMakeUndefined(netMesh);
+    removeAndDisposeAndMakeUndefined(controls);
+    renderer.render(scene, camera);
   }
 
   function removeAndDisposeAndMakeUndefined(object) {
@@ -342,28 +341,17 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // KEYBOARD EVENTS
 
-  // listen to keyboard events to move the paddles
-  document.addEventListener("keydown", function (e) {
-
-    // what does this do?
-    if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-      e.preventDefault();
-    }
-
-    if (e.key.toLowerCase() === paddleIncreaseKey.toLowerCase()) {
-      if (player === 1)
-        gameSocket.send(JSON.stringify({command: "player1PaddleUpKeyPressed"}));
-      else if (player === 2)
-        gameSocket.send(JSON.stringify({command: "player2PaddleUpKeyPressed"}));
-    }
-
-    if (e.key.toLowerCase() === paddleDecreaseKey.toLowerCase()) {
-      if (player === 1)
-        gameSocket.send(JSON.stringify({command: "player1PaddleDownKeyPressed"}));
-      else if (player === 2)
-        gameSocket.send(JSON.stringify({command: "player2PaddleDownKeyPressed"}));        
-    }
-  });
+//   // listen to keyboard events to move the paddles
+//   document.addEventListener("keydown", function (e) {
+//     // what does this do?
+//     if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+//       e.preventDefault();
+//     }
+//     if (e.key.toLowerCase() === paddleIncreaseKey.toLowerCase())
+//         gameSocket.send(JSON.stringify({command: "paddleUpKeyPressed"}));
+//     else if (e.key.toLowerCase() === paddleDecreaseKey.toLowerCase())
+//         gameSocket.send(JSON.stringify({command: "paddleDownKeyPressed"}));
+//   });
 
   // TODO listen to keyboard events to stop the paddle if key is released
 
@@ -393,6 +381,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function handleWebSocketOpen(event) {
     try {
       var data = JSON.parse(event.data);
+      console.log("Received data:", data);
 
       if (data.command === "set_player") {
         console.log("set player", data.player);
@@ -406,10 +395,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       if (data.command === "match_info") {
         if (data.mode === "start") {
           document.getElementById('message_info').style.display = 'none';
-          if (tournament_stage === "final") {
-            initGame();
-            createLeftPaddle();
-          }
           player1 = data.player1;
           player2 = data.player2;
           if (char_choice === player1) {
