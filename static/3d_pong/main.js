@@ -341,17 +341,17 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // KEYBOARD EVENTS
 
-//   // listen to keyboard events to move the paddles
-//   document.addEventListener("keydown", function (e) {
-//     // what does this do?
-//     if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-//       e.preventDefault();
-//     }
-//     if (e.key.toLowerCase() === paddleIncreaseKey.toLowerCase())
-//         gameSocket.send(JSON.stringify({command: "paddleUpKeyPressed"}));
-//     else if (e.key.toLowerCase() === paddleDecreaseKey.toLowerCase())
-//         gameSocket.send(JSON.stringify({command: "paddleDownKeyPressed"}));
-//   });
+   // listen to keyboard events to move the paddles
+   document.addEventListener("keydown", function (e) {
+     // what does this do?
+     if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+       e.preventDefault();
+     }
+     if (e.key.toLowerCase() === paddleIncreaseKey.toLowerCase())
+         gameSocket.send(JSON.stringify({command: "paddleUpKeyPressed"}));
+     else if (e.key.toLowerCase() === paddleDecreaseKey.toLowerCase())
+         gameSocket.send(JSON.stringify({command: "paddleDownKeyPressed"}));
+   });
 
   // TODO listen to keyboard events to stop the paddle if key is released
 
