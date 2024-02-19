@@ -13,18 +13,19 @@ class Ball:
         self.dx = 1 if random.random() < 0.5 else -1
         self.dy = (random.uniform(0, 2)) - 1
         self.speed = 0.01
+        self.max_z = random.random()
 
-    def update_ball(self):
+    def update_position(self):
         self.x += self.dx * self.speed
         self.y += self.dy * self.speed
         # calculate ball z based on ball x so that it reaches max_z when crossing the net and 0 at either paddle
         self.z = self.size / 2 + self.max_z * math.exp(-((self.x - 0) ** 2) / (2 * (1/4) ** 2))  # where '0' is mean and 1/4 is standard_deviation
 
-    def hit_wall(self):
+    def check_hit_wall(self):
         if self.y < 0 or self.y >= 1:
             self.dy = -self.dy
 
-    def hit_paddle(self):
+    def check_hit_paddle(self):
         self.dx = -self.dx
         self.max_z = random.random()
 
@@ -82,10 +83,10 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.matches[0].player2_name = self.player
             self.paddle = self.matches[0].paddleRight
             await self.send_to_group(match_info('start', [self.matches[0].player1_name, self.matches[0].player2_name]), self.group_name)
+            # Start the game loop
+            asyncio.ensure_future(self.game_loop())
         
-        # Start the game loop
-        asyncio.ensure_future(self.game_loop())
-
+        
     async def disconnect(self, close_code):
         # Handle disconnect logic, e.g., remove the player from the game
         pass
@@ -115,12 +116,31 @@ class PongConsumer(AsyncWebsocketConsumer):
             match.ball.y += match.ball.dy * match.ball.speed
 
             # Check for collisions and update scores
-            # Implement your collision and scoring logic here
+            match.ball.update_position()
+            match.ball.check_hit_wall()
+            if not await self.check_hit_paddle(match.ball, match.paddleLeft):
+                match.score_player2 += 1
+                match.ball = Ball()
+                self.send_to_group(match_info('update', [self.matches[0].player1_name, self.matches[0].player2_name], [match.score_player1, match.score_player2]), self.group_name)
+            elif not await self.check_hit_paddle(match.ball, match.paddleRight):
+                match.score_player1 += 1
+                match.ball = Ball()
+                self.send_to_group(match_info('update', [self.matches[0].player1_name, self.matches[0].player2_name], [match.score_player1, match.score_player2]), self.group_name)
+
 
             # Send updated game state to group
             await self.send_to_group(match_data(match.ball, [match.score_player1, match.score_player2], match.paddleLeft, match.paddleRight), self.group_name)
 
             await asyncio.sleep(0.1)
+
+    async def check_hit_paddle(self, ball, paddle):
+        if ball.x < 0.05 and abs(ball.y - paddle.y) < paddle.height / 2:
+            ball.check_hit_paddle()
+            return True
+        elif ball.x > 0.95 and abs(ball.y - paddle.y) < paddle.height / 2:
+            ball.check_hit_paddle()
+            return True
+        return False
 
     async def send_to_self(self, data):
         await self.channel_layer.send(self.channel_name, {
