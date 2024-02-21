@@ -1,8 +1,3 @@
-// ISSUES
-// paddles momentarily appear but disappear once game starts because paddle y's are not set correctly
-// ball initially appears in centre but game data makes it appear off centre
-// so now focus on scaling!
-
 import * as THREE from 'three';
 import { FontLoader } from 'three/FontLoader';
 import { TextGeometry } from 'three/TextGeometry';
@@ -151,14 +146,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   function initGame() {
     console.log("initGame");
-    paddleWidth = sceneProperties.zoomedCanvasWidth * 0.02;
-    paddleHeight = sceneProperties.zoomedCanvasHeight / 5; // must match with self.height = 1/5 in consumers.py
-    paddleDepth = sceneProperties.zoomedCanvasHeight * 0.05;
-    minBallZ = ballSize * 0.7;
-    maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     initCamera();
     initTable();
     createTable();
+    paddleWidth = sceneProperties.zoomedCanvasWidth * 0.02;
+    paddleHeight = tableHeight / 4; // must match with self.height = 1/5 in consumers.py
+    paddleDepth = sceneProperties.zoomedCanvasHeight * 0.05;
+    minBallZ = ballSize * 0.7;
+    maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     renderer.render(scene, camera);
   }
 
@@ -338,7 +333,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     removeAndDisposeAndMakeUndefined(controls);
     renderer.render(scene, camera);
     document.removeEventListener("keydown", keyDownEventListener);
-    // will need to remove keyup event listener here eventually
+    document.removeEventListener("keyup", keyUpEventListener);
   }
 
   function removeAndDisposeAndMakeUndefined(object) {
@@ -363,12 +358,17 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   // KEYBOARD EVENTS
   function keyDownEventListener(e) {
     if (e.key.toLowerCase() === paddleIncreaseKey.toLowerCase())
-      gameSocket.send(JSON.stringify({command: "move_paddle", direction: "up"}));
+      gameSocket.send(JSON.stringify({command: "move_paddle", direction: "up", action: "pressed"}));
     else if (e.key.toLowerCase() === paddleDecreaseKey.toLowerCase())
-      gameSocket.send(JSON.stringify({command: "move_paddle", direction: "down"}));
+      gameSocket.send(JSON.stringify({command: "move_paddle", direction: "down", action: "pressed"}));
   }
 
-  // will need keyUpEventListener here eventually
+  function keyUpEventListener(e) {
+    if (e.key.toLowerCase() === paddleIncreaseKey.toLowerCase())
+      gameSocket.send(JSON.stringify({command: "move_paddle", direction: "up", action: "released"}));
+    else if (e.key.toLowerCase() === paddleDecreaseKey.toLowerCase())
+      gameSocket.send(JSON.stringify({command: "move_paddle", direction: "down", action: "released"}));
+  }
 
   // WEBSOCKET CODE
 
@@ -432,7 +432,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           renderer.render(scene, camera);
           // listen to keyboard events to move the paddles
           document.addEventListener("keydown", keyDownEventListener);
-          // TODO will need keyup here eventually
+          document.addEventListener("keyup", keyUpEventListener);
         }
       }
 
