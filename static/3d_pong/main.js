@@ -39,7 +39,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   var leftPaddleMesh, rightPaddleMesh, paddleWidth, paddleHeight, paddleDepth;
   var paddleIncreaseKey, paddleDecreaseKey;
   var textHeight, textDepth, textYpos, leftScoreXpos, rightScoreXpos, leftNameOffset, rightNameOffset;
-  var scorePlayer1Mesh, scorePlayer2Mesh, namePlayer1Mesh, namePlayer2Mesh;
+  var player1ScoreMesh, player2ScoreMesh, namePlayer1Mesh, namePlayer2Mesh;
   var controls;
   var player1, player2;
   var player = 0;
@@ -47,6 +47,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   var char_choice;
   var gameSocket;
   var game_mode; // "local" or "remote" or "tournament"
+  var paddleCam = false;
 
   // variables for message at the end of the game:
   var winMessage = {
@@ -173,12 +174,62 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     setNormalCam();
   }
 
+  // normalCam, paddleCam
+
   function setNormalCam() {
+    paddleCam = false
     controls.enabled = true;
     paddleIncreaseKey = "W";
     paddleDecreaseKey = "S";
     sceneProperties.camera.position.set(0, 0, 11);
     sceneProperties.camera.rotation.set(0, 0, 0);
+  }
+
+  function setPaddleCam(player) {
+    const halfPaddleDepth = paddleDepth / 2;
+    if (player === 1) {
+      paddleCam = true
+      controls.enabled = false;
+      paddleIncreaseKey = "A";
+      paddleDecreaseKey = "D";
+      sceneProperties.camera.position.set(leftPaddleMesh.position.x, leftPaddleMesh.position.y, halfPaddleDepth);
+      sceneProperties.camera.rotation.set(Math.PI / 2, -Math.PI / 2, 0);
+    }
+    if (player === 2) {
+      paddleCam = true
+      controls.enabled = false;
+      paddleIncreaseKey = "D";
+      paddleDecreaseKey = "A";
+      sceneProperties.camera.position.set(rightPaddleMesh.position.x, rightPaddleMesh.position.y, halfPaddleDepth);
+      sceneProperties.camera.rotation.set(Math.PI / 2, Math.PI / 2, 0);
+    } 
+  }
+
+  function updatePaddleCam() {
+    const halfPaddleDepth = paddleDepth / 2;
+    if (paddleCam)
+      if (player === 1)
+        sceneProperties.camera.position.set(leftPaddleMesh.position.x, leftPaddleMesh.position.y, halfPaddleDepth);
+      else if (player === 2)
+        sceneProperties.camera.position.set(rightPaddleMesh.position.x, rightPaddleMesh.position.y, halfPaddleDepth);
+  }
+
+  function setPaddleCamForLeadingPlayer() {
+    if (player1Score > player2Score) {
+      if (player === 1)
+        setPaddleCam(player);
+      if (player === 2)
+        setNormalCam();
+    }
+    else if (player1Score < player2Score) {
+      if (player === 1)
+        setNormalCam();
+      if (player === 2)
+        setPaddleCam(player);
+    }
+    else if (player1Score == player2Score) {
+      setNormalCam(); // both players
+    }
   }
 
   // CONSTRUCTION OF MESHES
@@ -270,25 +321,25 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   }
 
   function createP1ScoreText() {
-    const scorePlayer1Geom = new TextGeometry(player1Score.toString(), { font: sceneProperties.font, size: textHeight, height: textDepth });
-    const scorePlayer1Material = new THREE.MeshPhongMaterial({ color: sceneProperties.p1Colour });
-    scorePlayer1Mesh = new THREE.Mesh(scorePlayer1Geom, scorePlayer1Material);
+    const player1ScoreGeom = new TextGeometry(player1Score.toString(), { font: sceneProperties.font, size: textHeight, height: textDepth });
+    const player1ScoreMaterial = new THREE.MeshPhongMaterial({ color: sceneProperties.p1Colour });
+    player1ScoreMesh = new THREE.Mesh(player1ScoreGeom, player1ScoreMaterial);
     const p1ScoreTextWidth = leftScoreXpos;
     const p1ScoreTextHeight = textYpos - textHeight;
     const p1ScoreTextDepth = maxBallZ;
-    scorePlayer1Mesh.position.set(p1ScoreTextWidth, p1ScoreTextHeight, p1ScoreTextDepth);
-    sceneProperties.scene.add(scorePlayer1Mesh);
+    player1ScoreMesh.position.set(p1ScoreTextWidth, p1ScoreTextHeight, p1ScoreTextDepth);
+    sceneProperties.scene.add(player1ScoreMesh);
   }
 
   function createP2ScoreText() {
-    const scorePlayer2Geom = new TextGeometry(player2Score.toString(), { font: sceneProperties.font, size: textHeight, height: textDepth });
-    const scorePlayer2Material = new THREE.MeshPhongMaterial({ color: sceneProperties.p2Colour });
-    scorePlayer2Mesh = new THREE.Mesh(scorePlayer2Geom, scorePlayer2Material);
+    const player2ScoreGeom = new TextGeometry(player2Score.toString(), { font: sceneProperties.font, size: textHeight, height: textDepth });
+    const player2ScoreMaterial = new THREE.MeshPhongMaterial({ color: sceneProperties.p2Colour });
+    player2ScoreMesh = new THREE.Mesh(player2ScoreGeom, player2ScoreMaterial);
     const p2ScoreTextWidth = rightScoreXpos;
     const p2ScoreTextHeight = textYpos - textHeight;
     const p2ScoreTextDepth = maxBallZ;
-    scorePlayer2Mesh.position.set(p2ScoreTextWidth, p2ScoreTextHeight, p2ScoreTextDepth);
-    sceneProperties.scene.add(scorePlayer2Mesh);
+    player2ScoreMesh.position.set(p2ScoreTextWidth, p2ScoreTextHeight, p2ScoreTextDepth);
+    sceneProperties.scene.add(player2ScoreMesh);
   }
 
   function createP1NameText() {
@@ -319,8 +370,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   function removeElements() { // not currently called from anywhere
     removeAndDisposeAndMakeUndefined(ballMesh);
-    removeAndDisposeAndMakeUndefined(scorePlayer1Mesh);
-    removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
+    removeAndDisposeAndMakeUndefined(player1ScoreMesh);
+    removeAndDisposeAndMakeUndefined(player2ScoreMesh);
     removeAndDisposeAndMakeUndefined(namePlayer1Mesh);
     removeAndDisposeAndMakeUndefined(namePlayer2Mesh);
     removeAndDisposeAndMakeUndefined(leftPaddleMesh);
@@ -442,16 +493,20 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         ballMesh.position.z = scaleFloatToRange(data.ball.z, minBallZ, maxBallZ);
         leftPaddleMesh.position.y = data.paddleLeft * tableHeight;
         rightPaddleMesh.position.y = data.paddleRight * tableHeight;
+        updatePaddleCam(); // only when y changes?
         if (data.score.player1 != player1Score) {
           player1Score = data.score.player1;
-          removeAndDisposeAndMakeUndefined(scorePlayer1Mesh);
+          removeAndDisposeAndMakeUndefined(player1ScoreMesh);
           createP1ScoreText();
+          setPaddleCamForLeadingPlayer();
         }
         else if (data.score.player2 != player2Score) {
           player2Score = data.score.player2;
-          removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
+          removeAndDisposeAndMakeUndefined(player2ScoreMesh);
           createP2ScoreText();
+          setPaddleCamForLeadingPlayer();
         }
+        
         renderer.render(scene, camera);
       }
     } catch (error) {
