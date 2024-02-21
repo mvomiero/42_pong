@@ -8,9 +8,6 @@ def match_data(ball, score, paddleLeft, paddleRight):
             'x': ball.x,
             'y': ball.y,
             'z': ball.z,
-            'dx': ball.dx,
-            'dy': ball.dy,
-            'speed': ball.speed,
         },
         'score': {
             'player1': score[0],

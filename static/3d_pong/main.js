@@ -1,3 +1,8 @@
+// ISSUES
+// paddles momentarily appear but disappear once game starts because paddle y's are not set correctly
+// ball initially appears in centre but game data makes it appear off centre
+// so now focus on scaling!
+
 import * as THREE from 'three';
 import { FontLoader } from 'three/FontLoader';
 import { TextGeometry } from 'three/TextGeometry';
@@ -147,7 +152,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function initGame() {
     console.log("initGame");
     paddleWidth = sceneProperties.zoomedCanvasWidth * 0.02;
-    paddleHeight = sceneProperties.zoomedCanvasWidth * 0.2;
+    paddleHeight = sceneProperties.zoomedCanvasHeight / 5; // must match with self.height = 1/5 in consumers.py
     paddleDepth = sceneProperties.zoomedCanvasHeight * 0.05;
     minBallZ = sceneProperties.zoomedCanvasWidth * 0.05;
     maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
@@ -199,6 +204,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     rightNameOffset = sceneProperties.zoomedCanvasWidth * 0.04;
   }
 
+  function createBall() {
+    var geometry = new THREE.SphereGeometry(0.2, 50);
+    var material = new THREE.MeshPhongMaterial({ color: sceneProperties.ballColour });
+    ballMesh = new THREE.Mesh(geometry, material);
+    ballMesh.position.set(0, 0, maxBallZ);
+    sceneProperties.scene.add(ballMesh);
+  }
+
   function createLeftPaddle() {
     var paddleGeometry = new THREE.BoxGeometry(paddleWidth, paddleHeight, paddleDepth);
     var leftPaddleMeshMaterial = new THREE.MeshPhongMaterial({ color: sceneProperties.p1Colour });
@@ -206,7 +219,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     const halfPaddleDepth = paddleDepth / 2;
     leftPaddleMesh.position.set(-tableWidth / 2 - paddleWidth / 2, 0, halfPaddleDepth);
     sceneProperties.scene.add(leftPaddleMesh);
-    renderer.render(scene, camera);
   }
 
   function createRightPaddle() {
@@ -325,6 +337,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     removeAndDisposeAndMakeUndefined(netMesh);
     removeAndDisposeAndMakeUndefined(controls);
     renderer.render(scene, camera);
+    document.removeEventListener("keydown", keyDownEventListener);
+    // will need to remove keyup event listener here eventually
   }
 
   function removeAndDisposeAndMakeUndefined(object) {
@@ -340,20 +354,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   }
 
   // KEYBOARD EVENTS
+  function keyDownEventListener(e) {
+    if (e.key.toLowerCase() === paddleIncreaseKey.toLowerCase())
+      gameSocket.send(JSON.stringify({command: "move_paddle", direction: "up"}));
+    else if (e.key.toLowerCase() === paddleDecreaseKey.toLowerCase())
+      gameSocket.send(JSON.stringify({command: "move_paddle", direction: "down"}));
+  }
 
-   // listen to keyboard events to move the paddles
-   document.addEventListener("keydown", function (e) {
-     // what does this do?
-     if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-       e.preventDefault();
-     }
-     if (e.key.toLowerCase() === paddleIncreaseKey.toLowerCase())
-         gameSocket.send(JSON.stringify({command: "paddleUpKeyPressed"}));
-     else if (e.key.toLowerCase() === paddleDecreaseKey.toLowerCase())
-         gameSocket.send(JSON.stringify({command: "paddleDownKeyPressed"}));
-   });
-
-  // TODO listen to keyboard events to stop the paddle if key is released
+  // will need keyUpEventListener here eventually
 
   // WEBSOCKET CODE
 
@@ -381,11 +389,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function handleWebSocketOpen(event) {
     try {
       var data = JSON.parse(event.data);
-      console.log("Received data:", data);
+      // console.log("Received data:", data);
 
       if (data.command === "set_player") {
         console.log("set player", data.player);
         createLeftPaddle();
+        renderer.render(scene, camera);
         char_choice = data.player;
       }
 
@@ -412,28 +421,27 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           createP2ScoreText();
           createP1NameText();
           createP2NameText();
+          createBall();
           renderer.render(scene, camera);
+          // listen to keyboard events to move the paddles
+          document.addEventListener("keydown", keyDownEventListener);
+          // TODO will need keyup here eventually
         }
       }
 
       if (data.command === "match_data") {
-        ballMesh.position.x = data.ball.x;
-        ballMesh.position.y = data.ball.y;
-        ballMesh.position.z = data.ball.z;
-        ball.dx = data.ball.dx;
-        ball.dy = data.ball.dy;
-        leftPaddleMesh.position.y = data.leftPaddle.y;
-        rightPaddleMesh.position.y = data.rightPaddle.y;
-        // update score
-        player1Score = data.score.player1Score;
-        player2Score = data.score.player2Score;
-        if (data.score.player1Score != player1Score) {
-          player1Score = data.score.player1Score;
+        ballMesh.position.x = data.ball.x * tableWidth;
+        ballMesh.position.y = data.ball.y * tableHeight;
+        ballMesh.position.z = data.ball.z * maxBallZ;
+        leftPaddleMesh.position.y = data.paddleLeft * tableHeight;
+        rightPaddleMesh.position.y = data.paddleRight * tableHeight;
+        if (data.score.player1 != player1Score) {
+          player1Score = data.score.player1;
           removeAndDisposeAndMakeUndefined(scorePlayer1Mesh);
           createP1ScoreText();
         }
-        if (data.score.player2Score != player2Score) {
-          player2Score = data.score.player2Score;
+        else if (data.score.player2 != player2Score) {
+          player2Score = data.score.player2;
           removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
           createP2ScoreText();
         }
