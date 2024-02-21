@@ -21,17 +21,21 @@ class Ball:
         self.size = 0.1
         self.x = 0
         self.y = 0
-        self.z = self.size
-        self.dx = 1 if random.random() < 0.5 else -1
-        self.dy = (random.uniform(0, 2)) - 1
+        self.z = 1
+        # self.dx = 1 if random.random() < 0.5 else -1
+        # self.dy = (random.uniform(0, 2)) - 1
+        self.dx = 1
+        self.dy = 0
         self.speed = 0.005
-        self.max_z = random.random() - 0.5
+        self.min_z = self.size
+        self.max_z = random.uniform(self.size, 1)
 
     def update_position(self):
         self.x += self.dx * self.speed
         self.y += self.dy * self.speed
         # calculate ball z based on ball x so that it reaches max_z when crossing the net and 0 at either paddle
-        # self.z = self.size / 2 + self.max_z * math.exp(-((self.x - 0) ** 2) / (2 * (1/4) ** 2))  # where '0' is mean and 1/4 is standard_deviation
+        self.z = self.size / 2 + self.max_z * math.exp(-((self.x - 0) ** 2) / (2 * (1/4) ** 2))
+        # where '0' is mean and 1/4 is standard_deviation
 
     def check_hit_wall(self):
         if self.y < -0.5 or self.y >= 0.5:
@@ -42,7 +46,7 @@ class Ball:
         top_of_paddle = paddle.y + paddle.height / 2
         if bottom_of_paddle < self.y < top_of_paddle:
             self.dx = -self.dx
-            # ball.max_z = random.random()
+            self.max_z = random.uniform(self.size, 1)
             return True
         else:
             return False

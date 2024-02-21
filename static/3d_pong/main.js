@@ -40,7 +40,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   var player1Score = 0, player2Score = 0;
   const ball = {};
   var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
-  var ballMesh, minBallZ, maxBallZ;
+  var ballMesh, ballSize = 0.2, minBallZ, maxBallZ;
   var leftPaddleMesh, rightPaddleMesh, paddleWidth, paddleHeight, paddleDepth;
   var paddleIncreaseKey, paddleDecreaseKey;
   var textHeight, textDepth, textYpos, leftScoreXpos, rightScoreXpos, leftNameOffset, rightNameOffset;
@@ -154,7 +154,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     paddleWidth = sceneProperties.zoomedCanvasWidth * 0.02;
     paddleHeight = sceneProperties.zoomedCanvasHeight / 5; // must match with self.height = 1/5 in consumers.py
     paddleDepth = sceneProperties.zoomedCanvasHeight * 0.05;
-    minBallZ = sceneProperties.zoomedCanvasWidth * 0.05;
+    minBallZ = ballSize * 0.7;
     maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     initCamera();
     initTable();
@@ -205,10 +205,10 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   }
 
   function createBall() {
-    var geometry = new THREE.SphereGeometry(0.2, 50);
+    var geometry = new THREE.SphereGeometry(ballSize, 50);
     var material = new THREE.MeshPhongMaterial({ color: sceneProperties.ballColour });
     ballMesh = new THREE.Mesh(geometry, material);
-    ballMesh.position.set(0, 0, maxBallZ);
+    ballMesh.position.set(0, 0, ballSize);
     sceneProperties.scene.add(ballMesh);
   }
 
@@ -353,6 +353,13 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     object = undefined;
   }
 
+  // UTILITY FUNCTIONS
+
+  function scaleFloatToRange(floatValue, minRange, maxRange) {
+    floatValue = Math.max(0, Math.min(1, floatValue));
+    return (maxRange - minRange) * floatValue + minRange;
+  }
+
   // KEYBOARD EVENTS
   function keyDownEventListener(e) {
     if (e.key.toLowerCase() === paddleIncreaseKey.toLowerCase())
@@ -432,7 +439,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       if (data.command === "match_data") {
         ballMesh.position.x = data.ball.x * tableWidth;
         ballMesh.position.y = data.ball.y * tableHeight;
-        ballMesh.position.z = data.ball.z * maxBallZ;
+        ballMesh.position.z = scaleFloatToRange(data.ball.z, minBallZ, maxBallZ);
         leftPaddleMesh.position.y = data.paddleLeft * tableHeight;
         rightPaddleMesh.position.y = data.paddleRight * tableHeight;
         if (data.score.player1 != player1Score) {
