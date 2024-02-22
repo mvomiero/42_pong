@@ -1,5 +1,6 @@
 
 import random, math
+import asyncio
 
 class Table:
     def __init__(self):
@@ -117,7 +118,7 @@ class Paddle:
                 self.y = table_bottom + self.half_height
   
 class Match():
-    winning_score = 2
+    winning_score = 11
 
     def __init__(self):
         self.consumer_instances = []
@@ -130,7 +131,27 @@ class Match():
         self.score_player1 = 0
         self.score_player2 = 0
         self.player_quit = False
+        self.lock = asyncio.Lock()
     
+    def player_missing(self):
+        return self.player1_name is None or self.player2_name is None
+
+    def add_player(self, player_name, player_instance):
+        if self.player1_name is None:
+            self.player1_name = player_name
+            self.consumer_instances.append(player_instance)
+        else:
+            self.player2_name = player_name
+            self.consumer_instances.append(player_instance)
+
+    def get_paddle(self, player_name):
+        if self.player1_name == player_name:
+            return self.paddle_left
+        elif self.player2_name == player_name:
+            return self.paddle_right
+        else:
+            return None
+
     def check_if_ball_hit_paddle(self):
         if self.ball.x < self.paddle_left.x:
             hit_paddle_left = self.ball.check_hit_paddle(self.paddle_left)
