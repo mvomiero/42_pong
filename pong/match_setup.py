@@ -129,6 +129,7 @@ class Match():
         self.paddle_right = Paddle(self.table.right)
         self.score_player1 = 0
         self.score_player2 = 0
+        self.player_quit = False
     
     def check_if_ball_hit_paddle(self):
         if self.ball.x < self.paddle_left.x:

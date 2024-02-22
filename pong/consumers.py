@@ -28,10 +28,12 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.matches[0].player1_name = self.player
             self.matches[0].consumer_instances.append(self)
             self.paddle = self.matches[0].paddle_left
+            self.match = self.matches[0]
         else:
             self.matches[0].player2_name = self.player
             self.matches[0].consumer_instances.append(self)
             self.paddle = self.matches[0].paddle_right
+            self.match = self.matches[0]
             await self.send_to_group(
                 match_info('start', [self.matches[0].player1_name, self.matches[0].player2_name]), 
                 self.group_name
@@ -41,8 +43,11 @@ class PongConsumer(AsyncWebsocketConsumer):
         
         
     async def disconnect(self, close_code):
-        # Handle disconnect logic, e.g., remove the player from the game
-        pass
+        # check if self.match is in self.matches
+        if hasattr(self, 'match') and isinstance(self.match, Match) and any(self.match == match_instance for match_instance in self.matches.values()):
+            self.match.player_quit = True
+            await self.game_finished(4005)
+        
 
     async def receive(self, text_data):
         received_data = json.loads(text_data)
@@ -64,6 +69,8 @@ class PongConsumer(AsyncWebsocketConsumer):
                     self.group_name
                 )
             match.update_paddles()
+            if match.player_quit == True:
+                return
             await self.send_to_group(
                 match_data(match.ball, [match.score_player1, match.score_player2], match.paddle_left, match.paddle_right), 
                 self.group_name
@@ -83,13 +90,16 @@ class PongConsumer(AsyncWebsocketConsumer):
         
 
     async def game_finished(self, closing_code=None):
+        i_matches = 0
+        match = self.match
         # delete all PongConsumer instances in the match
-        for consumer in self.matches[0].consumer_instances:
+        for consumer in match.consumer_instances:
             await PongConsumer.delete_consumer_instance(consumer, closing_code)
         
         # delete the match instance
-        del self.matches[0]
-
+        del match
+        del self.matches[i_matches]
+        
 
     @staticmethod
     async def delete_consumer_instance(consumer, closing_code=None):
@@ -108,6 +118,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         # Close the WebSocket connection:
         await consumer.close(closing_code)
+
+        # delete the consumer instance
+        del consumer
 
 
     async def send_to_self(self, data):
