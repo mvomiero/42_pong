@@ -26,11 +26,16 @@ class PongConsumer(AsyncWebsocketConsumer):
         if len(self.matches) == 0:
             self.matches[0] = Match()
             self.matches[0].player1_name = self.player
+            self.matches[0].consumer_instances.append(self)
             self.paddle = self.matches[0].paddle_left
         else:
             self.matches[0].player2_name = self.player
+            self.matches[0].consumer_instances.append(self)
             self.paddle = self.matches[0].paddle_right
-            await self.send_to_group(match_info('start', [self.matches[0].player1_name, self.matches[0].player2_name]), self.group_name)
+            await self.send_to_group(
+                match_info('start', [self.matches[0].player1_name, self.matches[0].player2_name]), 
+                self.group_name
+            )
             # Start the game loop
             asyncio.ensure_future(self.game_loop())
         
@@ -92,14 +97,52 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.check_if_ball_hit_either_paddle(match)
             self.move_paddle(match.paddle_left, match.table)
             self.move_paddle(match.paddle_right, match.table)
-            await self.send_to_group(match_data(match.ball, [match.score_player1, match.score_player2], match.paddle_left, match.paddle_right), self.group_name)
+            await self.send_to_group(
+                match_data(match.ball, [match.score_player1, match.score_player2], match.paddle_left, match.paddle_right), 
+                self.group_name
+            )
             await asyncio.sleep(0.01)
         
+        # send match_info 'end' to the players
         winner = match.player1_name if match.score_player1 > match.score_player2 else match.player2_name
         await self.send_to_group(
             match_info('end', [match.player1_name, match.player2_name], [match.score_player1, match.score_player2], winner), 
             self.group_name
         )
+
+        await asyncio.sleep(0.5)    # delay to ensure the players receive the 'end' message
+
+        # deleting/closing all PongConsumer instances and the match instance
+        await self.game_finished(3001)
+        
+
+    async def game_finished(self, closing_code=None):
+        # delete all PongConsumer instances in the match
+        for consumer in self.matches[0].consumer_instances:
+            await PongConsumer.delete_consumer_instance(consumer, closing_code)
+        
+        # delete the match instance
+        del self.matches[0]
+
+
+    @staticmethod
+    async def delete_consumer_instance(consumer, closing_code=None):
+        # copy the channel groups (to delete the group later on if it's empty)
+        channel_groups_copy = consumer.channel_layer.groups.copy()
+        
+        # Remove the consumer instance from the matches list
+        await consumer.channel_layer.group_discard(
+            consumer.group_name,
+            consumer.channel_name
+        )
+
+        # delete group if it's empty
+        if consumer.group_name in channel_groups_copy and not channel_groups_copy[consumer.group_name]:
+            del channel_groups_copy[consumer.group_name]
+
+        # Close the WebSocket connection:
+        await consumer.close(closing_code)
+
 
     async def send_to_self(self, data):
         await self.channel_layer.send(self.channel_name, {

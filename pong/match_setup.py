@@ -98,6 +98,7 @@ class Match():
     winning_score = 2
 
     def __init__(self):
+        self.consumer_instances = []
         self.player1_name = None
         self.player2_name = None
         self.table = Table()
