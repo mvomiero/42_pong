@@ -74,6 +74,16 @@ class Paddle:
         self.up_key_held = False
         self.down_key_held = False
     
+    def paddle_keyPress(self, direction, action):
+        if direction == 'up' and action == 'pressed':
+            self.paddle_up_pressed()
+        elif direction == 'up' and action == 'released':
+            self.paddle_up_released()
+        elif direction == 'down' and action == 'pressed':
+            self.paddle_down_pressed()
+        elif direction == 'down' and action == 'released':
+            self.paddle_down_released()
+
     def paddle_up_pressed(self):
         if not self.up_key_held:
             self.down_key_held = False
@@ -92,7 +102,19 @@ class Paddle:
 
     def paddle_down_released(self):
         self.down_key_held = False
-        self.speed = 0   
+        self.speed = 0
+    
+    def update_paddle(self, table_top, table_bottom):
+        if self.up_key_held and self.y + self.half_height < table_top:
+            self.speed += self.speed_increment
+            self.y += self.speed
+            if self.y + self.half_height > table_top:
+                self.y = table_top - self.half_height
+        if self.down_key_held and self.y - self.half_height > table_bottom:
+            self.speed += self.speed_increment
+            self.y -= self.speed
+            if self.y - self.half_height < table_bottom:
+                self.y = table_bottom + self.half_height
   
 class Match():
     winning_score = 2
@@ -107,3 +129,27 @@ class Match():
         self.paddle_right = Paddle(self.table.right)
         self.score_player1 = 0
         self.score_player2 = 0
+    
+    def check_if_ball_hit_paddle(self):
+        if self.ball.x < self.paddle_left.x:
+            hit_paddle_left = self.ball.check_hit_paddle(self.paddle_left)
+            if not hit_paddle_left:
+                self.score_player2 += 1
+                self.ball = Ball()
+                return False
+        elif self.ball.x > self.paddle_right.x:
+            hit_paddle_right = self.ball.check_hit_paddle(self.paddle_right)
+            if not hit_paddle_right:
+                self.score_player1 += 1
+                del self.ball
+                self.ball = Ball()
+                return False
+        return True
+    
+    def update_ball(self):
+        self.ball.update_position()
+        self.ball.check_hit_table_top_or_bottom(self.table)
+    
+    def update_paddles(self):
+        self.paddle_left.update_paddle(self.table.top, self.table.bottom)
+        self.paddle_right.update_paddle(self.table.top, self.table.bottom)

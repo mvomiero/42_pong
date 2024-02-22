@@ -50,53 +50,20 @@ class PongConsumer(AsyncWebsocketConsumer):
         command = received_data.get('command')
 
         if command == 'move_paddle':
-            await self.update_paddle_position(received_data['direction'], received_data['action'])
+            self.paddle.paddle_keyPress(received_data['direction'], received_data['action'])
 
-    async def update_paddle_position(self, direction, action):
-        if direction == 'up' and action == 'pressed':
-            self.paddle.paddle_up_pressed()
-        elif direction == 'up' and action == 'released':
-            self.paddle.paddle_up_released()
-        elif direction == 'down' and action == 'pressed':
-            self.paddle.paddle_down_pressed()
-        elif direction == 'down' and action == 'released':
-            self.paddle.paddle_down_released()
-
-    def check_if_ball_hit_either_paddle(self, match):
-        if match.ball.x < match.paddle_left.x:
-            hit_paddle_left = match.ball.check_hit_paddle(match.paddle_left)
-            if not hit_paddle_left:
-                match.score_player2 += 1
-                match.ball = Ball()
-                # self.send_to_group(match_info('update', [match.player1_name, match.player2_name], [match.score_player1, match.score_player2]), self.group_name)
-        elif match.ball.x > match.paddle_right.x:
-            hit_paddle_right = match.ball.check_hit_paddle(match.paddle_right)
-            if not hit_paddle_right:
-                match.score_player1 += 1
-                match.ball = Ball()
-                # self.send_to_group(match_info('update', [match.player1_name, match.player2_name], [match.score_player1, match.score_player2]), self.group_name)
-    
-    def move_paddle(self, paddle, table):
-        if paddle.up_key_held and paddle.y + paddle.half_height < table.top:
-            paddle.speed += paddle.speed_increment
-            paddle.y += paddle.speed
-            if paddle.y + paddle.half_height > table.top:
-                paddle.y = table.top - paddle.half_height
-        if paddle.down_key_held and paddle.y - paddle.half_height > table.bottom:
-            paddle.speed += paddle.speed_increment
-            paddle.y -= paddle.speed
-            if paddle.y - paddle.half_height < table.bottom:
-                paddle.y = table.bottom + paddle.half_height
 
     async def game_loop(self):
         print('game loop started')
         match = self.matches[0]
         while match.winning_score > max(match.score_player1, match.score_player2):
-            match.ball.update_position()
-            match.ball.check_hit_table_top_or_bottom(match.table)
-            self.check_if_ball_hit_either_paddle(match)
-            self.move_paddle(match.paddle_left, match.table)
-            self.move_paddle(match.paddle_right, match.table)
+            match.update_ball()
+            if match.check_if_ball_hit_paddle() is False:
+                await self.send_to_group(
+                    match_info('update', [match.player1_name, match.player2_name], [match.score_player1, match.score_player2]), 
+                    self.group_name
+                )
+            match.update_paddles()
             await self.send_to_group(
                 match_data(match.ball, [match.score_player1, match.score_player2], match.paddle_left, match.paddle_right), 
                 self.group_name
@@ -110,9 +77,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.group_name
         )
 
-        await asyncio.sleep(0.5)    # delay to ensure the players receive the 'end' message
-
         # deleting/closing all PongConsumer instances and the match instance
+        await asyncio.sleep(0.5)    # delay to ensure the players receive the 'end' message
         await self.game_finished(3001)
         
 
