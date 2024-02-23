@@ -52,7 +52,6 @@ class Ball:
                 self.speed *= 0.7
             else:
                 self.speed += paddle.speed * 0.3
-            # self.speed = max(self.speed, self.max_speed)
             if self.speed < self.min_speed:
                 self.speed = self.min_speed
             if self.speed > self.max_speed:
@@ -106,16 +105,20 @@ class Paddle:
         self.speed = 0
     
     def update_paddle(self, table_top, table_bottom):
-        if self.up_key_held and self.y + self.half_height < table_top:
-            self.speed += self.speed_increment
-            self.y += self.speed
-            if self.y + self.half_height > table_top:
+        if self.up_key_held:
+            if self.y + self.half_height < table_top:
+                self.speed += self.speed_increment
+                self.y += self.speed
+            else:
                 self.y = table_top - self.half_height
-        if self.down_key_held and self.y - self.half_height > table_bottom:
-            self.speed += self.speed_increment
-            self.y -= self.speed
-            if self.y - self.half_height < table_bottom:
+                self.speed = 0
+        if self.down_key_held:
+            if self.y - self.half_height > table_bottom:
+                self.speed += self.speed_increment
+                self.y -= self.speed
+            else:
                 self.y = table_bottom + self.half_height
+                self.speed = 0
   
 class Match():
     winning_score = 11

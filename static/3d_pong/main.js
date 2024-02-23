@@ -43,17 +43,16 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   var controls;
   var player1, player2;
   var player = 0;
-  var winnerName;
   var char_choice;
   var gameSocket;
-  var game_mode; // "local" or "remote" or "tournament"
   var paddleCam = false;
 
   // variables for message at the end of the game:
   var winMessage = {
     player: undefined,
     game_mode: undefined,
-    ranking: {
+    winner: undefined, // match only
+    ranking: { // tournament only
       1: undefined,
       2: undefined,
       3: undefined,
@@ -85,32 +84,17 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     if (playerName !== '' && playerName.length <= 10) { // Check if name is not empty and has max 10 characters
       document.getElementById('nameInputSection').style.display = 'none';
       document.getElementById('game_board').style.display = 'block';
-
-      // Connect to the websocket
-      // roomCode, connectionString and gameSocket are set as var as we will need to change them later!
       var roomCode = document.getElementById("room_code").value;
-      if (roomCode === "Tournament") {
-        game_mode = "tournament";
-        tournament_stage = "waitingForPlayers";
-      } else if (roomCode === "Match") {
-        game_mode = "remote";
-      }
       winMessage.player = playerName;
       winMessage.game_mode = roomCode;
-      
       char_choice = playerName;
       var connectionString =
         "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
       gameSocket = new WebSocket(connectionString);
       console.log("[WebSocket started] connectionString: ", connectionString);
-
       displayPlayerAndMode(char_choice, roomCode);
       document.getElementById('message_info').innerHTML = "Info: Waiting for opponent to connect...";
-
-      // start the game
       initGame();
-
-      // Set the event handlers
       gameSocket.onmessage = handleWebSocketOpen;
       gameSocket.onclose = handleWebSocketClose;
       gameSocket.onerror = handleWebSocketError;
@@ -132,21 +116,20 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   document.getElementById('submitNameButton').addEventListener('click', submitNameAndStartGame);
   document.getElementById('restartGameButton').addEventListener('click', showNameInput2);
 
-  // Function to check if an element is in the viewport
-  function isInViewport(element) {
-    const rect = element.getBoundingClientRect();
-    return (
-      rect.top >= 0 &&
-      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-    );
-  }
+  // // Function to check if an element is in the viewport
+  // function isInViewport(element) {
+  //   const rect = element.getBoundingClientRect();
+  //   return (
+  //     rect.top >= 0 &&
+  //     rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+  //   );
+  // }
 
   /**************************************************/
   /**************** END NEW PART ********************/
   /**************************************************/
 
   function initGame() {
-    console.log("initGame");
     initCamera();
     initTable();
     createTable();
@@ -368,7 +351,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // DESTRUCTION OF MESHES
 
-  function removeElements() { // not currently called from anywhere
+  function removeElements() {
     removeAndDisposeAndMakeUndefined(ballMesh);
     removeAndDisposeAndMakeUndefined(player1ScoreMesh);
     removeAndDisposeAndMakeUndefined(player2ScoreMesh);
@@ -421,27 +404,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       gameSocket.send(JSON.stringify({command: "move_paddle", direction: "down", action: "released"}));
   }
 
-  // WEBSOCKET CODE
-
-  function sendMatchInfo() {
-    if (player === 0) // needed?
-      return;
-    var matchInfo = {
-      command: "match_info",
-      mode: "end",
-      score: {
-        player1: player1Score,
-        player2: player2Score,
-      },
-      winner: winnerName
-    };
-
-    winMessage.ranking[1] = player1 === winnerName ? player1 : player2;
-    winMessage.ranking[2] = player1 !== winnerName ? player1 : player2;
-    
-    gameSocket.send(JSON.stringify(matchInfo));
-  }
-
   // RECEIVING DATA
 
   function handleWebSocketOpen(event) {
@@ -450,15 +412,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       // console.log("Received data:", data);
 
       if (data.command === "set_player") {
-        console.log("set player", data.player);
         createLeftPaddle();
         renderer.render(scene, camera);
         char_choice = data.player;
       }
 
-      if (data.command === "match_info") {
-        console.log("match_info", data);
-      }
       if (data.command === "match_info") {
         if (data.mode === "start") {
           document.getElementById('message_info').style.display = 'none';
@@ -487,6 +445,20 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         }
       }
 
+      if (data.command === "match_info") {
+        if (data.mode === "end") {
+          winMessage.winner = data.winner
+          removeElements();
+        }
+      }
+
+      if (data.command === "tournament_info") {
+        if (data.mode === "end") {
+          winMessage.ranking = data.playerRanking
+          removeElements();
+        }
+      }
+
       if (data.command === "match_data") {
         ballMesh.position.x = data.ball.x * tableWidth;
         ballMesh.position.y = data.ball.y * tableHeight;
@@ -498,13 +470,13 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           player1Score = data.score.player1;
           removeAndDisposeAndMakeUndefined(player1ScoreMesh);
           createP1ScoreText();
-          setPaddleCamForLeadingPlayer();
+          // setPaddleCamForLeadingPlayer();
         }
         else if (data.score.player2 != player2Score) {
           player2Score = data.score.player2;
           removeAndDisposeAndMakeUndefined(player2ScoreMesh);
           createP2ScoreText();
-          setPaddleCamForLeadingPlayer();
+          // setPaddleCamForLeadingPlayer();
         }
         
         renderer.render(scene, camera);
@@ -517,9 +489,17 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
 
   function displayResultMessage() {
-    console.log("displayResultMessage: ", winMessage.player, winMessage.game_mode, winMessage.ranking);
-    console.log("displayResultMessage: ", winnerName, char_choice, game_mode);
-    if (winMessage.game_mode === "match" || winMessage.game_mode === "tournament") {
+    if (winMessage.game_mode === "match") {
+      if (winMessage.player === winMessage.winner) {
+        document.getElementById('img_win').style.display = "block";
+        document.getElementById('closing_message').innerHTML = "🌴🎉 Congratulations, you won! 🎉🌴";
+      }
+      else {
+        document.getElementById('img_loss').style.display = "block";
+        document.getElementById('closing_message').innerHTML = "👽 Unfortunately, you lost! 👽";
+      }
+    }
+    else if (winMessage.game_mode === "tournament") {
       if (winMessage.player === winMessage.ranking[1]) {
         document.getElementById('img_win').style.display = "block";
         document.getElementById('closing_message').innerHTML = "🌴🎉 Congratulations, you won! 🎉🌴";
@@ -528,11 +508,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         document.getElementById('img_loss').style.display = "block";
         document.getElementById('closing_message').innerHTML = "👽 Unfortunately, you lost! 👽";
       }
-      if (winMessage.game_mode === "tournament") {
-        document.getElementById('closing_message_ranking').style.display = "block";
-        document.getElementById('closing_message_ranking').innerHTML = "Ranking: <br> 1. " + winMessage.ranking[1] + "<br> 2. " + winMessage.ranking[2] + "<br> 3. " + winMessage.ranking[3] + "<br> 4. " + winMessage.ranking[4];
-        document.getElementById('closing_message').innerHTML = winMessage.ranking[1] + " won the tournament!";
-      }
+      document.getElementById('closing_message_ranking').style.display = "block";
+      document.getElementById('closing_message_ranking').innerHTML = "Ranking: <br> 1. " + winMessage.ranking[1] + "<br> 2. " + winMessage.ranking[2] + "<br> 3. " + winMessage.ranking[3] + "<br> 4. " + winMessage.ranking[4];
+      document.getElementById('closing_message').innerHTML = winMessage.ranking[1] + " won the tournament!";
     }
   }
 
@@ -564,6 +542,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         document.getElementById('closing_message').innerHTML = "The room is full.";
       }
       else if (event.code === 4005 || event.code === 4006) {
+        removeElements();
         document.getElementById('closing_message').innerHTML = "The connection has been lost.";
       }
     }, 1000);
