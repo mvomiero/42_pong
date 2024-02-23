@@ -4,6 +4,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from pong.webSocket_msg_create import *
 from pong.match_setup import *
+from pong.tournament_setup import *
 
 class PongConsumer(AsyncWebsocketConsumer):
     game_loop_sleep_time = 0.01
@@ -22,14 +23,8 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Setup match or tournament
         if self.mode == "match":
             await self.setup_match()
-            await self.add_channel_group(self.match.group_name)
         elif self.mode == "tournament":
             await self.setup_tournament()
-
-        # Start game loop if the match is ready
-        if not self.match.player_missing():
-            print('starting game loop')
-            asyncio.ensure_future(self.game_loop())
     
 
     async def setup_match(self):
@@ -39,28 +34,73 @@ class PongConsumer(AsyncWebsocketConsumer):
             match = None
             match_found = False
             for match in self.matches:
-                if match.player_missing():
+                if match.tournament is None and match.player_missing():
                     match_found = True
                     break
             # create new match if no match with missing player is found
             if match_found is False:
-                match = Match()
+                match = Match(None)
                 match.group_name = f"match_{id(match)}"
                 self.matches.add(match)
-            
-        # add the player to the match
-        match.add_player(self.player, self)
+        
+            # add the player to the match
+            match.add_player(self.player, self)
 
         # save the match and paddle (of self) instance
         self.match = match
         self.paddle = self.match.get_paddle(self.player)
 
+        # add the player to the match's channel group
+        await self.add_channel_group(self.match.group_name)
+
+        # Start game loop if the match is ready
+        if not self.match.player_missing():
+            print('[remote match] starting game loop')
+            asyncio.ensure_future(self.game_loop())
+
 
     async def setup_tournament(self):
 
         async with self.tournaments_lock:
-            pass
+            #find a tournament with a missing player
+            tournament = None
+            tournament_found = False
+            for tournament in self.tournaments:
+                if tournament.player_missing():
+                    tournament_found = True
+                    break
+            # create new tournament if no tournament with missing player is found
+            if tournament_found is False:
+                tournament = Tournament()
+                tournament.group_name = f"tournament_{id(tournament)}"
+                self.tournaments.add(tournament)
         
+            # add the player to the tournament
+            tournament.add_player(self)
+
+        # save the tournament instance
+        self.tn = tournament
+
+        # add the player to the match's tournament's channel group
+        await self.add_channel_group(self.match.group_name)
+        await self.add_channel_group(self.tn.group_name)
+
+        print(f'added player: {self.player} to tournament: {self.tn.group_name} & match: {self.match.group_name}')
+        print(f'number of player in tournament: {len(self.tn.consumer_instances)}')
+        
+        # Start game loop (semi-finals) if the tournament is ready
+        if not self.tn.player_missing():
+            await self.send_to_group(
+                tournament_info('start', self.tn.semi1, self.tn.semi2),
+                self.tn.group_name
+            )
+            
+            print('[remote tournament] starting game loop')
+            consumer_semi1 = self.tn.semi1.consumer_instances[1]
+            consumer_semi2 = self.tn.semi2.consumer_instances[1]
+            asyncio.ensure_future(consumer_semi1.game_loop())
+            asyncio.ensure_future(consumer_semi2.game_loop())
+
 
     async def disconnect(self, close_code):
         # check if self.match is in self.matches
@@ -104,9 +144,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             await asyncio.sleep(self.game_loop_sleep_time)
         
         # send match_info 'end' to the players
-        winner = match.player1_name if match.score_player1 > match.score_player2 else match.player2_name
         await self.send_to_group(
-            match_info('end', [match.player1_name, match.player2_name], [match.score_player1, match.score_player2], winner), 
+            match_info('end', [match.player1_name, match.player2_name], [match.score_player1, match.score_player2], match.get_winner()), 
             self.match.group_name
         )
 
@@ -161,6 +200,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         })
 
     async def send_to_group(self, data, group_name):
+        print(f'sending to group: {group_name}, data: {data}')
         # Send message to the player's group
         await self.channel_layer.group_send(
             group_name,

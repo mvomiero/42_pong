@@ -60,14 +60,14 @@ def tournament_info(mode, matchSemi1=None, matchSemi2=None, matchFinal=None, pla
         'playerRanking': {},
     }
     if matchSemi1 is not None:
-        list['matchSemi1']['player1'] = matchSemi1[0] if len(matchSemi1) > 0 else None
-        list['matchSemi1']['player2'] = matchSemi1[1] if len(matchSemi1) > 0 else None
+        list['matchSemi1']['player1'] = matchSemi1.player1_name
+        list['matchSemi1']['player2'] = matchSemi1.player2_name
     if matchSemi2 is not None:
-        list['matchSemi2']['player1'] = matchSemi2[0] if len(matchSemi2) > 0 else None
-        list['matchSemi2']['player2'] = matchSemi2[1] if len(matchSemi2) > 0 else None
+        list['matchSemi2']['player1'] = matchSemi2.player1_name
+        list['matchSemi2']['player2'] = matchSemi2.player2_name
     if matchFinal is not None:
-        list['matchFinal']['player1'] = matchFinal[0] if len(matchFinal) > 0 else None
-        list['matchFinal']['player2'] = matchFinal[1] if len(matchFinal) > 1 else None
+        list['matchFinal']['player1'] = matchFinal.player1_name
+        list['matchFinal']['player2'] = matchFinal.player2_name
     if playerRanking is not None and len(playerRanking) >= 4:
         list['playerRanking']['firstPosition'] = playerRanking[0]
         list['playerRanking']['secondPosition'] = playerRanking[1]

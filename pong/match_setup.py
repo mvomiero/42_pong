@@ -123,7 +123,7 @@ class Paddle:
 class Match():
     winning_score = 11
 
-    def __init__(self):
+    def __init__(self, tournament):
         self.consumer_instances = []
         self.player1_name = None
         self.player2_name = None
@@ -133,7 +133,7 @@ class Match():
         self.paddle_right = Paddle(self.table.right)
         self.score_player1 = 0
         self.score_player2 = 0
-        self.tournament = None
+        self.tournament = tournament
         self.player_quit = False
         self.group_name = None
         self.lock = asyncio.Lock()
@@ -144,10 +144,9 @@ class Match():
     def add_player(self, player_name, player_instance):
         if self.player1_name is None:
             self.player1_name = player_name
-            self.consumer_instances.append(player_instance)
         else:
             self.player2_name = player_name
-            self.consumer_instances.append(player_instance)
+        self.consumer_instances.append(player_instance)
 
     def get_paddle(self, player_name):
         if self.player1_name == player_name:
@@ -156,6 +155,22 @@ class Match():
             return self.paddle_right
         else:
             return None
+    
+    def get_finalRank(self):
+        if self.score_player1 < self.winning_score and self.score_player2 < self.winning_score:
+            return []
+        if self.score_player1 > self.score_player2:
+            return [self.player1_name, self.player2_name]
+        else:
+            return [self.player2_name, self.player1_name]
+    
+    def get_winner(self):
+        if self.score_player1 < self.winning_score and self.score_player2 < self.winning_score:
+            return None
+        if self.score_player1 > self.score_player2:
+            return self.player1_name
+        else:
+            return self.player2_name
 
     def check_if_ball_hit_paddle(self):
         if self.ball.x < self.paddle_left.x:
