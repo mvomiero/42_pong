@@ -409,7 +409,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function handleWebSocketOpen(event) {
     try {
       var data = JSON.parse(event.data);
-      console.log("Received data:", data);
+      if (data.command != "match_data")
+        console.log("Received data:", data);
 
       if (data.command === "set_player") {
         createLeftPaddle();

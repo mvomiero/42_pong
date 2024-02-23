@@ -56,7 +56,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Start game loop if the match is ready
         if not self.match.player_missing():
             print('[remote match] starting game loop')
-            asyncio.ensure_future(self.game_loop())
+            asyncio.ensure_future(self.game_loop(self.match))
 
 
     async def setup_tournament(self):
@@ -82,32 +82,21 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.tn = tournament
 
         # add the player to the match's tournament's channel group
+        print(f"Adding player {self.player} to match {self.match.group_name}")
         await self.add_channel_group(self.match.group_name)
         await self.add_channel_group(self.tn.group_name)
 
-        print(f'added player: {self.player} to tournament: {self.tn.group_name} & match: {self.match.group_name}')
-        print(f'number of player in tournament: {len(self.tn.consumer_instances)}')
-        
         # Start game loop (semi-finals) if the tournament is ready
         if not self.tn.player_missing():
-            await self.send_to_group(
-                tournament_info('start', self.tn.semi1, self.tn.semi2),
-                self.tn.group_name
-            )
+            asyncio.ensure_future(self.tournament_loop(self.tn))
             
-            print('[remote tournament] starting game loop')
-            consumer_semi1 = self.tn.semi1.consumer_instances[1]
-            consumer_semi2 = self.tn.semi2.consumer_instances[1]
-            asyncio.ensure_future(consumer_semi1.game_loop())
-            asyncio.ensure_future(consumer_semi2.game_loop())
-
-
+            
     async def disconnect(self, close_code):
         # check if self.match is in self.matches
         if hasattr(self, 'match') and isinstance(self.match, Match) and self.match in self.matches:
             self.match.player_quit = True
             await asyncio.sleep(self.game_loop_sleep_time * 2)  # delay to ensure the game_loop has finished
-            await self.game_finished(4005)
+            await self.game_clear(4005)
         
 
     async def receive(self, text_data):
@@ -119,8 +108,54 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.paddle.paddle_keyPress(received_data['direction'], received_data['action'])
 
 
-    async def game_loop(self):
-        match = self.match
+    async def tournament_loop(self, tournament):
+        
+        await self.send_to_group(
+            tournament_info('start', self.tn.semi1, self.tn.semi2),
+            self.tn.group_name
+        )
+        
+        # start semi-finals
+        print('[remote tournament] starting game loop')
+        consumer_semi1 = self.tn.semi1.consumer_instances[1]
+        consumer_semi2 = self.tn.semi2.consumer_instances[1]
+        asyncio.ensure_future(consumer_semi1.game_loop(consumer_semi1.match))
+        asyncio.ensure_future(consumer_semi2.game_loop(consumer_semi2.match))
+
+        while not tournament.finished:
+            if tournament.semi1.finished and tournament.semi2.finished and tournament.final is None:
+                tournament.set_final()
+                for consumer in tournament.consumer_instances:
+                    await self.add_channel_group(tournament.final.group_name)
+
+                await self.send_to_group(
+                    tournament_info('update', tournament.semi1, tournament.semi2, tournament.final),
+                    self.tn.group_name
+                )
+                print('[remote tournament] starting final game loop')
+                consumer_final = tournament.final.consumer_instances[1]
+                for consumer in tournament.consumer_instances:
+                    print(f'match_id: {id(consumer.match)}')
+                asyncio.ensure_future(consumer_final.game_loop(consumer_final.match))
+            if tournament.final is not None and tournament.final.finished:
+                print('[remote tournament] tournament finished')
+                tournament.finished = True
+            if tournament.player_quit:
+                return
+            await asyncio.sleep(1)
+
+        # send tournament_info 'end' to the players
+        await self.send_to_group(
+            tournament_info('end', tournament.semi1, tournament.semi2, tournament.final, tournament.get_finalRank()),
+            self.tn.group_name
+        )
+        await asyncio.sleep(0.5)    # delay to ensure the players receive the 'end' message
+
+        # delete/close all PongConsumer and Match instances and the Tournament instance
+        await self.tournament_clear(3001)
+
+
+    async def game_loop(self, match):
 
         await self.send_to_group(
             match_info('start', [match.player1_name, match.player2_name]), 
@@ -143,18 +178,22 @@ class PongConsumer(AsyncWebsocketConsumer):
             )
             await asyncio.sleep(self.game_loop_sleep_time)
         
+        if not match.player_quit:
+            match.finished = True
+
         # send match_info 'end' to the players
         await self.send_to_group(
             match_info('end', [match.player1_name, match.player2_name], [match.score_player1, match.score_player2], match.get_winner()), 
             self.match.group_name
         )
-
-        # deleting/closing all PongConsumer instances and the match instance
         await asyncio.sleep(0.5)    # delay to ensure the players receive the 'end' message
-        await self.game_finished(3001)
+
+        # in case of remote-match: delete/close all PongConsumer instances and the match instance
+        if self.mode == "match":
+            await self.game_clear(3001)
         
 
-    async def game_finished(self, closing_code=None):
+    async def game_clear(self, closing_code=None):
         i_matches = 0
         match = self.match
         # delete all PongConsumer instances in the match
@@ -200,7 +239,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         })
 
     async def send_to_group(self, data, group_name):
-        print(f'sending to group: {group_name}, data: {data}')
         # Send message to the player's group
         await self.channel_layer.group_send(
             group_name,

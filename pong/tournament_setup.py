@@ -9,6 +9,7 @@ class Tournament():
         self.semi2 = None
         self.final = None
         self.player_quit = False
+        self.finished = False
         self.group_name = None
         self.lock = asyncio.Lock()
 
@@ -23,7 +24,7 @@ class Tournament():
         # add the player to the match
         match.add_player(consumer.player, consumer)
 
-        # save the match and paddle (of self) instance
+        # save the match and paddle instance
         consumer.match = match
         consumer.paddle = match.get_paddle(consumer.player)
     
@@ -42,6 +43,34 @@ class Tournament():
             match = self.semi2
         
         return match
+    
+    def set_final(self):
+        # get the winners of the semi-finals
+        winner1_name = self.semi1.get_winner()
+        winner2_name = self.semi2.get_winner()
+        for consumer in self.consumer_instances:
+            if consumer.player == winner1_name:
+                player1 = consumer
+            elif consumer.player == winner2_name:
+                player2 = consumer
+            
+        # create the final match
+        match = Match(self)
+        match.group_name = f"match_{id(match)}"
+        self.final = match
+
+        # add the players to the match
+        match.add_player(player1.player, player1)
+        match.add_player(player2.player, player2)
+
+        # save the match and paddle instance
+        for consumer in self.consumer_instances:
+            consumer.match = match
+            if not (consumer.player == winner1_name or consumer.player == winner2_name):
+                consumer.paddle = None
+        player1.paddle = match.get_paddle(player1.player)
+        player2.paddle = match.get_paddle(player2.player)
+        
 
     def get_finalRank(self):
         if self.final is None or self.semi1 is None or self.semi2 is None:

@@ -121,7 +121,7 @@ class Paddle:
                 self.speed = 0
   
 class Match():
-    winning_score = 11
+    winning_score = 2
 
     def __init__(self, tournament):
         self.consumer_instances = []
@@ -135,6 +135,7 @@ class Match():
         self.score_player2 = 0
         self.tournament = tournament
         self.player_quit = False
+        self.finished = False
         self.group_name = None
         self.lock = asyncio.Lock()
     
