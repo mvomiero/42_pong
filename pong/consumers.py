@@ -1,4 +1,3 @@
-# modified x, y, z so 0, 0, 0 is the centre and range is now from -0.5 to 0.5
 
 import json, asyncio
 from asgiref.sync import async_to_sync
@@ -10,43 +9,59 @@ class PongConsumer(AsyncWebsocketConsumer):
     game_loop_sleep_time = 0.01
     matches = set()  # Store match instances in a set
     matches_lock = asyncio.Lock()
+    tournaments = set()  # Store tournament instances in a set
+    tournaments_lock = asyncio.Lock()
 
     async def connect(self):
+        self.mode = self.scope['url_route']['kwargs']['game_mode']
         self.player = self.scope['url_route']['kwargs']['player']
         
         await self.accept()
         await self.send_to_self(set_player(self.player))
 
-        # find a match for the player and add the player
-        async with self.matches_lock:
-            match = None
-            match_found = False
-            for match in self.matches:
-                if match.player_missing():
-                    match_found = True
-                    break
-            if match_found is False:
-                match = Match()
-                self.matches.add(match)
-            
-            print(f'adding player {self.player} to match {match}')
-            self.match = match
-            self.match.add_player(self.player, self)
-            self.paddle = self.match.get_paddle(self.player)
-
-        # Set group_name and join the group
-        self.group_name = f"match_{id(self.match)}"
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name
-        )
+        # Setup match or tournament
+        if self.mode == "match":
+            await self.setup_match()
+            await self.add_channel_group(self.match.group_name)
+        elif self.mode == "tournament":
+            await self.setup_tournament()
 
         # Start game loop if the match is ready
         if not self.match.player_missing():
             print('starting game loop')
             asyncio.ensure_future(self.game_loop())
     
+
+    async def setup_match(self):
         
+        async with self.matches_lock:
+            # find a match with a missing player
+            match = None
+            match_found = False
+            for match in self.matches:
+                if match.player_missing():
+                    match_found = True
+                    break
+            # create new match if no match with missing player is found
+            if match_found is False:
+                match = Match()
+                match.group_name = f"match_{id(match)}"
+                self.matches.add(match)
+            
+        # add the player to the match
+        match.add_player(self.player, self)
+
+        # save the match and paddle (of self) instance
+        self.match = match
+        self.paddle = self.match.get_paddle(self.player)
+
+
+    async def setup_tournament(self):
+
+        async with self.tournaments_lock:
+            pass
+        
+
     async def disconnect(self, close_code):
         # check if self.match is in self.matches
         if hasattr(self, 'match') and isinstance(self.match, Match) and self.match in self.matches:
@@ -69,7 +84,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         await self.send_to_group(
             match_info('start', [match.player1_name, match.player2_name]), 
-            self.group_name
+            self.match.group_name
         )
         
         while match.winning_score > max(match.score_player1, match.score_player2):
@@ -77,14 +92,14 @@ class PongConsumer(AsyncWebsocketConsumer):
             if match.check_if_ball_hit_paddle() is False:
                 await self.send_to_group(
                     match_info('update', [match.player1_name, match.player2_name], [match.score_player1, match.score_player2]), 
-                    self.group_name
+                    self.match.group_name
                 )
             match.update_paddles()
-            if match.player_quit == True:
+            if match.player_quit is True:
                 return
             await self.send_to_group(
                 match_data(match.ball, [match.score_player1, match.score_player2], match.paddle_left, match.paddle_right), 
-                self.group_name
+                self.match.group_name
             )
             await asyncio.sleep(self.game_loop_sleep_time)
         
@@ -92,7 +107,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         winner = match.player1_name if match.score_player1 > match.score_player2 else match.player2_name
         await self.send_to_group(
             match_info('end', [match.player1_name, match.player2_name], [match.score_player1, match.score_player2], winner), 
-            self.group_name
+            self.match.group_name
         )
 
         # deleting/closing all PongConsumer instances and the match instance
@@ -119,13 +134,13 @@ class PongConsumer(AsyncWebsocketConsumer):
         
         # Remove the consumer instance from the matches list
         await consumer.channel_layer.group_discard(
-            consumer.group_name,
+            consumer.match.group_name,
             consumer.channel_name
         )
 
         # delete group if it's empty
-        if consumer.group_name in channel_groups_copy and not channel_groups_copy[consumer.group_name]:
-            del channel_groups_copy[consumer.group_name]
+        if consumer.match.group_name in channel_groups_copy and not channel_groups_copy[consumer.match.group_name]:
+            del channel_groups_copy[consumer.match.group_name]
 
         # Close the WebSocket connection:
         await consumer.close(closing_code)
@@ -133,6 +148,11 @@ class PongConsumer(AsyncWebsocketConsumer):
         # delete the consumer instance
         del consumer
 
+    async def add_channel_group(self, group_name):
+        await self.channel_layer.group_add(
+            group_name,
+            self.channel_name
+        )
 
     async def send_to_self(self, data):
         await self.channel_layer.send(self.channel_name, {

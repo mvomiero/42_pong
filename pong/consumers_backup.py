@@ -104,6 +104,29 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
                     #     'paddleLeft':  ::Paddle,  # first instance of PongConsumer paddle
                     #     'paddleRight': ::Paddle,  # second instance of PongConsumer paddle
                     # },
+    
+    set_tournaments = {}  # Dictionary to store tournaments and their matches
+                # set_tournaments = {
+                    # 'id1': {
+                    #     'players':     ['player1', 'player2', 'player3', 'player4'],
+                    #     'matchesSemi': ['match1', 'match2'],
+                    #     'matchFinal':  ['match3'],
+                    #     'group_name':  ['tournament_1'],
+                    #     'startTime':   <timestamp>,
+                    #     'endTime':     None,          # None if not started yet
+                    #     'finished':    [False],
+                    #     'lock':        asyncio.Lock(),
+                    # },
+                    # 'id2': {
+                    #     'players':     ['player5', 'player6'],
+                    #     'matchesSemi': [None, None],
+                    #     'matchFinal':  [None],
+                    #     'group_name':  ['tournament_2'],
+                    #     'startTime':   <timestamp>,
+                    #     'endTime':     <timestamp>,
+                    #     'finished':    [True],
+                    #     'lock':        asyncio.Lock(),
+                    # },
 
     # ************************************************************ #
     # *********** ESTABLISH NEW WEBSOCKET CONNECTION ************* #

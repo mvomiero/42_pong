@@ -130,7 +130,9 @@ class Match():
         self.paddle_right = Paddle(self.table.right)
         self.score_player1 = 0
         self.score_player2 = 0
+        self.tournament = None
         self.player_quit = False
+        self.group_name = None
         self.lock = asyncio.Lock()
     
     def player_missing(self):
