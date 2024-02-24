@@ -85,7 +85,7 @@ def error_disconnection(request):
 #     durations (e.g. gdur) = number (e.g. 10)
 def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
-        gend = (pytz.timezone('UTC')).localize(gend)
+        gend = (pytz.timezone('Europe/Paris')).localize(gend)
         game_data = GameData(
             player1_name=p1n,
             player1_points=p1s,
@@ -104,9 +104,8 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
 def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur):
-    # tend = (pytz.timezone('UTC')).localize(tend)
     hash = '#hash'
-    tend = gend = (pytz.timezone('UTC')).localize(tend)
+    tend = (pytz.timezone('Europe/Paris')).localize(tend)
     tournament_data = TournamentData(
         match_id_semi_1=matchIdSemi1,
         match_id_semi_2=matchIdSemi2,
