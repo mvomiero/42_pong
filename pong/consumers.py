@@ -1,4 +1,4 @@
-import gc
+
 import json, asyncio
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -75,6 +75,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             if tournament_found is False:
                 tournament = Tournament()
                 tournament.group_name = f"tournament_{id(tournament)}"
+                print(f'tournament.group_name: {tournament.group_name}')
                 self.tournaments.add(tournament)
         
             # add the player to the tournament
@@ -82,6 +83,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         # save the tournament instance
         self.tn = tournament
+        print(f'tn.group_name: {self.tn.group_name}')
 
         # add the player to the match's tournament's channel group
         await self.add_channel_group(self.match.group_name)
@@ -208,9 +210,9 @@ class PongConsumer(AsyncWebsocketConsumer):
             tournament.clear_tournament()
 
             # delete the tournament instance
-            if self.tn in self.tournaments:
+            if tournament in self.tournaments:
                 self.tournaments.discard(tournament)
-
+        
 
     async def game_clear(self, match, closing_code=None):
         # delete all PongConsumer instances in the match
@@ -222,7 +224,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             match.clear_match()
 
             # delete the match instance
-            if self.match in self.matches:
+            if match in self.matches:
                 self.matches.discard(match)
         
 
