@@ -82,7 +82,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.tn = tournament
 
         # add the player to the match's tournament's channel group
-        print(f"Adding player {self.player} to match {self.match.group_name}")
         await self.add_channel_group(self.match.group_name)
         await self.add_channel_group(self.tn.group_name)
 
@@ -104,7 +103,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         # print(f'data received: {received_data}')
         command = received_data.get('command')
 
-        if command and command == 'move_paddle':
+        if command and command == 'move_paddle' and self.paddle is not None:
             self.paddle.paddle_keyPress(received_data['direction'], received_data['action'])
 
 
@@ -123,25 +122,26 @@ class PongConsumer(AsyncWebsocketConsumer):
         asyncio.ensure_future(consumer_semi2.game_loop(consumer_semi2.match))
 
         while not tournament.finished:
+            
             if tournament.semi1.finished and tournament.semi2.finished and tournament.final is None:
                 tournament.set_final()
                 for consumer in tournament.consumer_instances:
-                    await self.add_channel_group(tournament.final.group_name)
-
+                    await consumer.add_channel_group(tournament.final.group_name)
                 await self.send_to_group(
                     tournament_info('update', tournament.semi1, tournament.semi2, tournament.final),
                     self.tn.group_name
                 )
                 print('[remote tournament] starting final game loop')
                 consumer_final = tournament.final.consumer_instances[1]
-                for consumer in tournament.consumer_instances:
-                    print(f'match_id: {id(consumer.match)}')
                 asyncio.ensure_future(consumer_final.game_loop(consumer_final.match))
+            
             if tournament.final is not None and tournament.final.finished:
                 print('[remote tournament] tournament finished')
                 tournament.finished = True
+            
             if tournament.player_quit:
                 return
+            
             await asyncio.sleep(1)
 
         # send tournament_info 'end' to the players
@@ -191,7 +191,11 @@ class PongConsumer(AsyncWebsocketConsumer):
         # in case of remote-match: delete/close all PongConsumer instances and the match instance
         if self.mode == "match":
             await self.game_clear(3001)
-        
+
+
+    async def tournament_clear(self, closing_code=None):
+        pass
+
 
     async def game_clear(self, closing_code=None):
         i_matches = 0
