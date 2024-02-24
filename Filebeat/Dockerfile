@@ -20,5 +20,3 @@ RUN mkdir /logs
 RUN mkdir /etc/filebeat/ssl
 
 CMD ["filebeat", "-e", "-c", "/etc/filebeat/filebeat.yml"]
-
-#CMD ["tail", "-f", "/dev/null"]

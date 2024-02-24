@@ -22,7 +22,7 @@ filebeat.inputs:
 - type: log
 
   # Unique ID among all inputs, an ID is required.
-  id: my-log-id
+  id: log-id
 
   # Change to true to enable this input configuration.
   enabled: true
@@ -152,16 +152,6 @@ setup.kibana:
 output.logstash:
   # The Logstash hosts
   hosts: ["logstash:5044"]
-
-  # Optional SSL. By default is off.
-  # List of root certificates for HTTPS server verifications
-  #protocol: "https"
-  #ssl.certificate_authorities: ["/etc/filebeat/ssl/ca_cert.crt"]
-  # Certificate for SSL client authentication
-  #ssl.certificate: "/etc/filebeat/ssl/filebeat_cert_signed.crt"
-
-  # Client Certificate Key
-  #ssl.key: "/etc/filebeat/ssl/filebeat_key.pem"
 
 # ================================= Processors =================================
 processors:

@@ -13,8 +13,8 @@ RUN pip3 install -r requirements.txt --break-system-packages \
     && pip install psycopg2
 RUN pip install pytz -r requirements.txt
 RUN mkdir logs
-COPY ./certs/10.15.205.2-key.pem ./certs/10.15.205.2-key.pem
-COPY ./certs/10.15.205.2-cert.pem ./certs/10.15.205.2-cert.pem
+COPY ./certs/127.0.0.1-key.pem ./certs/127.0.0.1-key.pem
+COPY ./certs/127.0.0.1-cert.pem ./certs/127.0.0.1-cert.pem
 RUN django-admin startproject transcendence
 WORKDIR /transcendence
 RUN python manage.py startapp pong
