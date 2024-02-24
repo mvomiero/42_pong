@@ -570,4 +570,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     document.getElementById('closing_message_ranking').style.display = 'none';
   });
 
+  document.getElementById("refreshLink").addEventListener("click", function () {
+    event.preventDefault(); // Prevent the default behavior of the link
+    location.reload(); // Reload the page
+  });
+
 });
