@@ -14,6 +14,8 @@ from itertools import groupby
 from operator import itemgetter
 from django.db.models import Subquery, OuterRef
 
+from pong.match_setup import Match  # NEW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 def index(request):
 	return render(request, "pong/index.html")
 
@@ -101,17 +103,8 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     games (e.g. match['endTime']) = floating point number / POSIX timestamp (e.g. time.time())
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
-def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur):
-    gend = datetime.fromtimestamp(semiMatch1['endTime'])
-    gdur = semiMatch1['endTime'] - semiMatch1['startTime']
-    matchIdSemi1 = add_game_data(semiMatch1['players'][0], semiMatch1['score'][0], semiMatch1['players'][1], semiMatch1['score'][1], gend, gdur, True)
-    gend = datetime.fromtimestamp(semiMatch2['endTime'])
-    gdur = semiMatch2['endTime'] - semiMatch2['startTime']
-    matchIdSemi2 = add_game_data(semiMatch2['players'][0], semiMatch2['score'][0], semiMatch2['players'][1], semiMatch2['score'][1], gend, gdur, True)
-    gend = datetime.fromtimestamp(finalMatch['endTime'])
-    gdur = finalMatch['endTime'] - finalMatch['startTime']
-    matchIdFinal = add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
-    tend = (pytz.timezone('UTC')).localize(tend)
+def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur):
+    # tend = (pytz.timezone('UTC')).localize(tend)
     hash = '#hash'
     tournament_data = TournamentData(
         match_id_semi_1=matchIdSemi1,
@@ -123,7 +116,7 @@ def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, t
         blockchain_hash=hash
     )
     tournament_data.save()
-
+    
 
 # NEW FOR DASHBOARD:
     

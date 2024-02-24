@@ -1,6 +1,7 @@
 
 import random, math
 import asyncio
+import time
 
 class Table:
     def __init__(self):
@@ -121,7 +122,7 @@ class Paddle:
                 self.speed = 0
   
 class Match():
-    winning_score = 10
+    winning_score = 1
 
     def __init__(self, tournament):
         self.consumer_instances = []
@@ -133,6 +134,8 @@ class Match():
         self.paddle_right = Paddle(self.table.right)
         self.score_player1 = 0
         self.score_player2 = 0
+        self.start_time = None
+        self.end_time = None
         self.tournament = tournament
         self.player_quit = False
         self.finished = False
@@ -149,6 +152,12 @@ class Match():
         self.player1_name = None
         self.player2_name = None
         self.group_name = None
+
+    def set_start_time(self):
+        self.start_time = time.time()
+    
+    def set_end_time(self):
+        self.end_time = time.time()
 
     def player_missing(self):
         return self.player1_name is None or self.player2_name is None

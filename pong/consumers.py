@@ -5,6 +5,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from pong.webSocket_msg_create import *
 from pong.match_setup import *
 from pong.tournament_setup import *
+from pong.views import add_game_data, add_tournament_data
+from datetime import datetime
 
 class PongConsumer(AsyncWebsocketConsumer):
     game_loop_sleep_time = 0.01
@@ -116,6 +118,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     async def tournament_loop(self, tournament):
         
+        tournament.set_start_time()
+
         await self.send_to_group(
             tournament_info('start', self.tn.semi1, self.tn.semi2),
             self.tn.group_name
@@ -145,6 +149,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             if tournament.final is not None and tournament.final.finished:
                 print('[remote tournament] tournament finished')
                 tournament.finished = True
+                tournament.set_end_time()
             
             if tournament.player_quit:
                 return
@@ -158,11 +163,14 @@ class PongConsumer(AsyncWebsocketConsumer):
         )
         await asyncio.sleep(0.5)    # delay to ensure the players receive the 'end' message
 
-        # delete/close all PongConsumer and Match instances and the Tournament instance
+        # store tournament in database & delete/close all PongConsumer and Match instances and the Tournament instance
+        await self.store_database_tournament(tournament)
         await self.tournament_clear(tournament, 3002)
 
 
     async def game_loop(self, match):
+
+        match.set_start_time()
 
         await self.send_to_group(
             match_info('start', [match.player1_name, match.player2_name]), 
@@ -187,6 +195,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         
         if not match.player_quit:
             match.finished = True
+            match.set_end_time()
 
         # send match_info 'end' to the players
         await self.send_to_group(
@@ -195,10 +204,34 @@ class PongConsumer(AsyncWebsocketConsumer):
         )
         await asyncio.sleep(0.5)    # delay to ensure the players receive the 'end' message
 
-        # in case of remote-match: delete/close all PongConsumer instances and the match instance
+        # in case of remote-match: store in database and delete/close all PongConsumer instances and the match instance
         if self.mode == "match":
+            await self.store_database_match(match)
             await self.game_clear(match, 3001)
 
+
+    async def store_database_tournament(self, tournament):
+        match_id_semi1 = await self.store_database_match(tournament.semi1)
+        match_id_semi2 = await self.store_database_match(tournament.semi2)
+        match_id_final = await self.store_database_match(tournament.final)
+        playersRank = tournament.get_finalRank()
+        tend = datetime.fromtimestamp(tournament.end_time)
+        tdur = tournament.end_time - tournament.start_time
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, lambda: add_tournament_data(match_id_semi1, match_id_semi2, match_id_final, playersRank, tend, tdur))
+        
+
+    async def store_database_match(self, match):
+        p1n = match.player1_name
+        p2n = match.player2_name
+        p1s = match.score_player1
+        p2s = match.score_player2
+        gend = datetime.fromtimestamp(match.end_time)
+        gdur = match.end_time - match.start_time
+        itg = False if match.tournament is None else True
+        loop = asyncio.get_event_loop()
+        match_id = await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
+        return match_id
 
     async def tournament_clear(self, tournament, closing_code=None):
         # delete all PongConsumer instances in the tournament-matches

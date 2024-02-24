@@ -1,6 +1,7 @@
 
 import asyncio
 from pong.match_setup import Match
+import time
 
 class Tournament():
     def __init__(self):
@@ -8,6 +9,8 @@ class Tournament():
         self.semi1 = None
         self.semi2 = None
         self.final = None
+        self.start_time = None
+        self.end_time = None
         self.player_quit = False
         self.finished = False
         self.group_name = None
@@ -22,6 +25,12 @@ class Tournament():
         self.semi2 = None
         self.final = None
         self.group_name = None
+
+    def set_start_time(self):
+        self.start_time = time.time()
+    
+    def set_end_time(self):
+        self.end_time = time.time()
 
     def player_missing(self):
         return len(self.consumer_instances) < 4
