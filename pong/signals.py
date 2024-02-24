@@ -91,9 +91,17 @@ def generate_random_tournament(database_end, time_diff, size_TournamentData):
     tdur = finalMatch['endTime'] - min(semiMatch1['startTime'], semiMatch2['startTime'])
     tend = datetime.fromtimestamp(finalMatch['endTime'])
 
-    return semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur
+    # store matches in the database
+    match_id_semi1 = add_game_data(*match_to_params(semiMatch1))
+    match_id_semi2 = add_game_data(*match_to_params(semiMatch2))
+    match_id_final = add_game_data(*match_to_params(finalMatch))
+
+    return match_id_semi1, match_id_semi2, match_id_final, playersRank, tend, tdur
+    # return semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur
 
 
 def match_to_list(p1n, p1s, p2n, p2s, gend, gdur, itg):
     return {'players': [p1n, p2n], 'score': [p1s, p2s], 'endTime': gend, 'startTime': gend - gdur, 'is_tournament_game': itg}
 
+def match_to_params(match):
+    return match['players'][0], match['score'][0], match['players'][1], match['score'][1], match['endTime'], match['endTime'] - match['startTime'], match['is_tournament_game']
