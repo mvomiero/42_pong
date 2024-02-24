@@ -13,9 +13,11 @@ import json
 from itertools import groupby
 from operator import itemgetter
 from django.db.models import Subquery, OuterRef
+
 from .deploy_sepo import deploy_sepo
 from asgiref.sync import sync_to_async
 import random
+
 
 def index(request):
 	return render(request, "pong/index.html")
@@ -84,9 +86,10 @@ def error_disconnection(request):
 # format dates:
 #     games (gend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. gdur) = number (e.g. 10)
-async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
+def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
-        gend = (pytz.timezone('Europe/Paris')).localize(gend)
+        game_result = p1n + ", " + str(p1s) + ", " + p2n + ", " + str(p2s)
+        gend = (pytz.timezone('UTC')).localize(gend)
         game_data = GameData(
             player1_name=p1n,
             player1_points=p1s,
@@ -94,7 +97,7 @@ async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
             player2_points=p2s,
             game_end_timestamp=gend,
             game_duration_secs=gdur,
-            is_tournament_game=itg
+            is_tournament_game=itg,
         )
         try:
             game_data.save()
@@ -106,25 +109,34 @@ async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     games (e.g. match['endTime']) = floating point number / POSIX timestamp (e.g. time.time())
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
-async def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur):
-    tend = (pytz.timezone('Europe/Paris')).localize(tend)
+async def add_tournament_data(semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur):
+    gend = datetime.fromtimestamp(semiMatch1['endTime'])
+    gdur = semiMatch1['endTime'] - semiMatch1['startTime']
+    matchIdSemi1 = add_game_data(semiMatch1['players'][0], semiMatch1['score'][0], semiMatch1['players'][1], semiMatch1['score'][1], gend, gdur, True)
+    gend = datetime.fromtimestamp(semiMatch2['endTime'])
+    gdur = semiMatch2['endTime'] - semiMatch2['startTime']
+    matchIdSemi2 = add_game_data(semiMatch2['players'][0], semiMatch2['score'][0], semiMatch2['players'][1], semiMatch2['score'][1], gend, gdur, True)
+    gend = datetime.fromtimestamp(finalMatch['endTime'])
+    gdur = finalMatch['endTime'] - finalMatch['startTime']
+    matchIdFinal = add_game_data(finalMatch['players'][0], finalMatch['score'][0], finalMatch['players'][1], finalMatch['score'][1], gend, gdur, True)
+    tend = (pytz.timezone('UTC')).localize(tend)
     tourID = random.randint(0, 9999)
     tour_result = str(tourID) + " " + str(playersRank)
     tx_hash = await deploy_sepo(tour_result)
     tournament_data = TournamentData(
+        tour_id=tourID,
         match_id_semi_1=matchIdSemi1,
         match_id_semi_2=matchIdSemi2,
         match_id_final=matchIdFinal,
         tournament_end_timestamp=tend,
         tournament_duration_secs=tdur,
         player_ranking = playersRank,
-        blockchain_hash=tx_hash
+        blockchain_hash=tx_hash,
     )
     try:
         tournament_data.save()
     except Exception as e:
         print(f"Error saving tournament data: {e}")
-    
 
 # NEW FOR DASHBOARD:
     
@@ -216,6 +228,9 @@ def get_dashboardMatch_data(request):
     # Data for NON tournament games
     game_data = GameData.objects.filter(is_tournament_game=False)
 
+    if not game_data:
+        return JsonResponse({})
+
     """ Chart data: Matches per Day """
     bar_chart_data = chart_entriesPerDay(game_data, 'game_end_timestamp')
     
@@ -249,11 +264,10 @@ def get_dashboardMatch_data(request):
         'minutes': (match_time % 3600) // 60,
         'seconds': (match_time % 3600) % 60
     }
-
     single_match_time = game_data.aggregate(longest_match_time=Max('game_duration_secs')).get('longest_match_time', 0)
     longest_match_time = {
         'minutes': single_match_time // 60,
-        'seconds': single_match_time % 60
+        'seconds': single_match_time % 60,
     }
 
     """ Player with most wins """
@@ -289,21 +303,20 @@ def get_dashboardMatch_data(request):
     for data in combined_data:
         player_name = data['player1_name'] if 'player1_name' in data else data['player2_name']
         player_durations[player_name] = player_durations.get(player_name, 0) + data['total_time']
-    highest_time_player = {
-        'alias': max(player_durations, key=player_durations.get),
-        'time': {
-            'minutes': player_durations[max(player_durations, key=player_durations.get)] // 60,
-            'seconds': player_durations[max(player_durations, key=player_durations.get)] % 60
-        }
+    if player_durations:
+        highest_time_player = {
+            'alias': max(player_durations, key=player_durations.get),
+            'time': {
+                'minutes': player_durations[max(player_durations, key=player_durations.get)] // 60,
+                'seconds': player_durations[max(player_durations, key=player_durations.get)] % 60
+            }
     }
+    # highest_time_player = {}
 
     # Prepare the response and return it as JSON
     response_data = {
-        'barChart1': bar_chart_data,
         'areaChart1': area_chart_data,
-        'lineChart1': line_chart_data,
-        'scatteredChart1': scattered_chart_data,
-        'lineChart2': line_chart_data2,
+        'barChart1': bar_chart_data,
         'cards': {
             'uniquePlayers': nbr_unique_players,
             'nbrMatches': nbr_matches,
@@ -312,6 +325,9 @@ def get_dashboardMatch_data(request):
             'bestPlayer': bestPlayer,
             'highestTimePlayer': highest_time_player
         },
+        'lineChart1': line_chart_data,
+        'lineChart2': line_chart_data2,
+        'scatteredChart1': scattered_chart_data,
     }
     return JsonResponse(response_data)
 
@@ -319,8 +335,11 @@ def get_dashboardMatch_data(request):
 # GET request for dashboard 'Tournament' data
 def get_dashboardTournament_data(request):
     # Data for tournament games
-    game_data = GameData.objects.all().filter(is_tournament_game=True)
+    # game_data = GameData.objects.all().filter(is_tournament_game=True)
     tournament_data = TournamentData.objects.all()
+
+    if not tournament_data:
+        return JsonResponse({})
 
 
     """ Chart data: Tournaments per Day """
@@ -347,14 +366,11 @@ def get_dashboardTournament_data(request):
     # "different Players participated"
     players_query = tournament_data.values_list('player_ranking', flat=True)
     all_players = [player for sublist in players_query for player in sublist]
-    # print(f'all_players={all_players}')
     nbr_unique_players = len(list(set(all_players)))
 
     # "Tournaments played"
     nbr_tournaments = tournament_data.count()
-    print(f'nbr_tournaments={nbr_tournaments}')
 
-    # "Total Tournament Time"
     match_time = tournament_data.aggregate(total_match_time=Sum('tournament_duration_secs')).get('total_match_time', 0)
     total_tournament_time = {
         'hours': match_time // 3600,
@@ -388,8 +404,8 @@ def get_dashboardTournament_data(request):
         for player in data['player_ranking']:
             player_duration[player] = player_duration.get(player, 0) + data['total_time']
     max_player = max(player_duration, key=player_duration.get)
-    print(f'max_player={max_player}')
 
+    highest_time_player = {}
     highest_time_player = {
         'alias': max(player_duration, key=player_duration.get),
         'time': {
@@ -438,14 +454,10 @@ def get_dashboardPlayer_list(request):
 def get_dashboard_data_player(request):
     # Retrieve player alias from POST request
     playerAlias = json.loads(request.body.decode('utf-8')).get('playerAlias')
-    print(f'\n\nplayerAlias={playerAlias}')
 
     # Data for player
     player_matches = GameData.objects.filter(Q(player1_name=playerAlias) | Q(player2_name=playerAlias))
-    print(f'player_matches={player_matches}')
     player_tournaments = TournamentData.objects.filter(Q(player_ranking__icontains=playerAlias))
-    print(f'player_tournaments={player_tournaments}')
-    
 
     """ Data for the Chart """
     player_wins = player_matches.annotate(
@@ -556,5 +568,4 @@ def get_dashboard_data_player(request):
             'shortestMatch': shortest_match,
         },
     }
-    print(f'response_data={response_data}')
     return JsonResponse(response_data)

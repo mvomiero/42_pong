@@ -14,8 +14,8 @@ RUN apt-get install -y kibana
 
 ENV PATH=/usr/share/kibana/bin:$PATH
 
-COPY ./certs/127.0.0.1-key.pem ./certs/127.0.0.1-key.pem
-COPY ./certs/127.0.0.1-cert.pem ./certs/127.0.0.1-cert.pem
+COPY ./certs/10.15.205.2-key.pem ./certs/10.15.205.2-key.pem
+COPY ./certs/10.15.205.2-cert.pem ./certs/10.15.205.2-cert.pem
 COPY ./Kibana/kibana.yml /etc/kibana/kibana.yml
 
 #COPY auto_setup.sh /etc/kibana/auto_setup.sh

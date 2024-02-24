@@ -7,25 +7,15 @@ from datetime import timedelta, datetime
 import time
 import calendar
 import random
-# from asgiref.sync import sync_to_async
-from asgiref.sync import async_to_sync
 import asyncio
-import threading
-from time import sleep
 
 @receiver(post_migrate)
-def on_post_migrate(sender, **kwargs):
-    async_init_database = async_to_sync(initialize_database)
-    async_init_database(sender, **kwargs)
+def initialize_database(sender, **kwargs):
 
-async def initialize_database(sender, **kwargs):
-# @receiver(post_migrate)
-# def initialize_database(sender, **kwargs):
+    GameData.objects.all().delete()
+    TournamentData.objects.all().delete()
 
-    # GameData.objects.all().delete()
-    # TournamentData.objects.all().delete()
-
-    # print(f"Database initialization (nbr objects match: {GameData.objects.count()} | nbr objects tournament: {TournamentData.objects.count()})")
+    print(f"Database initialization (nbr objects match: {GameData.objects.count()} | nbr objects tournament: {TournamentData.objects.count()})")
 
     database_end = time.time()
     my_time = (2023, 11, 1, 0, 0, 0, 2, 305, -1)
@@ -34,25 +24,23 @@ async def initialize_database(sender, **kwargs):
 
     # add entries to have 100 matches in database
     size_GameData = GameData.objects.count()
-    while size_GameData < 2:
-        # asyncio.run_coroutine_threadsafe(add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData)), loop=asyncio.get_event_loop())
-        add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
-        sleep(1)
-        size_GameData += 1
-        #size_GameData = GameData.objects.count()
-    
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    while size_GameData < 0:
+        asyncio.run(add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData)))
+        size_GameData += 1    
+    loop.close()
     
     # add entries to have 10 tournaments in database
     size_TournamentData = TournamentData.objects.count()
-    while size_TournamentData < 1:
-        print(f"Adding tournament {size_TournamentData}")
-        # asyncio.run_coroutine_threadsafe(add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData)), loop=asyncio.get_event_loop())
-        await add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData))
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    while size_TournamentData < 0:
+        asyncio.run(add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData)))
         size_TournamentData += 1
-        #size_TournamentData = TournamentData.objects.count()
+    loop.close()
 
     print(f"After initialization (match objects: {GameData.objects.count()} | tournament objects: {TournamentData.objects.count()})")
-
 
 
 def generate_random_match(database_end, time_diff, is_tournament, size_GameData):
@@ -73,7 +61,7 @@ def generate_random_match(database_end, time_diff, is_tournament, size_GameData)
 
     if not is_tournament:
         gend = datetime.fromtimestamp(gend)
-
+    
     return p1n, p1s, p2n, p2s, gend, gdur, is_tournament
 
 
@@ -106,9 +94,16 @@ def generate_random_tournament(database_end, time_diff, size_TournamentData):
     tdur = finalMatch['endTime'] - min(semiMatch1['startTime'], semiMatch2['startTime'])
     tend = datetime.fromtimestamp(finalMatch['endTime'])
 
-    return semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur
+    # store matches in the database
+    match_id_semi1 = asyncio.run(add_game_data(*match_to_params(semiMatch1)))
+    match_id_semi2 = asyncio.run(add_game_data(*match_to_params(semiMatch2)))
+    match_id_final = asyncio.run(add_game_data(*match_to_params(finalMatch)))
+
+    return match_id_semi1, match_id_semi2, match_id_final, playersRank, tend, tdur
 
 
 def match_to_list(p1n, p1s, p2n, p2s, gend, gdur, itg):
     return {'players': [p1n, p2n], 'score': [p1s, p2s], 'endTime': gend, 'startTime': gend - gdur, 'is_tournament_game': itg}
 
+def match_to_params(match):
+    return match['players'][0], match['score'][0], match['players'][1], match['score'][1], datetime.fromtimestamp(match['endTime']), match['endTime'] - match['startTime'], match['is_tournament_game']
