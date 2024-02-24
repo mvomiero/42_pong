@@ -13,6 +13,16 @@ class Tournament():
         self.group_name = None
         self.lock = asyncio.Lock()
 
+    def clear_tournament(self):
+        self.consumer_instances = []
+        self.semi1.clear_match()
+        self.semi2.clear_match()
+        self.final.clear_match()
+        self.semi1 = None
+        self.semi2 = None
+        self.final = None
+        self.group_name = None
+
     def player_missing(self):
         return len(self.consumer_instances) < 4
     

@@ -1,4 +1,4 @@
-
+import gc
 import json, asyncio
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -8,10 +8,12 @@ from pong.tournament_setup import *
 
 class PongConsumer(AsyncWebsocketConsumer):
     game_loop_sleep_time = 0.01
+    tournament_loop_sleep_time = 1
     matches = set()  # Store match instances in a set
     matches_lock = asyncio.Lock()
     tournaments = set()  # Store tournament instances in a set
     tournaments_lock = asyncio.Lock()
+    channel_groups_lock = asyncio.Lock()
 
     async def connect(self):
         self.mode = self.scope['url_route']['kwargs']['game_mode']
@@ -92,11 +94,14 @@ class PongConsumer(AsyncWebsocketConsumer):
             
     async def disconnect(self, close_code):
         # check if self.match is in self.matches
-        if hasattr(self, 'match') and isinstance(self.match, Match) and self.match in self.matches:
+        if self.mode == "match" and hasattr(self, 'match') and isinstance(self.match, Match):
             self.match.player_quit = True
             await asyncio.sleep(self.game_loop_sleep_time * 2)  # delay to ensure the game_loop has finished
-            await self.game_clear(4005)
-        
+            await self.game_clear(self.match, 4005)
+        elif self.mode == "tournament" and hasattr(self, 'tn') and isinstance(self.tn, Tournament):
+            self.tn.player_quit = True
+            await asyncio.sleep(self.tournament_loop_sleep_time * 2)  # delay to ensure the tournament_loop has finished
+            await self.tournament_clear(self.tn, 4006)
 
     async def receive(self, text_data):
         received_data = json.loads(text_data)
@@ -142,7 +147,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             if tournament.player_quit:
                 return
             
-            await asyncio.sleep(1)
+            await asyncio.sleep(self.tournament_loop_sleep_time)
 
         # send tournament_info 'end' to the players
         await self.send_to_group(
@@ -152,7 +157,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         await asyncio.sleep(0.5)    # delay to ensure the players receive the 'end' message
 
         # delete/close all PongConsumer and Match instances and the Tournament instance
-        await self.tournament_clear(3001)
+        await self.tournament_clear(tournament, 3002)
 
 
     async def game_loop(self, match):
@@ -190,45 +195,65 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         # in case of remote-match: delete/close all PongConsumer instances and the match instance
         if self.mode == "match":
-            await self.game_clear(3001)
+            await self.game_clear(match, 3001)
 
 
-    async def tournament_clear(self, closing_code=None):
-        pass
+    async def tournament_clear(self, tournament, closing_code=None):
+        # delete all PongConsumer instances in the tournament-matches
+        for consumer in tournament.consumer_instances:
+            await consumer.delete_consumer_instance(closing_code)
+
+        if tournament is not None:
+            # delete match instance in tournament
+            tournament.clear_tournament()
+
+            # delete the tournament instance
+            if self.tn in self.tournaments:
+                self.tournaments.discard(tournament)
 
 
-    async def game_clear(self, closing_code=None):
-        i_matches = 0
-        match = self.match
+    async def game_clear(self, match, closing_code=None):
         # delete all PongConsumer instances in the match
         for consumer in match.consumer_instances:
-            await PongConsumer.delete_consumer_instance(consumer, closing_code)
+            await consumer.delete_consumer_instance(closing_code)
         
-        # delete the match instance
-        self.matches.discard(match)
-        del match
+        if match is not None:
+            # delete match instance
+            match.clear_match()
+
+            # delete the match instance
+            if self.match in self.matches:
+                self.matches.discard(match)
         
 
-    @staticmethod
-    async def delete_consumer_instance(consumer, closing_code=None):
-        # copy the channel groups (to delete the group later on if it's empty)
-        channel_groups_copy = consumer.channel_layer.groups.copy()
-        
-        # Remove the consumer instance from the matches list
-        await consumer.channel_layer.group_discard(
-            consumer.match.group_name,
-            consumer.channel_name
-        )
+    async def delete_consumer_instance(self, closing_code=None):
+        async with self.channel_groups_lock:
+            groups_copy = self.channel_layer.groups.copy()
+            groups_to_remove = []
 
-        # delete group if it's empty
-        if consumer.match.group_name in channel_groups_copy and not channel_groups_copy[consumer.match.group_name]:
-            del channel_groups_copy[consumer.match.group_name]
+            # Identify groups to remove
+            for group_name in groups_copy.keys():
+                if self.channel_name in groups_copy.get(group_name, []):
+                    await self.channel_layer.group_discard(
+                        group_name,
+                        self.channel_name
+                    )
+                if not groups_copy.get(group_name, []):
+                    groups_to_remove.append(group_name)
+
+            # Remove the empty groups
+            for group_name in groups_to_remove:
+                del groups_copy[group_name]
 
         # Close the WebSocket connection:
-        await consumer.close(closing_code)
+        await self.close(closing_code)
+
+        # delete match & tournament instances
+        self.tn = None
+        self.match = None
 
         # delete the consumer instance
-        del consumer
+        del self
 
     async def add_channel_group(self, group_name):
         await self.channel_layer.group_add(

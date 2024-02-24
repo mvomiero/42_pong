@@ -121,7 +121,7 @@ class Paddle:
                 self.speed = 0
   
 class Match():
-    winning_score = 2
+    winning_score = 1
 
     def __init__(self, tournament):
         self.consumer_instances = []
@@ -139,6 +139,17 @@ class Match():
         self.group_name = None
         self.lock = asyncio.Lock()
     
+    def clear_match(self):
+        self.consumer_instances = []
+        self.table = None
+        self.ball = None
+        self.paddle_left = None
+        self.paddle_right = None
+        self.tournament = None
+        self.player1_name = None
+        self.player2_name = None
+        self.group_name = None
+
     def player_missing(self):
         return self.player1_name is None or self.player2_name is None
 
