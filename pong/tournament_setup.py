@@ -89,3 +89,5 @@ class Tournament():
         finalRank = self.final.get_finalRank()
         finalRank.extend(list(set(self.semi1.get_finalRank()) - set(finalRank)))
         finalRank.extend(list(set(self.semi2.get_finalRank()) - set(finalRank)))
+        
+        return finalRank
