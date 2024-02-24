@@ -25,19 +25,15 @@ def initialize_database(sender, **kwargs):
     size_GameData = GameData.objects.count()
     while size_GameData < 200:
         add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
-        size_GameData += 1
-        #size_GameData = GameData.objects.count()
-    
+        size_GameData += 1    
     
     # add entries to have 10 tournaments in database
     size_TournamentData = TournamentData.objects.count()
     while size_TournamentData < 20:
         add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData))
         size_TournamentData += 1
-        #size_TournamentData = TournamentData.objects.count()
 
     print(f"After initialization (match objects: {GameData.objects.count()} | tournament objects: {TournamentData.objects.count()})")
-
 
 
 def generate_random_match(database_end, time_diff, is_tournament, size_GameData):
@@ -58,7 +54,7 @@ def generate_random_match(database_end, time_diff, is_tournament, size_GameData)
 
     if not is_tournament:
         gend = datetime.fromtimestamp(gend)
-
+    
     return p1n, p1s, p2n, p2s, gend, gdur, is_tournament
 
 
@@ -97,11 +93,10 @@ def generate_random_tournament(database_end, time_diff, size_TournamentData):
     match_id_final = add_game_data(*match_to_params(finalMatch))
 
     return match_id_semi1, match_id_semi2, match_id_final, playersRank, tend, tdur
-    # return semiMatch1, semiMatch2, finalMatch, playersRank, tend, tdur
 
 
 def match_to_list(p1n, p1s, p2n, p2s, gend, gdur, itg):
     return {'players': [p1n, p2n], 'score': [p1s, p2s], 'endTime': gend, 'startTime': gend - gdur, 'is_tournament_game': itg}
 
 def match_to_params(match):
-    return match['players'][0], match['score'][0], match['players'][1], match['score'][1], match['endTime'], match['endTime'] - match['startTime'], match['is_tournament_game']
+    return match['players'][0], match['score'][0], match['players'][1], match['score'][1], datetime.fromtimestamp(match['endTime']), match['endTime'] - match['startTime'], match['is_tournament_game']

@@ -106,6 +106,7 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur):
     # tend = (pytz.timezone('UTC')).localize(tend)
     hash = '#hash'
+    tend = gend = (pytz.timezone('UTC')).localize(tend)
     tournament_data = TournamentData(
         match_id_semi_1=matchIdSemi1,
         match_id_semi_2=matchIdSemi2,
