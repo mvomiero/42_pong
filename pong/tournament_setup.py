@@ -18,9 +18,12 @@ class Tournament():
 
     def clear_tournament(self):
         self.consumer_instances = []
-        self.semi1.clear_match()
-        self.semi2.clear_match()
-        self.final.clear_match()
+        if self.semi1 is not None:
+            self.semi1.clear_match()
+        if self.semi2 is not None:
+            self.semi2.clear_match()
+        if self.final is not None:
+            self.final.clear_match()
         self.semi1 = None
         self.semi2 = None
         self.final = None

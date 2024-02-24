@@ -455,7 +455,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
       if (data.command === "tournament_info") {
         if (data.mode === "end") {
-          winMessage.ranking = data.playerRanking
+          console.log("tournament_info end", data)
+          winMessage.ranking[1] = data.playerRanking.firstPosition
+          winMessage.ranking[2] = data.playerRanking.secondPosition
+          winMessage.ranking[3] = data.playerRanking.thirdPosition
+          winMessage.ranking[4] = data.playerRanking.fourthPosition
           removeElements();
         }
       }
