@@ -371,6 +371,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   }
 
   function removeAndDisposeAndMakeUndefined(object) {
+    if (!object)
+      return;
     sceneProperties.scene.remove(object);
     if (object.geometry)
       object.geometry.dispose();
@@ -405,6 +407,17 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   }
 
   // RECEIVING DATA
+
+  function displayTournamentMatches(data) {
+      document.getElementById('tournament_info').style.display = 'inline-flex';
+      document.getElementById('semiFinal1').innerHTML = data.matchSemi1.player1 + " vs. " + data.matchSemi2.player2;
+      document.getElementById('semiFinal2').innerHTML = data.matchSemi2.player1 + " vs. " + data.matchSemi2.player2;
+
+      if (data.matchFinal.player1 === undefined || data.matchFinal.player2 === undefined)
+        document.getElementById('final').innerHTML = "Not yet started";
+      else
+        document.getElementById('final').innerHTML = data.matchFinal.player1 + " vs. " + data.matchFinal.player2;
+  }
 
   function handleWebSocketOpen(event) {
     try {
@@ -454,6 +467,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       }
 
       if (data.command === "tournament_info") {
+        console.log("TOURNAMENT INFO", data)
+        displayTournamentMatches(data);
         if (data.mode === "end") {
           console.log("tournament_info end", data)
           winMessage.ranking[1] = data.playerRanking.firstPosition
@@ -513,6 +528,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         document.getElementById('img_loss').style.display = "block";
         document.getElementById('closing_message').innerHTML = "👽 Unfortunately, you lost! 👽";
       }
+      document.getElementById('tournament_info').style.display = 'none';
       document.getElementById('closing_message_ranking').style.display = "block";
       document.getElementById('closing_message_ranking').innerHTML = "Ranking: <br> 1. " + winMessage.ranking[1] + "<br> 2. " + winMessage.ranking[2] + "<br> 3. " + winMessage.ranking[3] + "<br> 4. " + winMessage.ranking[4];
       document.getElementById('closing_message').innerHTML = winMessage.ranking[1] + " won the tournament!";
@@ -548,6 +564,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       }
       else if (event.code === 4005 || event.code === 4006) {
         removeElements();
+        console.log("hola");
         document.getElementById('closing_message').innerHTML = "The connection has been lost.";
       }
     }, 1000);
