@@ -118,11 +118,16 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         received_data = json.loads(text_data)
-        # print(f'data received: {received_data}')
         command = received_data.get('command')
+        mode = received_data.get('mode')
 
-        if hasattr(self, 'match') and not self.match.finished and command and command == 'move_paddle' and self.paddle is not None:
+        if hasattr(self, 'match') and not self.match.finished and not self.match.paused and command and command == 'move_paddle' and self.paddle is not None:
             self.paddle.paddle_keyPress(received_data['direction'], received_data['action'])
+        
+        if hasattr(self, 'match') and not self.match.finished and command and command == 'move_info' and mode == 'pause':
+            self.match.pause_start(self)
+        elif hasattr(self, 'match') and not self.match.finished and command and command == 'move_info' and mode == 'resume':
+            self.match.pause_end(self)
 
 
     async def tournament_loop(self, tournament):
