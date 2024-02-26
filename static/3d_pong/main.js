@@ -371,6 +371,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   }
 
   function removeAndDisposeAndMakeUndefined(object) {
+    if (!object)
+      return;
     sceneProperties.scene.remove(object);
     if (object.geometry)
       object.geometry.dispose();
@@ -454,6 +456,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       }
 
       if (data.command === "tournament_info") {
+        console.log("TOURNAMENT INFO", data)
         if (data.mode === "end") {
           console.log("tournament_info end", data)
           winMessage.ranking[1] = data.playerRanking.firstPosition
@@ -548,6 +551,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       }
       else if (event.code === 4005 || event.code === 4006) {
         removeElements();
+        console.log("hola");
         document.getElementById('closing_message').innerHTML = "The connection has been lost.";
       }
     }, 1000);
