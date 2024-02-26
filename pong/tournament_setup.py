@@ -66,6 +66,14 @@ class Tournament():
         
         return match
     
+    def set_matches_disconnect(self):
+        if self.semi1 is not None:
+            self.semi1.player_quit = True
+        if self.semi2 is not None:
+            self.semi2.player_quit = True
+        if self.final is not None:
+            self.final.player_quit = True
+
     def set_final(self):
         # get the winners of the semi-finals
         winner1_name = self.semi1.get_winner()
