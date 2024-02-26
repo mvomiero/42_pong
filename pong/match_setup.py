@@ -122,7 +122,7 @@ class Paddle:
                 self.speed = 0
   
 class Match():
-    winning_score = 5
+    winning_score = 2
 
     def __init__(self, tournament):
         self.consumer_instances = []
@@ -194,6 +194,14 @@ class Match():
             return self.player1_name
         else:
             return self.player2_name
+    
+    def get_winner_instance(self):
+        if self.score_player1 < self.winning_score and self.score_player2 < self.winning_score:
+            return None
+        if self.score_player1 > self.score_player2:
+            return self.consumer_instances[0]
+        else:
+            return self.consumer_instances[1]
 
     def pause_start(self, player_instance):
         if not self.paused and player_instance in self.consumer_instances:
