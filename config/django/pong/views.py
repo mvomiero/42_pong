@@ -106,11 +106,14 @@ async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     games (e.g. match['endTime']) = floating point number / POSIX timestamp (e.g. time.time())
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
-async def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur):
+async def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur, blockchain=True):
     tend = (pytz.timezone('Europe/Paris')).localize(tend)
-    tourID = random.randint(0, 9999)
-    tour_result = str(tourID) + " " + str(playersRank)
-    tx_hash = await deploy_sepo(tour_result)
+    if blockchain:
+        tourID = random.randint(0, 9999)
+        tour_result = str(tourID) + " " + str(playersRank)
+        tx_hash = await deploy_sepo(tour_result)
+    else:
+        tx_hash = "0x0"
     tournament_data = TournamentData(
         match_id_semi_1=matchIdSemi1,
         match_id_semi_2=matchIdSemi2,
