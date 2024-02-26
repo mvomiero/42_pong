@@ -76,12 +76,14 @@ class Tournament():
 
     def set_final(self):
         # get the winners of the semi-finals
-        winner1_name = self.semi1.get_winner()
-        winner2_name = self.semi2.get_winner()
+        winner1_instance = self.semi1.get_winner_instance()
+        winner2_instance = self.semi2.get_winner_instance()
+        player1 = None
+        player2 = None
         for consumer in self.consumer_instances:
-            if consumer.player == winner1_name:
+            if consumer == winner1_instance:
                 player1 = consumer
-            elif consumer.player == winner2_name:
+            elif consumer == winner2_instance:
                 player2 = consumer
             
         # create the final match
@@ -96,7 +98,7 @@ class Tournament():
         # save the match and paddle instance
         for consumer in self.consumer_instances:
             consumer.match = match
-            if not (consumer.player == winner1_name or consumer.player == winner2_name):
+            if not (consumer == winner1_instance or consumer == winner2_instance):
                 consumer.paddle = None
         player1.paddle = match.get_paddle(player1.player)
         player2.paddle = match.get_paddle(player2.player)
