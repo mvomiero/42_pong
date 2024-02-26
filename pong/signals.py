@@ -30,7 +30,7 @@ def initialize_database(sender, **kwargs):
     # add entries to have 10 tournaments in database
     size_TournamentData = TournamentData.objects.count()
     while size_TournamentData < 20:
-        add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData))
+        add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData), False)
         size_TournamentData += 1
 
     print(f"After initialization (match objects: {GameData.objects.count()} | tournament objects: {TournamentData.objects.count()})")

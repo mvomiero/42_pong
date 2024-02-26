@@ -103,7 +103,7 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     games (e.g. match['endTime']) = floating point number / POSIX timestamp (e.g. time.time())
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
-def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur):
+def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur, blockchain=True):
     hash = '#hash'
     tend = (pytz.timezone('Europe/Paris')).localize(tend)
     tournament_data = TournamentData(
