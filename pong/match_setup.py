@@ -122,7 +122,7 @@ class Paddle:
                 self.speed = 0
   
 class Match():
-    winning_score = 2
+    winning_score = 5
 
     def __init__(self, tournament):
         self.consumer_instances = []
@@ -137,6 +137,8 @@ class Match():
         self.start_time = None
         self.end_time = None
         self.tournament = tournament
+        self.paused = False
+        self.paused_consumer = None
         self.player_quit = False
         self.finished = False
         self.group_name = None
@@ -193,6 +195,16 @@ class Match():
         else:
             return self.player2_name
 
+    def pause_start(self, player_instance):
+        if not self.paused and player_instance in self.consumer_instances:
+            self.paused = True
+            self.paused_consumer = player_instance
+    
+    def pause_end(self, player_instance):
+        if self.paused_consumer == player_instance:
+            self.paused = False
+            self.paused_consumer = None
+
     def check_if_ball_hit_paddle(self):
         if self.ball.x < self.paddle_left.x:
             hit_paddle_left = self.ball.check_hit_paddle(self.paddle_left)
@@ -210,9 +222,11 @@ class Match():
         return True
     
     def update_ball(self):
-        self.ball.update_position()
-        self.ball.check_hit_table_top_or_bottom(self.table)
+        if not self.paused:
+            self.ball.update_position()
+            self.ball.check_hit_table_top_or_bottom(self.table)
     
     def update_paddles(self):
-        self.paddle_left.update_paddle(self.table.top, self.table.bottom)
-        self.paddle_right.update_paddle(self.table.top, self.table.bottom)
+        if not self.paused:
+            self.paddle_left.update_paddle(self.table.top, self.table.bottom)
+            self.paddle_right.update_paddle(self.table.top, self.table.bottom)
