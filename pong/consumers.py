@@ -11,6 +11,7 @@ from datetime import datetime
 class PongConsumer(AsyncWebsocketConsumer):
     game_loop_sleep_time = 0.01
     tournament_loop_sleep_time = 0.4
+    sleep_delay_end_msg = 0.3
     matches = set()  # Store match instances in a set
     matches_lock = asyncio.Lock()
     tournaments = set()  # Store tournament instances in a set
@@ -114,6 +115,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             except Exception as e:
                 print(f'[tournament] Two WebSockets disconnect at same time: {e}')
 
+
     async def receive(self, text_data):
         received_data = json.loads(text_data)
         command = received_data.get('command')
@@ -167,7 +169,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             tournament_info('end', tournament.semi1, tournament.semi2, tournament.final, tournament.get_finalRank()),
             self.tn.group_name
         )
-        await asyncio.sleep(0.5)    # delay to ensure the players receive the 'end' message
+        await asyncio.sleep(self.sleep_delay_end_msg)    # delay to ensure the players receive the 'end' message
 
         # store tournament in database & delete/close all PongConsumer and Match instances and the Tournament instance
         await self.store_database_tournament(tournament)
@@ -192,7 +194,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                     self.match.group_name
                 )
             match.update_paddles()
-            
+
             if match.player_quit is True:
                 return
             
@@ -212,7 +214,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             match_info('end', [match.player1_name, match.player2_name], [match.score_player1, match.score_player2], match.get_winner()), 
             self.match.group_name
         )
-        await asyncio.sleep(0.5)    # delay to ensure the players receive the 'end' message
+        await asyncio.sleep(self.sleep_delay_end_msg)    # delay to ensure the players receive the 'end' message
 
         # in case of remote-match: store in database and delete/close all PongConsumer instances and the match instance
         if self.mode == "match":
