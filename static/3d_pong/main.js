@@ -419,6 +419,25 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         document.getElementById('final').innerHTML = data.matchFinal.player1 + " vs. " + data.matchFinal.player2;
   }
 
+  function startCountdown(duration, display) {
+    let timer = duration;
+    display.textContent = timer;
+
+    const countdownInterval = setInterval(function () {
+      timer--;
+
+      if (timer > 0) {
+        display.textContent = timer;
+      } else if (timer === 0) {
+        display.textContent = 'Go!';
+      } else {
+        clearInterval(countdownInterval);
+        display.parentNode.removeChild(display);
+      }
+    }, 1000);
+  }
+
+
   function handleWebSocketOpen(event) {
     try {
       var data = JSON.parse(event.data);
@@ -426,11 +445,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         console.log("Received data:", data);
 
       if (data.command === "set_player") {
+        
+        /* const countdownDisplay = document.querySelector('#countdownText');
+        startCountdown(4, countdownDisplay); // 4 seconds total for "3, 2, 1, go!"
         createLeftPaddle();
-        renderer.render(scene, camera);
+        renderer.render(scene, camera); */
         char_choice = data.player;
       }
-
+      
       if (data.command === "match_info") {
         if (data.mode === "start") {
           document.getElementById('message_info').style.display = 'none';
@@ -445,6 +467,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           else {
             player = 0;
           }
+          createLeftPaddle();
           createRightPaddle();
           initTextParams();
           createP1ScoreText();
@@ -453,6 +476,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           createP2NameText();
           createBall();
           renderer.render(scene, camera);
+          const countdownDisplay = document.querySelector('#countdownText');
+          startCountdown(4, countdownDisplay); // 4 seconds total for "3, 2, 1, go!"
           // listen to keyboard events to move the paddles
           document.addEventListener("keydown", keyDownEventListener);
           document.addEventListener("keyup", keyUpEventListener);
