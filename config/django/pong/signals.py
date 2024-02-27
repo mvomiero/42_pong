@@ -26,8 +26,9 @@ def initialize_database(sender, **kwargs):
     size_GameData = GameData.objects.count()
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    while size_GameData < 1:
-        asyncio.run(add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData)))
+    while size_GameData < 8:
+        # asyncio.run(add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData)))
+        add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
         size_GameData += 1    
     loop.close()
     
@@ -35,8 +36,9 @@ def initialize_database(sender, **kwargs):
     size_TournamentData = TournamentData.objects.count()
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    while size_TournamentData < 1:
-        asyncio.run(add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData), False))
+    while size_TournamentData < 2:
+        # asyncio.run(add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData), False))
+        add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData), False)
         size_TournamentData += 1
     loop.close()
 
@@ -95,9 +97,12 @@ def generate_random_tournament(database_end, time_diff, size_TournamentData):
     tend = datetime.fromtimestamp(finalMatch['endTime'])
 
     # store matches in the database
-    match_id_semi1 = asyncio.run(add_game_data(*match_to_params(semiMatch1)))
-    match_id_semi2 = asyncio.run(add_game_data(*match_to_params(semiMatch2)))
-    match_id_final = asyncio.run(add_game_data(*match_to_params(finalMatch)))
+    match_id_semi1 = add_game_data(*match_to_params(semiMatch1))
+    match_id_semi2 = add_game_data(*match_to_params(semiMatch2))
+    match_id_final = add_game_data(*match_to_params(finalMatch))
+    # match_id_semi1 = asyncio.run(add_game_data(*match_to_params(semiMatch1)))
+    # match_id_semi2 = asyncio.run(add_game_data(*match_to_params(semiMatch2)))
+    # match_id_final = asyncio.run(add_game_data(*match_to_params(finalMatch)))
 
     return match_id_semi1, match_id_semi2, match_id_final, playersRank, tend, tdur
 

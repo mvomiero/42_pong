@@ -1,0 +1,120 @@
+DEBUG 2024-02-27 19:05:06,811 utils (0.002) 
+            SELECT
+                c.relname,
+                CASE
+                    WHEN c.relispartition THEN 'p'
+                    WHEN c.relkind IN ('m', 'v') THEN 'v'
+                    ELSE 't'
+                END,
+                obj_description(c.oid, 'pg_class')
+            FROM pg_catalog.pg_class c
+            LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
+                AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        ; args=None; alias=default
+DEBUG 2024-02-27 19:05:06,813 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,814 utils (0.000) 
+            SELECT
+                c.relname,
+                CASE
+                    WHEN c.relispartition THEN 'p'
+                    WHEN c.relkind IN ('m', 'v') THEN 'v'
+                    ELSE 't'
+                END,
+                obj_description(c.oid, 'pg_class')
+            FROM pg_catalog.pg_class c
+            LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
+                AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        ; args=None; alias=default
+DEBUG 2024-02-27 19:05:06,815 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,824 utils (0.001) 
+            SELECT
+                c.relname,
+                CASE
+                    WHEN c.relispartition THEN 'p'
+                    WHEN c.relkind IN ('m', 'v') THEN 'v'
+                    ELSE 't'
+                END,
+                obj_description(c.oid, 'pg_class')
+            FROM pg_catalog.pg_class c
+            LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
+                AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        ; args=None; alias=default
+DEBUG 2024-02-27 19:05:06,824 utils (0.001) 
+            SELECT
+                c.relname,
+                CASE
+                    WHEN c.relispartition THEN 'p'
+                    WHEN c.relkind IN ('m', 'v') THEN 'v'
+                    ELSE 't'
+                END,
+                obj_description(c.oid, 'pg_class')
+            FROM pg_catalog.pg_class c
+            LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
+                AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        ; args=None; alias=default
+DEBUG 2024-02-27 19:05:06,825 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,826 utils (0.001) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin'; args=('admin',); alias=default
+DEBUG 2024-02-27 19:05:06,826 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'admin' AND "django_content_type"."model" = 'logentry') LIMIT 21; args=('admin', 'logentry'); alias=default
+DEBUG 2024-02-27 19:05:06,828 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (1) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(1,); alias=default
+DEBUG 2024-02-27 19:05:06,828 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin'; args=('admin',); alias=default
+DEBUG 2024-02-27 19:05:06,829 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,830 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,830 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,831 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,845 utils (0.003) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 15', 3, 'Player 0', 11, '2024-01-14T04:20:40.830260+01:00'::timestamptz, 820, true) RETURNING "pong_gamedata"."id"; args=('Player 15', 3, 'Player 0', 11, datetime.datetime(2024, 1, 14, 4, 20, 40, 830260, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 820, True); alias=default
+DEBUG 2024-02-27 19:05:06,848 utils (0.002) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 4', 2, 'Player 13', 11, '2024-01-14T04:08:47.830260+01:00'::timestamptz, 21, true) RETURNING "pong_gamedata"."id"; args=('Player 4', 2, 'Player 13', 11, datetime.datetime(2024, 1, 14, 4, 8, 47, 830260, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 21, True); alias=default
+DEBUG 2024-02-27 19:05:06,850 utils (0.002) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 0', 2, 'Player 13', 11, '2024-01-14T04:22:55.830260+01:00'::timestamptz, 360, true) RETURNING "pong_gamedata"."id"; args=('Player 0', 2, 'Player 13', 11, datetime.datetime(2024, 1, 14, 4, 22, 55, 830260, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 360, True); alias=default
+DEBUG 2024-02-27 19:05:06,855 utils (0.004) INSERT INTO "pong_tournamentdata" ("tour_id", "match_id_semi_1", "match_id_semi_2", "match_id_final", "tournament_end_timestamp", "tournament_duration_secs", "player_ranking", "blockchain_hash") VALUES (0, 45, 46, 47, '2024-01-14T04:22:55.830260+01:00'::timestamptz, 955, '["Player 13", "Player 0", "Player 15", "Player 4"]', '0x0') RETURNING "pong_tournamentdata"."id"; args=(0, 45, 46, 47, datetime.datetime(2024, 1, 14, 4, 22, 55, 830260, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 955, <psycopg2._json.Json object at 0x7f7d71142ba0>, '0x0'); alias=default
+DEBUG 2024-02-27 19:05:06,856 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,857 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,857 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'auth'; args=('auth',); alias=default
+DEBUG 2024-02-27 19:05:06,858 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'auth' AND "django_content_type"."model" = 'permission') LIMIT 21; args=('auth', 'permission'); alias=default
+DEBUG 2024-02-27 19:05:06,858 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'auth' AND "django_content_type"."model" = 'group') LIMIT 21; args=('auth', 'group'); alias=default
+DEBUG 2024-02-27 19:05:06,859 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'auth' AND "django_content_type"."model" = 'user') LIMIT 21; args=('auth', 'user'); alias=default
+DEBUG 2024-02-27 19:05:06,862 utils (0.001) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (2, 3, 4) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(2, 3, 4); alias=default
+DEBUG 2024-02-27 19:05:06,863 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'auth'; args=('auth',); alias=default
+DEBUG 2024-02-27 19:05:06,864 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,865 utils (0.001) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,866 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,866 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,867 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,868 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,868 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'contenttypes'; args=('contenttypes',); alias=default
+DEBUG 2024-02-27 19:05:06,869 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'contenttypes' AND "django_content_type"."model" = 'contenttype') LIMIT 21; args=('contenttypes', 'contenttype'); alias=default
+DEBUG 2024-02-27 19:05:06,870 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (5) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(5,); alias=default
+DEBUG 2024-02-27 19:05:06,871 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'contenttypes'; args=('contenttypes',); alias=default
+DEBUG 2024-02-27 19:05:06,871 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,872 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,872 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,873 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,873 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,873 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,874 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'sessions'; args=('sessions',); alias=default
+DEBUG 2024-02-27 19:05:06,874 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'sessions' AND "django_content_type"."model" = 'session') LIMIT 21; args=('sessions', 'session'); alias=default
+DEBUG 2024-02-27 19:05:06,875 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (6) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(6,); alias=default
+DEBUG 2024-02-27 19:05:06,876 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'sessions'; args=('sessions',); alias=default
+DEBUG 2024-02-27 19:05:06,876 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,877 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,877 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,878 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,878 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,878 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,879 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'pong'; args=('pong',); alias=default
+DEBUG 2024-02-27 19:05:06,879 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'pong' AND "django_content_type"."model" = 'gamedata') LIMIT 21; args=('pong', 'gamedata'); alias=default
+DEBUG 2024-02-27 19:05:06,880 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'pong' AND "django_content_type"."model" = 'tournamentdata') LIMIT 21; args=('pong', 'tournamentdata'); alias=default
+DEBUG 2024-02-27 19:05:06,881 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (8, 7) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(8, 7); alias=default
+DEBUG 2024-02-27 19:05:06,881 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'pong'; args=('pong',); alias=default
+DEBUG 2024-02-27 19:05:06,882 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,882 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,883 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,883 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,884 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-27 19:05:06,884 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default

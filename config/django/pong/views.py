@@ -14,6 +14,7 @@ from itertools import groupby
 from operator import itemgetter
 from django.db.models import Subquery, OuterRef
 from .deploy_sepo import deploy_sepo
+import asyncio
 from asgiref.sync import sync_to_async
 import random
 
@@ -84,7 +85,8 @@ def error_disconnection(request):
 # format dates:
 #     games (gend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. gdur) = number (e.g. 10)
-async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
+def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
+# async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
         gend = (pytz.timezone('Europe/Paris')).localize(gend)
         game_data = GameData(
@@ -106,12 +108,14 @@ async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     games (e.g. match['endTime']) = floating point number / POSIX timestamp (e.g. time.time())
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
-async def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur, blockchain=True):
+def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur, blockchain=True):
+# async def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur, blockchain=True):
     tend = (pytz.timezone('Europe/Paris')).localize(tend)
     if blockchain:
         tourID = random.randint(0, 9999)
         tour_result = str(tourID) + " " + str(playersRank)
-        tx_hash = await deploy_sepo(tour_result)
+        tx_hash = asyncio.run(deploy_sepo(tour_result))
+        # tx_hash = await deploy_sepo(tour_result)
     else:
         tx_hash = "0x0"
     tournament_data = TournamentData(
