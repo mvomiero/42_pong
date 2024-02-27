@@ -442,8 +442,8 @@ def get_dashboard_data_player(request):
     """ Data for the Chart """
     player_wins = player_matches.annotate(
         winner_name=Case(
-            When(player1_points=11, then=F('player1_name')),
-            When(player2_points=11, then=F('player2_name')),
+            When(player1_points__gt=F('player2_points'), then=F('player1_name')),
+            When(player2_points__gt=F('player1_points'), then=F('player2_name')),
             output_field=CharField(),
         )
     ).values_list('winner_name', flat=True)
@@ -452,6 +452,7 @@ def get_dashboard_data_player(request):
 
     percentage_wins = nbr_wins / player_matches.count() * 100
     percentage_losses = nbr_losses / player_matches.count() * 100
+    print(f"\nplayer_wins={player_wins}, nbr_wins={nbr_wins}, nbr_losses={nbr_losses}, player_matches.count()={player_matches.count()}\n")
 
     chart_pieWin = {
         'Wins': percentage_wins, 
