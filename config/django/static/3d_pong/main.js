@@ -141,6 +141,10 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     renderer.render(scene, camera);
   }
 
+  function handleMouseMove() {
+    renderer.render(scene, camera);
+  }
+
   function initCamera() {
     controls = new OrbitControls(sceneProperties.camera, sceneProperties.renderer.domElement);
     controls.enableDamping = true; // an animation loop is required when damping is enabled
@@ -149,6 +153,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     controls.minAzimuthAngle = -Math.PI / 2; // left limit
     controls.maxAzimuthAngle = Math.PI / 2; // right limit
     controls.maxPolarAngle = Math.PI / 1; // vertical rotation limit
+    document.addEventListener('mousemove', handleMouseMove);
     var onWindowResize = function () { // Handle resize events
       sceneProperties.camera.aspect = window.innerWidth / window.innerHeight;
       sceneProperties.camera.updateProjectionMatrix();
@@ -446,6 +451,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           else {
             player = 0;
           }
+          document.removeEventListener('mousemove', handleMouseMove)
           createLeftPaddle();
           createRightPaddle();
           initTextParams();
