@@ -136,7 +136,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     paddleWidth = sceneProperties.zoomedCanvasWidth * 0.02;
     paddleHeight = tableHeight / 4; // must match with self.height = 1/5 in consumers.py
     paddleDepth = sceneProperties.zoomedCanvasHeight * 0.05;
-    minBallZ = ballSize * 0.7;
+    minBallZ = ballSize;
     maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     renderer.render(scene, camera);
   }

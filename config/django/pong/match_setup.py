@@ -21,9 +21,11 @@ class Ball:
         self.z = 1
         self.dx = 1 if random.random() < 0.5 else -1
         self.dy = random.uniform(-1, 1)
-        self.speed = 0.005
-        self.min_speed = 0.002
-        self.max_speed = 0.05
+        self.speed = random.uniform(0.003, 0.0037)
+        self.min_speed = 0.0025
+        self.max_speed = 0.06
+        self.decrease_speed_multiplier = 0.7
+        self.increase_speed_multiplier = 0.065
         self.min_z = self.size
         self.max_z = self.randomise_max_z()
     
@@ -50,9 +52,9 @@ class Ball:
             self.dx = -self.dx
             self.max_z = self.randomise_max_z()
             if paddle.speed == 0:
-                self.speed *= 0.7
+                self.speed *= self.decrease_speed_multiplier
             else:
-                self.speed += paddle.speed * 0.3
+                self.speed += paddle.speed * self.increase_speed_multiplier
             if self.speed < self.min_speed:
                 self.speed = self.min_speed
             if self.speed > self.max_speed:
@@ -69,7 +71,7 @@ class Paddle:
         self.half_height = self.height / 2
         self.speed = 0
         self.speed_init = 0.001
-        self.speed_increment = 0.001
+        self.speed_increment = 0.0005
         self.min_speed = 0.001
         self.max_speed = 0.04
         self.up_key_held = False
@@ -122,7 +124,7 @@ class Paddle:
                 self.speed = 0
   
 class Match():
-    winning_score = 2
+    winning_score = 11
 
     def __init__(self, tournament):
         self.consumer_instances = []

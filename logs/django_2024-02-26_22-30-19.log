@@ -1,0 +1,137 @@
+DEBUG 2024-02-26 22:30:20,855 utils (0.002) 
+            SELECT
+                c.relname,
+                CASE
+                    WHEN c.relispartition THEN 'p'
+                    WHEN c.relkind IN ('m', 'v') THEN 'v'
+                    ELSE 't'
+                END,
+                obj_description(c.oid, 'pg_class')
+            FROM pg_catalog.pg_class c
+            LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
+                AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        ; args=None; alias=default
+DEBUG 2024-02-26 22:30:20,857 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2024-02-26 22:30:20,859 utils (0.001) 
+            SELECT
+                c.relname,
+                CASE
+                    WHEN c.relispartition THEN 'p'
+                    WHEN c.relkind IN ('m', 'v') THEN 'v'
+                    ELSE 't'
+                END,
+                obj_description(c.oid, 'pg_class')
+            FROM pg_catalog.pg_class c
+            LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
+                AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        ; args=None; alias=default
+DEBUG 2024-02-26 22:30:20,860 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2024-02-26 22:30:20,877 utils (0.001) 
+            SELECT
+                c.relname,
+                CASE
+                    WHEN c.relispartition THEN 'p'
+                    WHEN c.relkind IN ('m', 'v') THEN 'v'
+                    ELSE 't'
+                END,
+                obj_description(c.oid, 'pg_class')
+            FROM pg_catalog.pg_class c
+            LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
+                AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        ; args=None; alias=default
+DEBUG 2024-02-26 22:30:20,879 utils (0.001) 
+            SELECT
+                c.relname,
+                CASE
+                    WHEN c.relispartition THEN 'p'
+                    WHEN c.relkind IN ('m', 'v') THEN 'v'
+                    ELSE 't'
+                END,
+                obj_description(c.oid, 'pg_class')
+            FROM pg_catalog.pg_class c
+            LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
+                AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+                AND pg_catalog.pg_table_is_visible(c.oid)
+        ; args=None; alias=default
+DEBUG 2024-02-26 22:30:20,880 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2024-02-26 22:30:20,883 utils (0.001) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin'; args=('admin',); alias=default
+DEBUG 2024-02-26 22:30:20,884 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'admin' AND "django_content_type"."model" = 'logentry') LIMIT 21; args=('admin', 'logentry'); alias=default
+DEBUG 2024-02-26 22:30:20,886 utils (0.001) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (1) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(1,); alias=default
+DEBUG 2024-02-26 22:30:20,887 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin'; args=('admin',); alias=default
+DEBUG 2024-02-26 22:30:20,888 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:20,889 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:20,890 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:20,949 utils (0.012) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 4', 5, 'Player 6', 11, '2024-02-12T20:12:04.890005+01:00'::timestamptz, 860, false) RETURNING "pong_gamedata"."id"; args=('Player 4', 5, 'Player 6', 11, datetime.datetime(2024, 2, 12, 20, 12, 4, 890005, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 860, False); alias=default
+DEBUG 2024-02-26 22:30:20,950 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:20,966 utils (0.001) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 7', 11, 'Player 11', 3, '2023-12-01T07:32:38.890005+01:00'::timestamptz, 206, true) RETURNING "pong_gamedata"."id"; args=('Player 7', 11, 'Player 11', 3, datetime.datetime(2023, 12, 1, 7, 32, 38, 890005, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 206, True); alias=default
+DEBUG 2024-02-26 22:30:20,982 utils (0.002) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 15', 11, 'Player 12', 1, '2023-12-01T07:36:33.890005+01:00'::timestamptz, 962, true) RETURNING "pong_gamedata"."id"; args=('Player 15', 11, 'Player 12', 1, datetime.datetime(2023, 12, 1, 7, 36, 33, 890005, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 962, True); alias=default
+DEBUG 2024-02-26 22:30:20,998 utils (0.002) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 7', 11, 'Player 15', 10, '2023-12-01T07:36:59.890005+01:00'::timestamptz, 167, true) RETURNING "pong_gamedata"."id"; args=('Player 7', 11, 'Player 15', 10, datetime.datetime(2023, 12, 1, 7, 36, 59, 890005, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 167, True); alias=default
+DEBUG 2024-02-26 22:30:21,013 utils (0.001) INSERT INTO "pong_tournamentdata" ("tour_id", "match_id_semi_1", "match_id_semi_2", "match_id_final", "tournament_end_timestamp", "tournament_duration_secs", "player_ranking", "blockchain_hash") VALUES (0, 1383, 1384, 1385, '2023-12-01T07:36:59.890005+01:00'::timestamptz, 988, '["Player 7", "Player 15", "Player 11", "Player 12"]', '0x0') RETURNING "pong_tournamentdata"."id"; args=(0, 1383, 1384, 1385, datetime.datetime(2023, 12, 1, 7, 36, 59, 890005, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 988, <psycopg2._json.Json object at 0x7f8688a278c0>, '0x0'); alias=default
+DEBUG 2024-02-26 22:30:21,014 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,016 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,017 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'auth'; args=('auth',); alias=default
+DEBUG 2024-02-26 22:30:21,019 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'auth' AND "django_content_type"."model" = 'permission') LIMIT 21; args=('auth', 'permission'); alias=default
+DEBUG 2024-02-26 22:30:21,020 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'auth' AND "django_content_type"."model" = 'group') LIMIT 21; args=('auth', 'group'); alias=default
+DEBUG 2024-02-26 22:30:21,021 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'auth' AND "django_content_type"."model" = 'user') LIMIT 21; args=('auth', 'user'); alias=default
+DEBUG 2024-02-26 22:30:21,023 utils (0.001) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (2, 3, 4) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(2, 3, 4); alias=default
+DEBUG 2024-02-26 22:30:21,024 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'auth'; args=('auth',); alias=default
+DEBUG 2024-02-26 22:30:21,025 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,026 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,026 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,028 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,047 utils (0.002) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 7', 11, 'Player 6', 2, '2023-12-03T20:55:10.026280+01:00'::timestamptz, 756, true) RETURNING "pong_gamedata"."id"; args=('Player 7', 11, 'Player 6', 2, datetime.datetime(2023, 12, 3, 20, 55, 10, 26280, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 756, True); alias=default
+DEBUG 2024-02-26 22:30:21,064 utils (0.002) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 3', 3, 'Player 14', 11, '2023-12-03T20:54:30.026280+01:00'::timestamptz, 684, true) RETURNING "pong_gamedata"."id"; args=('Player 3', 3, 'Player 14', 11, datetime.datetime(2023, 12, 3, 20, 54, 30, 26280, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 684, True); alias=default
+DEBUG 2024-02-26 22:30:21,078 utils (0.001) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 7', 5, 'Player 14', 11, '2023-12-03T20:55:24.026280+01:00'::timestamptz, 158, true) RETURNING "pong_gamedata"."id"; args=('Player 7', 5, 'Player 14', 11, datetime.datetime(2023, 12, 3, 20, 55, 24, 26280, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 158, True); alias=default
+DEBUG 2024-02-26 22:30:21,115 utils (0.001) INSERT INTO "pong_tournamentdata" ("tour_id", "match_id_semi_1", "match_id_semi_2", "match_id_final", "tournament_end_timestamp", "tournament_duration_secs", "player_ranking", "blockchain_hash") VALUES (0, 1386, 1387, 1388, '2023-12-03T20:55:24.026280+01:00'::timestamptz, 770, '["Player 14", "Player 7", "Player 6", "Player 3"]', '0x0') RETURNING "pong_tournamentdata"."id"; args=(0, 1386, 1387, 1388, datetime.datetime(2023, 12, 3, 20, 55, 24, 26280, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 770, <psycopg2._json.Json object at 0x7f868884d250>, '0x0'); alias=default
+DEBUG 2024-02-26 22:30:21,117 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,118 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,120 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'contenttypes'; args=('contenttypes',); alias=default
+DEBUG 2024-02-26 22:30:21,134 utils (0.013) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'contenttypes' AND "django_content_type"."model" = 'contenttype') LIMIT 21; args=('contenttypes', 'contenttype'); alias=default
+DEBUG 2024-02-26 22:30:21,139 utils (0.003) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (5) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(5,); alias=default
+DEBUG 2024-02-26 22:30:21,142 utils (0.001) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'contenttypes'; args=('contenttypes',); alias=default
+DEBUG 2024-02-26 22:30:21,143 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,145 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,146 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,158 utils (0.010) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,185 utils (0.002) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 1', 10, 'Player 14', 11, '2023-11-18T19:13:35.145313+01:00'::timestamptz, 557, true) RETURNING "pong_gamedata"."id"; args=('Player 1', 10, 'Player 14', 11, datetime.datetime(2023, 11, 18, 19, 13, 35, 145313, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 557, True); alias=default
+DEBUG 2024-02-26 22:30:21,210 utils (0.002) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 11', 0, 'Player 9', 11, '2023-11-18T19:20:21.145313+01:00'::timestamptz, 970, true) RETURNING "pong_gamedata"."id"; args=('Player 11', 0, 'Player 9', 11, datetime.datetime(2023, 11, 18, 19, 20, 21, 145313, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 970, True); alias=default
+DEBUG 2024-02-26 22:30:21,239 utils (0.001) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 14', 2, 'Player 9', 11, '2023-11-18T19:20:30.145313+01:00'::timestamptz, 803, true) RETURNING "pong_gamedata"."id"; args=('Player 14', 2, 'Player 9', 11, datetime.datetime(2023, 11, 18, 19, 20, 30, 145313, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 803, True); alias=default
+DEBUG 2024-02-26 22:30:21,258 utils (0.001) INSERT INTO "pong_tournamentdata" ("tour_id", "match_id_semi_1", "match_id_semi_2", "match_id_final", "tournament_end_timestamp", "tournament_duration_secs", "player_ranking", "blockchain_hash") VALUES (0, 1389, 1390, 1391, '2023-11-18T19:20:30.145313+01:00'::timestamptz, 979, '["Player 9", "Player 14", "Player 1", "Player 11"]', '0x0') RETURNING "pong_tournamentdata"."id"; args=(0, 1389, 1390, 1391, datetime.datetime(2023, 11, 18, 19, 20, 30, 145313, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 979, <psycopg2._json.Json object at 0x7f868884d8e0>, '0x0'); alias=default
+DEBUG 2024-02-26 22:30:21,260 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,261 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,262 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'sessions'; args=('sessions',); alias=default
+DEBUG 2024-02-26 22:30:21,264 utils (0.001) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'sessions' AND "django_content_type"."model" = 'session') LIMIT 21; args=('sessions', 'session'); alias=default
+DEBUG 2024-02-26 22:30:21,266 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (6) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(6,); alias=default
+DEBUG 2024-02-26 22:30:21,267 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'sessions'; args=('sessions',); alias=default
+DEBUG 2024-02-26 22:30:21,269 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,270 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,271 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,272 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,291 utils (0.001) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 7', 11, 'Player 0', 9, '2024-01-07T22:30:32.270734+01:00'::timestamptz, 231, true) RETURNING "pong_gamedata"."id"; args=('Player 7', 11, 'Player 0', 9, datetime.datetime(2024, 1, 7, 22, 30, 32, 270734, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 231, True); alias=default
+DEBUG 2024-02-26 22:30:21,307 utils (0.001) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 4', 11, 'Player 15', 1, '2024-01-07T22:28:08.270734+01:00'::timestamptz, 363, true) RETURNING "pong_gamedata"."id"; args=('Player 4', 11, 'Player 15', 1, datetime.datetime(2024, 1, 7, 22, 28, 8, 270734, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 363, True); alias=default
+DEBUG 2024-02-26 22:30:21,323 utils (0.001) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 7', 3, 'Player 4', 11, '2024-01-07T22:34:05.270734+01:00'::timestamptz, 337, true) RETURNING "pong_gamedata"."id"; args=('Player 7', 3, 'Player 4', 11, datetime.datetime(2024, 1, 7, 22, 34, 5, 270734, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 337, True); alias=default
+DEBUG 2024-02-26 22:30:21,338 utils (0.000) INSERT INTO "pong_tournamentdata" ("tour_id", "match_id_semi_1", "match_id_semi_2", "match_id_final", "tournament_end_timestamp", "tournament_duration_secs", "player_ranking", "blockchain_hash") VALUES (0, 1392, 1393, 1394, '2024-01-07T22:34:05.270734+01:00'::timestamptz, 720, '["Player 4", "Player 7", "Player 0", "Player 15"]', '0x0') RETURNING "pong_tournamentdata"."id"; args=(0, 1392, 1393, 1394, datetime.datetime(2024, 1, 7, 22, 34, 5, 270734, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 720, <psycopg2._json.Json object at 0x7f868884e5d0>, '0x0'); alias=default
+DEBUG 2024-02-26 22:30:21,339 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,340 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,341 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'pong'; args=('pong',); alias=default
+DEBUG 2024-02-26 22:30:21,342 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'pong' AND "django_content_type"."model" = 'gamedata') LIMIT 21; args=('pong', 'gamedata'); alias=default
+DEBUG 2024-02-26 22:30:21,343 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'pong' AND "django_content_type"."model" = 'tournamentdata') LIMIT 21; args=('pong', 'tournamentdata'); alias=default
+DEBUG 2024-02-26 22:30:21,345 utils (0.001) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (8, 7) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(8, 7); alias=default
+DEBUG 2024-02-26 22:30:21,347 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'pong'; args=('pong',); alias=default
+DEBUG 2024-02-26 22:30:21,348 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,349 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,351 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,352 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,367 utils (0.001) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 7', 11, 'Player 8', 7, '2024-02-13T17:01:05.350084+01:00'::timestamptz, 276, true) RETURNING "pong_gamedata"."id"; args=('Player 7', 11, 'Player 8', 7, datetime.datetime(2024, 2, 13, 17, 1, 5, 350084, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 276, True); alias=default
+DEBUG 2024-02-26 22:30:21,383 utils (0.001) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 14', 11, 'Player 2', 6, '2024-02-13T16:58:55.350084+01:00'::timestamptz, 238, true) RETURNING "pong_gamedata"."id"; args=('Player 14', 11, 'Player 2', 6, datetime.datetime(2024, 2, 13, 16, 58, 55, 350084, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 238, True); alias=default
+DEBUG 2024-02-26 22:30:21,399 utils (0.001) INSERT INTO "pong_gamedata" ("player1_name", "player1_points", "player2_name", "player2_points", "game_end_timestamp", "game_duration_secs", "is_tournament_game") VALUES ('Player 7', 11, 'Player 14', 7, '2024-02-13T17:06:05.350084+01:00'::timestamptz, 800, true) RETURNING "pong_gamedata"."id"; args=('Player 7', 11, 'Player 14', 7, datetime.datetime(2024, 2, 13, 17, 6, 5, 350084, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 800, True); alias=default
+DEBUG 2024-02-26 22:30:21,413 utils (0.001) INSERT INTO "pong_tournamentdata" ("tour_id", "match_id_semi_1", "match_id_semi_2", "match_id_final", "tournament_end_timestamp", "tournament_duration_secs", "player_ranking", "blockchain_hash") VALUES (0, 1395, 1396, 1397, '2024-02-13T17:06:05.350084+01:00'::timestamptz, 668, '["Player 7", "Player 14", "Player 8", "Player 2"]', '0x0') RETURNING "pong_tournamentdata"."id"; args=(0, 1395, 1396, 1397, datetime.datetime(2024, 2, 13, 17, 6, 5, 350084, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>), 668, <psycopg2._json.Json object at 0x7f868884fad0>, '0x0'); alias=default
+DEBUG 2024-02-26 22:30:21,418 utils (0.001) SELECT COUNT(*) AS "__count" FROM "pong_gamedata"; args=(); alias=default
+DEBUG 2024-02-26 22:30:21,420 utils (0.000) SELECT COUNT(*) AS "__count" FROM "pong_tournamentdata"; args=(); alias=default
