@@ -27,7 +27,6 @@ def initialize_database(sender, **kwargs):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     while size_GameData < 8:
-        # asyncio.run(add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData)))
         add_game_data(*generate_random_match(database_end, time_diff, False, size_GameData))
         size_GameData += 1    
     loop.close()
@@ -37,7 +36,6 @@ def initialize_database(sender, **kwargs):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     while size_TournamentData < 2:
-        # asyncio.run(add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData), False))
         add_tournament_data(*generate_random_tournament(database_end, time_diff, size_TournamentData), False)
         size_TournamentData += 1
     loop.close()

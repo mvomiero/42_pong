@@ -237,7 +237,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         tdur = tournament.end_time - tournament.start_time
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, lambda: add_tournament_data(match_id_semi1, match_id_semi2, match_id_final, playersRank, tend, tdur))
-        # await add_tournament_data(match_id_semi1, match_id_semi2, match_id_final, playersRank, tend, tdur)
 
 
     async def store_database_match(self, match):
@@ -250,7 +249,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         itg = False if match.tournament is None else True
         loop = asyncio.get_event_loop()
         match_id = await loop.run_in_executor(None, lambda: add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg))
-        # match_id = await add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg)
         return match_id
 
     async def tournament_clear(self, tournament, closing_code=None):

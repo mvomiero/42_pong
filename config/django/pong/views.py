@@ -86,7 +86,6 @@ def error_disconnection(request):
 #     games (gend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. gdur) = number (e.g. 10)
 def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
-# async def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
         gend = (pytz.timezone('Europe/Paris')).localize(gend)
         game_data = GameData(
@@ -109,13 +108,11 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
 def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur, blockchain=True):
-# async def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur, blockchain=True):
     tend = (pytz.timezone('Europe/Paris')).localize(tend)
     if blockchain:
         tourID = random.randint(0, 9999)
         tour_result = str(tourID) + " " + str(playersRank)
         tx_hash = asyncio.run(deploy_sepo(tour_result))
-        # tx_hash = await deploy_sepo(tour_result)
     else:
         tx_hash = "0x0"
     tournament_data = TournamentData(
@@ -457,8 +454,8 @@ def get_dashboard_data_player(request):
     """ Data for the Chart """
     player_wins = player_matches.annotate(
         winner_name=Case(
-            When(player1_points=11, then=F('player1_name')),
-            When(player2_points=11, then=F('player2_name')),
+            When(player1_points__gt=F('player2_points'), then=F('player1_name')),
+            When(player2_points__gt=F('player1_points'), then=F('player2_name')),
             output_field=CharField(),
         )
     ).values_list('winner_name', flat=True)
