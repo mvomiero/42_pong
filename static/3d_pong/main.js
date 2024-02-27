@@ -87,9 +87,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       var roomCode = document.getElementById("room_code").value;
       winMessage.player = playerName;
       winMessage.game_mode = roomCode;
-      char_choice = encodeURIComponent(playerName);
+      char_choice = playerName;
       var connectionString =
-        "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + char_choice + "/";
+        "ws://" + window.location.host + "/ws/play/" + roomCode + "/" + encodeURIComponent(char_choice) + "/";
       gameSocket = new WebSocket(connectionString);
       console.log("[WebSocket started] connectionString: ", connectionString);
       displayPlayerAndMode(char_choice, roomCode);
