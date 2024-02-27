@@ -351,7 +351,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // DESTRUCTION OF MESHES
 
-  function removeElements() {
+  function removeGameElements() {
     removeAndDisposeAndMakeUndefined(ballMesh);
     removeAndDisposeAndMakeUndefined(player1ScoreMesh);
     removeAndDisposeAndMakeUndefined(player2ScoreMesh);
@@ -359,14 +359,18 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     removeAndDisposeAndMakeUndefined(namePlayer2Mesh);
     removeAndDisposeAndMakeUndefined(leftPaddleMesh);
     removeAndDisposeAndMakeUndefined(rightPaddleMesh);
+    renderer.render(scene, camera);
+    document.removeEventListener("keydown", keyDownEventListener);
+    document.removeEventListener("keyup", keyUpEventListener);
+  }
+
+  function removeTable() {
     removeAndDisposeAndMakeUndefined(tableMesh);
     removeAndDisposeAndMakeUndefined(tableUpperWallMesh);
     removeAndDisposeAndMakeUndefined(tableLowerWallMesh);
     removeAndDisposeAndMakeUndefined(netMesh);
     removeAndDisposeAndMakeUndefined(controls);
     renderer.render(scene, camera);
-    document.removeEventListener("keydown", keyDownEventListener);
-    document.removeEventListener("keyup", keyUpEventListener);
   }
 
   function removeAndDisposeAndMakeUndefined(object) {
@@ -425,8 +429,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         console.log("Received data:", data);
 
       if (data.command === "set_player") {
-        createLeftPaddle();
-        renderer.render(scene, camera);
         char_choice = data.player;
       }
 
@@ -444,6 +446,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           else {
             player = 0;
           }
+          createLeftPaddle();
           createRightPaddle();
           initTextParams();
           createP1ScoreText();
@@ -461,18 +464,19 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       if (data.command === "match_info") {
         if (data.mode === "end") {
           winMessage.winner = data.winner
-          removeElements();
+          removeGameElements();
         }
       }
 
       if (data.command === "tournament_info") {
-        displayTournamentMatches(data);
+        displayTournamentMatches(data); // shouldn't this be done on start only?
         if (data.mode === "end") {
           winMessage.ranking[1] = data.playerRanking.firstPosition
           winMessage.ranking[2] = data.playerRanking.secondPosition
           winMessage.ranking[3] = data.playerRanking.thirdPosition
           winMessage.ranking[4] = data.playerRanking.fourthPosition
-          removeElements();
+          removeGameElements();
+          removeTable();
         }
       }
 
@@ -560,7 +564,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         document.getElementById('closing_message').innerHTML = "The room is full.";
       }
       else if (event.code === 4005 || event.code === 4006) {
-        removeElements();
+        removeGameElements();
+        removeTable();
         document.getElementById('closing_message').innerHTML = "The connection has been lost.";
       }
     }, 1000);

@@ -124,7 +124,7 @@ class Paddle:
                 self.speed = 0
   
 class Match():
-    winning_score = 11
+    winning_score = 1
 
     def __init__(self, tournament):
         self.consumer_instances = []
