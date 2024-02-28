@@ -71,7 +71,10 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function submitNameAndStartGame() {
     const playerName1 = document.getElementById('playerName1').value.trim();  // Get the player name and remove leading and trailing whitespace
     const playerName2 = document.getElementById('playerName2').value.trim();  // Get the player name and remove leading and trailing whitespace
-    if ((playerName1 !== '' && playerName1.length <= 10) 
+    var disallowedChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    if (disallowedChars.test(playerName1) || disallowedChars.test(playerName2)) {
+      alert('Please do not use special characters like !@#$%^&*()_+-=[]{};:\\|,.<>/?');
+    } else if ((playerName1 !== '' && playerName1.length <= 10) 
         && (playerName2 !== '' && playerName2.length <= 10)) { // Check if names are not empty and have max 10 characters
         
         document.getElementById('nameInputSectionLocal').style.display = 'none';
