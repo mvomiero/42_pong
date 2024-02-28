@@ -476,9 +476,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           createP2NameText();
           createBall();
           renderer.render(scene, camera);
+          gameSocket.send(JSON.stringify({ command: "move_info", mode: "pause"}));
           const countdownDisplay = document.querySelector('#countdownText');
           startCountdown(4, countdownDisplay); // 4 seconds total for "3, 2, 1, go!"
-          // listen to keyboard events to move the paddles
+          setTimeout(() => {
+            gameSocket.send(JSON.stringify({ command: "move_info", mode: "resume" }));
+          }, 4000); // 4000 milliseconds = 4 seconds
           document.addEventListener("keydown", keyDownEventListener);
           document.addEventListener("keyup", keyUpEventListener);
         }
@@ -614,6 +617,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     document.getElementById('img_win').style.display = 'none';
     document.getElementById('img_loss').style.display = 'none';
     document.getElementById('closing_message_ranking').style.display = 'none';
+    document.getElementById('tournament_info').style.display = 'none';
   });
 
   document.getElementById("refreshLink").addEventListener("click", function () {
