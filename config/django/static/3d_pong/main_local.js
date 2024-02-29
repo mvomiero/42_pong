@@ -88,7 +88,10 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function submitNameAndStartGame() {
     playerName1 = document.getElementById('playerName1').value.trim();  // Get the player name and remove leading and trailing whitespace
     playerName2 = document.getElementById('playerName2').value.trim();  // Get the player name and remove leading and trailing whitespace  
-    if ((playerName1 !== '' && playerName1.length <= 10) 
+    var disallowedChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    if (disallowedChars.test(playerName1) || disallowedChars.test(playerName2)) {
+      alert('Please do not use special characters like !@#$%^&*()_+-=[]{};:\\|,.<>/?');
+    } else if ((playerName1 !== '' && playerName1.length <= 10) 
         && (playerName2 !== '' && playerName2.length <= 10)) { // Check if names are not empty and have max 10 characters
           document.getElementById('nameInputSectionLocal').style.display = 'none';
           document.getElementById('game_board').style.display = 'block';
@@ -380,6 +383,24 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // RECEIVING DATA
 
+  function startCountdown(duration, display) {
+    let timer = duration;
+    display.textContent = timer;
+
+    const countdownInterval = setInterval(function () {
+      timer--;
+
+      if (timer > 0) {
+        display.textContent = timer;
+      } else if (timer === 0) {
+        display.textContent = 'Go!';
+      } else {
+        clearInterval(countdownInterval);
+        display.parentNode.removeChild(display);
+      }
+    }, 1000);
+  }
+
   function displayTournamentMatches(data) {
     document.getElementById('tournament_info').style.display = 'inline-flex';
     document.getElementById('semiFinal1').innerHTML = data.matchSemi1.player1 + " vs. " + data.matchSemi2.player2;
@@ -410,6 +431,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           createP2NameText();
           createBall();
           renderer.render(scene, camera);
+          player1GameSocket.send(JSON.stringify({ command: "move_info", mode: "pause" }));
+          const countdownDisplay = document.querySelector('#countdownText');
+          startCountdown(4, countdownDisplay); // 4 seconds total for "3, 2, 1, go!"
+          setTimeout(() => {
+            player1GameSocket.send(JSON.stringify({ command: "move_info", mode: "resume" }));
+          }, 4000); // 4000 milliseconds = 4 seconds
           // listen to keyboard events to move the paddles
           document.addEventListener("keydown", keyDownEventListener);
           document.addEventListener("keyup", keyUpEventListener);
@@ -522,6 +549,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     document.getElementById('img_win').style.display = 'none';
     document.getElementById('img_loss').style.display = 'none';
     document.getElementById('closing_message_ranking').style.display = 'none';
+    document.getElementById('tournament_info').style.display = 'none';
   });
 
   document.getElementById("refreshLink").addEventListener("click", function () {
