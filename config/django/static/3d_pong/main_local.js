@@ -1,8 +1,17 @@
+// # Converting main.js to main_local.js 
+// - make sure button names are changed to their local versions
+// - we adapt submitNameAndStartGame to refer to setup both players (player1, player2) and their associated websockets (p1gameSocket, p2gameSocket)
+// - we only receive from backend on one of the sockets (p1gameSocket.onmessage)
+// - what about onclose and onerror?
+// - we define extra keys for the second player ("I K"), so now we have
+// 	- p1PaddleIncreaseKey, p1PaddleDecreaseKey, p2PaddleIncreaseKey, p2PaddleDecreaseKey
+// - we refer to both p1Paddle and p2Paddle in keyDownEventListener and keyUpEventListener
+// - we remove all reference to paddlecam - as there is no 'leading player view'
 
 import * as THREE from 'three';
-import {FontLoader} from 'three/FontLoader';
-import {TextGeometry} from 'three/TextGeometry';
-import {OrbitControls} from 'three/OrbitControls';
+import { FontLoader } from 'three/FontLoader';
+import { TextGeometry } from 'three/TextGeometry';
+import { OrbitControls } from 'three/OrbitControls';
 
 const fontLoader = new FontLoader();
 fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_serif_regular.typeface.json', function (font) {
@@ -20,7 +29,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     renderer: renderer,
     zoomedCanvasWidth: canvas.width * zoomFactor,
     zoomedCanvasHeight: canvas.height * zoomFactor,
-    currentScene: "waitingForPlayers", // scenes: "openingTitles", "preGame", "game", "closingTitles" and "end"
     backgroundColour: 0x000000,
     p1Colour: 0xb744ff,
     otherTextColour: 0xFFFFAA,
@@ -34,31 +42,33 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   light.position.set(0, 0, 12);
   sceneProperties.scene.add(light);
 
-  var scorePlayer1 = 0, scorePlayer2 = 0;
-  const winningScore = 4;
+  var player1Score = 0, player2Score = 0;
   const ball = {};
-  const intervalUpdateRateMs = 20;
   var tableMesh, tableUpperWallMesh, tableLowerWallMesh, netMesh, tableWidth, tableHeight, tableDepth;
-  var ballMesh, minBallZ, maxBallZ;
-  const ballSize = 0.4, initBallSpeed = 0.2, minBallSpeed = 0.1, amountToSlow = 0, maxBallSpeedDivider = 4; // amountToSlow = 0.025
-  var leftPaddleMesh, rightPaddleMesh, paddleWidth, paddleHeight, paddleDepth, leftPaddleSpeed = 0, rightPaddleSpeed = 0, paddleCam = false;
-  var paddleIncreaseKeyLeft, paddleDecreaseKeyLeft, paddleIncreaseKeyRight, paddleDecreaseKeyRight, paddleIntervalLeft, paddleIntervalRight;
+  var ballMesh, ballSize = 0.2, minBallZ, maxBallZ;
+  var leftPaddleMesh, rightPaddleMesh, paddleWidth, paddleHeight, paddleDepth;
+  var player1PaddleIncreaseKey, player1PaddleDecreaseKey, player2PaddleIncreaseKey, player2PaddleDecreaseKey;
   var textHeight, textDepth, textYpos, leftScoreXpos, rightScoreXpos, leftNameOffset, rightNameOffset;
-  var scorePlayer1Mesh, scorePlayer2Mesh;
-  var namePlayer1Mesh, namePlayer2Mesh;
+  var player1ScoreMesh, player2ScoreMesh, namePlayer1Mesh, namePlayer2Mesh;
   var controls;
-  var player1, player2;
-  var winnerName;
-  var winnerColour;
-  var gameSocket;
-  var animationId;
+  var playerName1, playerName2;
+  var player1GameSocket, player2GameSocket;
 
-  // variables for tournament:
-  var game_mode; // "local" or "remote" or "tournament"
-
+  // variables for message at the end of the game:
+  var winMessage = {
+    player: undefined,
+    game_mode: undefined,
+    winner: undefined, // match only
+    ranking: { // tournament only
+      1: undefined,
+      2: undefined,
+      3: undefined,
+      4: undefined
+    }
+  }
 
   /**************************************************/
-  /************* HANDLING HTML ELEMENTS *************/
+  /******************** NEW PART ********************/
   /**************************************************/
 
   // Function to show the name input field
@@ -67,34 +77,40 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     document.getElementById('nameInputSectionLocal').style.display = 'block';
   }
 
+  function displayPlayersAndMode() {
+    document.getElementById('player_info').innerHTML = "Players: " + playerName1 + ", " + playerName2;
+    document.getElementById('game_info').style.display = 'inline-flex';
+    document.getElementById('mode_info').innerHTML = "Mode: local match";
+    document.getElementById('game_message').style.display = 'block';
+  }
+
   // Function to show the canvas after submitting the name
   function submitNameAndStartGame() {
-    const playerName1 = document.getElementById('playerName1').value.trim();  // Get the player name and remove leading and trailing whitespace
-    const playerName2 = document.getElementById('playerName2').value.trim();  // Get the player name and remove leading and trailing whitespace
+    playerName1 = document.getElementById('playerName1').value.trim();  // Get the player name and remove leading and trailing whitespace
+    playerName2 = document.getElementById('playerName2').value.trim();  // Get the player name and remove leading and trailing whitespace  
     if ((playerName1 !== '' && playerName1.length <= 10) 
         && (playerName2 !== '' && playerName2.length <= 10)) { // Check if names are not empty and have max 10 characters
-        
-        document.getElementById('nameInputSectionLocal').style.display = 'none';
-        document.getElementById('game_board').style.display = 'block';
-
-        // Connect to the websocket
-        var roomCode = "local";
-        var connectionString =
-        "wss://" + window.location.host + "/ws/play/" + roomCode + "/" + encodeURIComponent(playerName1) + "/" + encodeURIComponent(playerName2) + "/";
-        gameSocket = new WebSocket(connectionString);
-        console.log("[WebSocket started] connectionString: ", connectionString);
-
-        // set game variables
-        player1 = playerName1;
-        player2 = playerName2;
-        game_mode = roomCode;
-
-        // start the game
-        initGame();
-
-        // Set the event handlers
-        gameSocket.onclose = handleWebSocketClose;
-        gameSocket.onerror = handleWebSocketError;
+          document.getElementById('nameInputSectionLocal').style.display = 'none';
+          document.getElementById('game_board').style.display = 'block';
+          var roomCode = document.getElementById("room_code").value; // can't set this to "local" otherwise game doesn't start
+          winMessage.game_mode = roomCode;
+          var player1ConnectionString =
+            "wss://" + window.location.host + "/ws/play/" + roomCode + "/" + encodeURIComponent(playerName1) + "/";
+          player1GameSocket = new WebSocket(player1ConnectionString);
+          console.log("[WebSocket started] connectionString: ", player1ConnectionString);
+          var player2ConnectionString =
+            "wss://" + window.location.host + "/ws/play/" + roomCode + "/" + encodeURIComponent(playerName2) + "/";
+          player2GameSocket = new WebSocket(player2ConnectionString);
+          console.log("[WebSocket started] connectionString: ", player2ConnectionString);
+          displayPlayersAndMode();
+          player1PaddleIncreaseKey = "W";
+          player1PaddleDecreaseKey = "S";
+          player2PaddleIncreaseKey = "I";
+          player2PaddleDecreaseKey = "K";
+          initGame();
+          player1GameSocket.onmessage = handleWebSocketOpen;
+          player1GameSocket.onclose = handleWebSocketClose;
+          player1GameSocket.onerror = handleWebSocketError;
 
     } else if (playerName1.length > 10 || playerName2.length > 10) {
         alert('Name too long - Please enter a valid name.');
@@ -109,45 +125,37 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     document.getElementById('pongChooseMode').style.display = 'block';
   }
 
-  // Event listener for the Start Game Button
   document.getElementById('startLocalGameButton').addEventListener('click', showNameInput);
-
-  // Event listener for the Submit Name Button
   document.getElementById('submitNameButtonLocal').addEventListener('click', submitNameAndStartGame);
-
-  // Event listener for the Submit Name Button
   document.getElementById('restartGameButton').addEventListener('click', showNameInput2);
 
+  // // Function to check if an element is in the viewport
+  // function isInViewport(element) {
+  //   const rect = element.getBoundingClientRect();
+  //   return (
+  //     rect.top >= 0 &&
+  //     rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+  //   );
+  // }
 
   /**************************************************/
-  /******************* GAME PART ********************/
+  /**************** END NEW PART ********************/
   /**************************************************/
 
   function initGame() {
-    paddleWidth = sceneProperties.zoomedCanvasWidth * 0.02;
-    paddleHeight = sceneProperties.zoomedCanvasWidth * 0.2;
-    paddleDepth = sceneProperties.zoomedCanvasHeight * 0.05;
-    minBallZ = sceneProperties.zoomedCanvasWidth * 0.05;
-    maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     initCamera();
     initTable();
     createTable();
-    initStart();
+    paddleWidth = sceneProperties.zoomedCanvasWidth * 0.02;
+    paddleHeight = tableHeight / 4; // must match with self.height = 1/5 in consumers.py
+    paddleDepth = sceneProperties.zoomedCanvasHeight * 0.05;
+    minBallZ = ballSize;
+    maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     renderer.render(scene, camera);
-    startAnimationLoop();
   }
 
-  function initStart() {
-    createLeftPaddle();
-    createRightPaddle();
-    initTextParams();
-    createP1ScoreText();
-    createP2ScoreText();
-    createP1NameText();
-    createP2NameText();
+  function handleMouseMove() {
     renderer.render(scene, camera);
-    sceneProperties.currentScene = "game";
-    initBall();
   }
 
   function initCamera() {
@@ -158,25 +166,17 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     controls.minAzimuthAngle = -Math.PI / 2; // left limit
     controls.maxAzimuthAngle = Math.PI / 2; // right limit
     controls.maxPolarAngle = Math.PI / 1; // vertical rotation limit
+    document.addEventListener('mousemove', handleMouseMove);
     var onWindowResize = function () { // Handle resize events
       sceneProperties.camera.aspect = window.innerWidth / window.innerHeight;
       sceneProperties.camera.updateProjectionMatrix();
     };
     window.addEventListener('resize', onWindowResize, false);
-    setNormalCam();
+    sceneProperties.camera.position.set(0, 0, 11);
+    sceneProperties.camera.rotation.set(0, 0, 0);
   }
-  
-  function removeAndDisposeAndMakeUndefined(object) {
-    sceneProperties.scene.remove(object);
-    if (object.geometry)
-      object.geometry.dispose();
-    if (object.material) {
-      if (object.material.map)
-        object.material.map.dispose();
-      object.material.dispose();
-    }
-    object = undefined;
-  }
+
+  // CONSTRUCTION OF MESHES
 
   function initTable() {
     tableWidth = sceneProperties.zoomedCanvasWidth * 0.75;
@@ -184,10 +184,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     tableDepth = sceneProperties.zoomedCanvasHeight * 0.01;
   }
 
-  function generateRandomBallHeight() {
-    return Math.floor(Math.random() * (maxBallZ - minBallZ + 1)) + minBallZ;
-  }
-  
   function initTextParams() {
     textHeight = sceneProperties.zoomedCanvasHeight * 0.075;
     textDepth = sceneProperties.zoomedCanvasHeight * 0.01;
@@ -198,6 +194,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     rightNameOffset = sceneProperties.zoomedCanvasWidth * 0.04;
   }
 
+  function createBall() {
+    var geometry = new THREE.SphereGeometry(ballSize, 50);
+    var material = new THREE.MeshPhongMaterial({ color: sceneProperties.ballColour });
+    ballMesh = new THREE.Mesh(geometry, material);
+    ballMesh.position.set(0, 0, ballSize);
+    sceneProperties.scene.add(ballMesh);
+  }
+
   function createLeftPaddle() {
     var paddleGeometry = new THREE.BoxGeometry(paddleWidth, paddleHeight, paddleDepth);
     var leftPaddleMeshMaterial = new THREE.MeshPhongMaterial({ color: sceneProperties.p1Colour });
@@ -205,7 +209,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     const halfPaddleDepth = paddleDepth / 2;
     leftPaddleMesh.position.set(-tableWidth / 2 - paddleWidth / 2, 0, halfPaddleDepth);
     sceneProperties.scene.add(leftPaddleMesh);
-    renderer.render(scene, camera);
   }
 
   function createRightPaddle() {
@@ -228,7 +231,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     var tableWallGeometry = new THREE.BoxGeometry(tableWidth, sceneProperties.zoomedCanvasHeight * 0.02, maxBallZ);
     var tableWallMaterial = new THREE.MeshPhongMaterial({
       color: sceneProperties.tableWallsColour,
-      opacity: 0.1,
+      opacity: 0.5,
       transparent: true
     });
     tableUpperWallMesh = new THREE.Mesh(tableWallGeometry, tableWallMaterial);
@@ -262,29 +265,29 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   }
 
   function createP1ScoreText() {
-    const scorePlayer1Geom = new TextGeometry(scorePlayer1.toString(), { font: sceneProperties.font, size: textHeight, height: textDepth });
-    const scorePlayer1Material = new THREE.MeshPhongMaterial({ color: sceneProperties.p1Colour });
-    scorePlayer1Mesh = new THREE.Mesh(scorePlayer1Geom, scorePlayer1Material);
+    const player1ScoreGeom = new TextGeometry(player1Score.toString(), { font: sceneProperties.font, size: textHeight, height: textDepth });
+    const player1ScoreMaterial = new THREE.MeshPhongMaterial({ color: sceneProperties.p1Colour });
+    player1ScoreMesh = new THREE.Mesh(player1ScoreGeom, player1ScoreMaterial);
     const p1ScoreTextWidth = leftScoreXpos;
     const p1ScoreTextHeight = textYpos - textHeight;
     const p1ScoreTextDepth = maxBallZ;
-    scorePlayer1Mesh.position.set(p1ScoreTextWidth, p1ScoreTextHeight, p1ScoreTextDepth);
-    sceneProperties.scene.add(scorePlayer1Mesh);
+    player1ScoreMesh.position.set(p1ScoreTextWidth, p1ScoreTextHeight, p1ScoreTextDepth);
+    sceneProperties.scene.add(player1ScoreMesh);
   }
 
   function createP2ScoreText() {
-    const scorePlayer2Geom = new TextGeometry(scorePlayer2.toString(), { font: sceneProperties.font, size: textHeight, height: textDepth });
-    const scorePlayer2Material = new THREE.MeshPhongMaterial({ color: sceneProperties.p2Colour });
-    scorePlayer2Mesh = new THREE.Mesh(scorePlayer2Geom, scorePlayer2Material);
+    const player2ScoreGeom = new TextGeometry(player2Score.toString(), { font: sceneProperties.font, size: textHeight, height: textDepth });
+    const player2ScoreMaterial = new THREE.MeshPhongMaterial({ color: sceneProperties.p2Colour });
+    player2ScoreMesh = new THREE.Mesh(player2ScoreGeom, player2ScoreMaterial);
     const p2ScoreTextWidth = rightScoreXpos;
     const p2ScoreTextHeight = textYpos - textHeight;
     const p2ScoreTextDepth = maxBallZ;
-    scorePlayer2Mesh.position.set(p2ScoreTextWidth, p2ScoreTextHeight, p2ScoreTextDepth);
-    sceneProperties.scene.add(scorePlayer2Mesh);
+    player2ScoreMesh.position.set(p2ScoreTextWidth, p2ScoreTextHeight, p2ScoreTextDepth);
+    sceneProperties.scene.add(player2ScoreMesh);
   }
 
   function createP1NameText() {
-    const namePlayer1Geom = new TextGeometry(player1, { font: sceneProperties.font, size: textHeight, height: textDepth });
+    const namePlayer1Geom = new TextGeometry(playerName1, { font: sceneProperties.font, size: textHeight, height: textDepth });
     const namePlayer1Material = new THREE.MeshPhongMaterial({ color: sceneProperties.p1Colour });
     namePlayer1Mesh = new THREE.Mesh(namePlayer1Geom, namePlayer1Material);
     const namePlayer1MeshWidth = leftScoreXpos + leftNameOffset;
@@ -295,7 +298,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   }
 
   function createP2NameText() {
-    const namePlayer2Geom = new TextGeometry(player2, { font: sceneProperties.font, size: textHeight, height: textDepth });
+    const namePlayer2Geom = new TextGeometry(playerName2, { font: sceneProperties.font, size: textHeight, height: textDepth });
     const namePlayer2Material = new THREE.MeshPhongMaterial({ color: sceneProperties.p2Colour });
     namePlayer2Mesh = new THREE.Mesh(namePlayer2Geom, namePlayer2Material);
     const boundingBox = new THREE.Box3().setFromObject(namePlayer2Mesh);
@@ -307,312 +310,171 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     sceneProperties.scene.add(namePlayer2Mesh);
   }
 
-  function checkIfBallHitTopBottomTable() {
-    if (ballMesh.position.y > tableHeight / 2 || ballMesh.position.y < -tableHeight / 2) {
-      ball.dy = -ball.dy;
-    }
-  }
+  // DESTRUCTION OF MESHES
 
-  function checkIfBallHitOrPassedPaddles()
-  {
-    // left paddle
-    if (ballMesh.position.x < -tableWidth / 2)
-    {
-      const halfPaddleHeight = paddleHeight / 2;
-      if (ballMesh.position.y < leftPaddleMesh.position.y + halfPaddleHeight && ballMesh.position.y > leftPaddleMesh.position.y - halfPaddleHeight)
-      {
-        ballMesh.position.x = -tableWidth / 2;
-        ballHitPaddle(leftPaddleSpeed);
-      }
-      else
-      {
-        ballPassedLeftPaddle();
-      }
-    }
-    // right paddle
-    else if (ballMesh.position.x > tableWidth / 2)
-    {
-      const halfPaddleHeight = paddleHeight / 2;
-      if (ballMesh.position.y < rightPaddleMesh.position.y + halfPaddleHeight && ballMesh.position.y > rightPaddleMesh.position.y - halfPaddleHeight)
-      {
-        ballMesh.position.x = tableWidth / 2;
-        ballHitPaddle(rightPaddleSpeed);
-      }
-      else
-      {
-        ballPassedRightPaddle();
-      }
-    }
-  }
-
-  function ballHitPaddle(paddleSpeed) {
-      // ball.height = generateRandomBallHeight();
-      ball.dx = -ball.dx;
-      ball.height = minBallZ;
-      // adjust ball speed according to paddle speed:
-      let newBallSpeed = ball.speed - amountToSlow; // ball first slows a bit on each paddle hit
-      //leftPaddleSpeed, rightPaddleSpeed
-      if (paddleSpeed > 0) // if the paddle is moving, it adds to the ball speed, if it is not moving the ball will slow a little
-        newBallSpeed = newBallSpeed + paddleSpeed / maxBallSpeedDivider; // divider controls overall max ball speed
-      if (newBallSpeed < minBallSpeed) // we check that the final ball speed doesn't fall below a minimum threshold
-        newBallSpeed = minBallSpeed;
-      ball.speed = newBallSpeed;
-  }
-
-  function reinitialise() {
-    animationId = undefined;
-    scorePlayer1 = 0;
-    scorePlayer2 = 0;
-    leftPaddleSpeed = 0;
-    rightPaddleSpeed = 0;
-    paddleCam = false;
-    player1 = undefined;
-    player2 = undefined;
-    //winnerName = undefined;
-    winnerColour = undefined;
-    sceneProperties.currentScene = "waitingForPlayers";
-  }
-
-  function checkForWin(score, thisPlayer, playerColour) {
-    if (score === winningScore) {
-      sceneProperties.currentScene = "none";
-      winnerName = thisPlayer;
-      winnerColour = playerColour;
-      removeAndDisposeAndMakeUndefined(ballMesh);
-      removeAndDisposeAndMakeUndefined(scorePlayer1Mesh);
-      removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
-      removeAndDisposeAndMakeUndefined(namePlayer1Mesh);
-      removeAndDisposeAndMakeUndefined(namePlayer2Mesh);
-      removeAndDisposeAndMakeUndefined(leftPaddleMesh); 
-      removeAndDisposeAndMakeUndefined(rightPaddleMesh);
-      removeAndDisposeAndMakeUndefined(tableMesh);
-      removeAndDisposeAndMakeUndefined(tableMesh);
-      removeAndDisposeAndMakeUndefined(tableUpperWallMesh);
-      removeAndDisposeAndMakeUndefined(tableLowerWallMesh);
-      removeAndDisposeAndMakeUndefined(netMesh);
-      removeAndDisposeAndMakeUndefined(controls);
-      renderer.render(scene, camera);
-      cancelAnimationFrame(animationId);
-      
-      console.log("sending match info (winner= " + winnerName + ")");
-      sendMatchInfo(); // send "end" command to add gameData to database
-      console.log("reinitialising");
-      reinitialise();
-      
-      // initClosingTitles(sceneProperties);
-    }
-  }
-
-  function setNormalCam() {
-    controls.enabled = true;
-    paddleIncreaseKeyLeft = "W";
-    paddleDecreaseKeyLeft = "S";
-    paddleIncreaseKeyRight = "ArrowUp";
-    paddleDecreaseKeyRight = "ArrowDown";
-    sceneProperties.camera.position.set(0, 0, 11);
-    sceneProperties.camera.rotation.set(0, 0, 0);   
-  }
-
-  function initBall() {
-    var geometry = new THREE.SphereGeometry(ballSize, 50);
-    var material = new THREE.MeshPhongMaterial({color: sceneProperties.ballColour});
-    ballMesh = new THREE.Mesh(geometry, material);
-    const halfBallSize = ballSize / 2;
-    ballMesh.position.set(0, 0, halfBallSize + minBallZ);
-    // ball.height = generateRandomBallHeight();
-    ball.dx = Math.random() < 0.5 ? 1 : -1;
-    ball.dy = (Math.random() * 2) - 1;
-    ball.height = minBallZ;
-    ball.speed = initBallSpeed;
-    sceneProperties.scene.add(ballMesh);
-  }
-
-  function ballPassedLeftPaddle() {
-    scorePlayer2++;
-    removeAndDisposeAndMakeUndefined(scorePlayer2Mesh);
-    createP2ScoreText();
+  function removeGameElements() {
     removeAndDisposeAndMakeUndefined(ballMesh);
+    removeAndDisposeAndMakeUndefined(player1ScoreMesh);
+    removeAndDisposeAndMakeUndefined(player2ScoreMesh);
+    removeAndDisposeAndMakeUndefined(namePlayer1Mesh);
+    removeAndDisposeAndMakeUndefined(namePlayer2Mesh);
+    removeAndDisposeAndMakeUndefined(leftPaddleMesh);
+    removeAndDisposeAndMakeUndefined(rightPaddleMesh);
     renderer.render(scene, camera);
-    initBall();
-    checkForWin(scorePlayer2, player2, sceneProperties.p2Colour);
+    document.removeEventListener("keydown", keyDownEventListener);
+    document.removeEventListener("keyup", keyUpEventListener);
   }
 
-  function ballPassedRightPaddle() {
-    scorePlayer1++;
-    removeAndDisposeAndMakeUndefined(scorePlayer1Mesh);
-    createP1ScoreText();
-    removeAndDisposeAndMakeUndefined(ballMesh);
+  function removeTable() {
+    removeAndDisposeAndMakeUndefined(tableMesh);
+    removeAndDisposeAndMakeUndefined(tableUpperWallMesh);
+    removeAndDisposeAndMakeUndefined(tableLowerWallMesh);
+    removeAndDisposeAndMakeUndefined(netMesh);
+    removeAndDisposeAndMakeUndefined(controls);
     renderer.render(scene, camera);
-    initBall();
-    checkForWin(scorePlayer1, player1, sceneProperties.p1Colour);
   }
 
-  function updateBall() {
-    ballMesh.position.x = ballMesh.position.x + ball.dx * ball.speed;
-    ballMesh.position.y = ballMesh.position.y + ball.dy * ball.speed;
-    // calculate z based on ball.height
-    const standardDeviation = tableWidth / 4;
-    const mean = 0;
-    const exponent = -((ballMesh.position.x - mean) ** 2) / (2 * standardDeviation ** 2);
-    const halfBallSize = ballSize / 2;
-    ballMesh.position.z = halfBallSize + ball.height * Math.exp(exponent);
-  }
-
-  function startAnimationLoop() {
-    animationId = requestAnimationFrame(startAnimationLoop);
-    // console.log("current scene is: ", sceneProperties.currentScene);
-    // if (sceneProperties.currentScene === "openingTitles") {
-    //   animateOpeningTitles(sceneProperties);
-    // }
-    if (sceneProperties.currentScene === "game") {
-      checkIfBallHitTopBottomTable();
-      checkIfBallHitOrPassedPaddles();
-      updateBall();
-      renderer.render(scene, camera); 
+  function removeAndDisposeAndMakeUndefined(object) {
+    if (!object)
+      return;
+    sceneProperties.scene.remove(object);
+    if (object.geometry)
+      object.geometry.dispose();
+    if (object.material) {
+      if (object.material.map)
+        object.material.map.dispose();
+      object.material.dispose();
     }
-    // if (sceneProperties.currentScene === "closingTitles") {
-    //   animateClosingTitles(sceneProperties);
-    // }
+    object = undefined;
   }
 
-  function paddleUpdateLeft(incDec) {
-    let newPaddleY, limit;
-    
-    leftPaddleSpeed = leftPaddleSpeed + 0.05;
-    if (incDec === "increase") {
-      newPaddleY = leftPaddleMesh.position.y + leftPaddleSpeed;
-      limit = tableHeight / 2 - paddleHeight / 2;
-      if (newPaddleY > limit) {
-        newPaddleY = limit;
-        clearInterval(paddleIntervalLeft);
-        leftPaddleSpeed = 0;
+  // UTILITY FUNCTIONS
+
+  function scaleFloatToRange(floatValue, minRange, maxRange) {
+    floatValue = Math.max(0, Math.min(1, floatValue));
+    return (maxRange - minRange) * floatValue + minRange;
+  }
+
+  // KEYBOARD EVENTS
+  function keyDownEventListener(e) {
+    if (e.key.toLowerCase() === player1PaddleIncreaseKey.toLowerCase())
+      player1GameSocket.send(JSON.stringify({command: "move_paddle", direction: "up", action: "pressed"}));
+    else if (e.key.toLowerCase() === player1PaddleDecreaseKey.toLowerCase())
+      player1GameSocket.send(JSON.stringify({command: "move_paddle", direction: "down", action: "pressed"}));
+    if (e.key.toLowerCase() === player2PaddleIncreaseKey.toLowerCase())
+      player2GameSocket.send(JSON.stringify({command: "move_paddle", direction: "up", action: "pressed"}));
+    else if (e.key.toLowerCase() === player2PaddleDecreaseKey.toLowerCase())
+      player2GameSocket.send(JSON.stringify({command: "move_paddle", direction: "down", action: "pressed"}));
+  }
+
+  function keyUpEventListener(e) {
+    if (e.key.toLowerCase() === player1PaddleIncreaseKey.toLowerCase())
+      player1GameSocket.send(JSON.stringify({command: "move_paddle", direction: "up", action: "released"}));
+    else if (e.key.toLowerCase() === player1PaddleDecreaseKey.toLowerCase())
+      player1GameSocket.send(JSON.stringify({command: "move_paddle", direction: "down", action: "released"}));
+    if (e.key.toLowerCase() === player2PaddleIncreaseKey.toLowerCase())
+      player2GameSocket.send(JSON.stringify({command: "move_paddle", direction: "up", action: "released"}));
+    else if (e.key.toLowerCase() === player2PaddleDecreaseKey.toLowerCase())
+      player2GameSocket.send(JSON.stringify({command: "move_paddle", direction: "down", action: "released"}));    
+  }
+
+  // RECEIVING DATA
+
+  function displayTournamentMatches(data) {
+    document.getElementById('tournament_info').style.display = 'inline-flex';
+    document.getElementById('semiFinal1').innerHTML = data.matchSemi1.player1 + " vs. " + data.matchSemi2.player2;
+    document.getElementById('semiFinal2').innerHTML = data.matchSemi2.player1 + " vs. " + data.matchSemi2.player2;
+
+    if (data.matchFinal.player1 === undefined || data.matchFinal.player2 === undefined)
+      document.getElementById('final').innerHTML = "Not yet started";
+    else
+      document.getElementById('final').innerHTML = data.matchFinal.player1 + " vs. " + data.matchFinal.player2;
+  }
+
+  function handleWebSocketOpen(event) {
+    try {
+      var data = JSON.parse(event.data);
+      if (data.command != "match_data")
+        console.log("Received data:", data);
+
+      if (data.command === "match_info") {
+        if (data.mode === "start") {
+          document.getElementById('message_info').style.display = 'none';
+          document.removeEventListener('mousemove', handleMouseMove)
+          createLeftPaddle();
+          createRightPaddle();
+          initTextParams();
+          createP1ScoreText();
+          createP2ScoreText();
+          createP1NameText();
+          createP2NameText();
+          createBall();
+          renderer.render(scene, camera);
+          // listen to keyboard events to move the paddles
+          document.addEventListener("keydown", keyDownEventListener);
+          document.addEventListener("keyup", keyUpEventListener);
+        }
       }
-    }
-    else if (incDec === "decrease") {
-      newPaddleY = leftPaddleMesh.position.y - leftPaddleSpeed;
-      limit = -tableHeight / 2 + paddleHeight / 2;
-      if (newPaddleY < limit) {
-        newPaddleY = limit;
-        clearInterval(paddleIntervalLeft);
-        leftPaddleSpeed = 0;
+
+      if (data.command === "match_info") {
+        if (data.mode === "end") {
+          winMessage.winner = data.winner
+          removeGameElements();
+        }
       }
-    }
-    leftPaddleMesh.position.y = newPaddleY;
-  }
 
-  function paddleUpdateRight(incDec) {
-    let newPaddleY, limit;
-    
-    rightPaddleSpeed = rightPaddleSpeed + 0.05;
-    if (incDec === "increase") {
-      newPaddleY = rightPaddleMesh.position.y + rightPaddleSpeed;
-      limit = tableHeight / 2 - paddleHeight / 2;
-      if (newPaddleY > limit) {
-        newPaddleY = limit;
-        clearInterval(paddleIntervalRight);
-        rightPaddleSpeed = 0;
+      if (data.command === "tournament_info") {
+        displayTournamentMatches(data); // shouldn't this be done on start only?
+        if (data.mode === "end") {
+          winMessage.ranking[1] = data.playerRanking.firstPosition
+          winMessage.ranking[2] = data.playerRanking.secondPosition
+          winMessage.ranking[3] = data.playerRanking.thirdPosition
+          winMessage.ranking[4] = data.playerRanking.fourthPosition
+          removeGameElements();
+          removeTable();
+        }
       }
-    }
-    else if (incDec === "decrease") {
-      newPaddleY = rightPaddleMesh.position.y - rightPaddleSpeed;
-      limit = -tableHeight / 2 + paddleHeight / 2;
-      if (newPaddleY < limit) {
-        newPaddleY = limit;
-        clearInterval(paddleIntervalRight);
-        rightPaddleSpeed = 0;
+
+      if (data.command === "match_data") {
+        ballMesh.position.x = data.ball.x * tableWidth;
+        ballMesh.position.y = data.ball.y * tableHeight;
+        ballMesh.position.z = scaleFloatToRange(data.ball.z, minBallZ, maxBallZ);
+        leftPaddleMesh.position.y = data.paddleLeft * tableHeight;
+        rightPaddleMesh.position.y = data.paddleRight * tableHeight;
+        if (data.score.player1 != player1Score) {
+          player1Score = data.score.player1;
+          removeAndDisposeAndMakeUndefined(player1ScoreMesh);
+          createP1ScoreText();
+        }
+        else if (data.score.player2 != player2Score) {
+          player2Score = data.score.player2;
+          removeAndDisposeAndMakeUndefined(player2ScoreMesh);
+          createP2ScoreText();
+        }
+        
+        renderer.render(scene, camera);
       }
+    } catch (error) {
+      console.error("Error parsing received data:", error);
+      console.log("Received data:", event.data);
     }
-    rightPaddleMesh.position.y = newPaddleY;
+  };
+
+
+  function displayResultMessage() {
+    if (winMessage.game_mode === "match") {
+      document.getElementById('img_win').style.display = "block";
+      document.getElementById('closing_message').innerHTML = "🌴🎉 Congratulations to " + winMessage.winner + ", you won!";
+    }
   }
-
-
-  /******************************************************/
-  /******************* KEYBOARD EVENTS ******************/
-  /******************************************************/
-
-  // listen to keyboard events to move the paddles
-  document.addEventListener("keydown", function (e) {
-    if (gameSocket !== undefined && gameSocket.readyState === WebSocket.OPEN && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-        e.preventDefault();
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKeyLeft.toLowerCase()) {
-      console.log("paddleIncreaseKeyLeft pressed");
-      clearInterval(paddleIntervalLeft);
-      leftPaddleSpeed = 0;
-      paddleIntervalLeft = setInterval(() => {
-        paddleUpdateLeft("increase");
-      }, intervalUpdateRateMs);
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKeyLeft.toLowerCase()) {
-      clearInterval(paddleIntervalLeft);
-      leftPaddleSpeed = 0;
-      paddleIntervalLeft = setInterval(() => {
-        paddleUpdateLeft("decrease");
-      }, intervalUpdateRateMs);
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKeyRight.toLowerCase()) {
-      clearInterval(paddleIntervalRight);
-      rightPaddleSpeed = 0;
-      paddleIntervalRight = setInterval(() => {
-        paddleUpdateRight("increase");
-      }, intervalUpdateRateMs);
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKeyRight.toLowerCase()) {
-      clearInterval(paddleIntervalRight);
-      rightPaddleSpeed = 0;
-      paddleIntervalRight = setInterval(() => {
-        paddleUpdateRight("decrease");
-      }, intervalUpdateRateMs);
-    }
-  });
-
-  // listen to keyboard events to stop the paddle if key is released
-  document.addEventListener("keyup", function (e) {
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKeyLeft.toLowerCase()) {
-      clearInterval(paddleIntervalLeft);
-      leftPaddleSpeed = 0;
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleIncreaseKeyRight.toLowerCase()) {
-      clearInterval(paddleIntervalRight);
-      rightPaddleSpeed = 0;
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKeyLeft.toLowerCase()) {
-      clearInterval(paddleIntervalLeft);
-      leftPaddleSpeed = 0;
-    }
-    if (sceneProperties.currentScene === "game" && e.key.toLowerCase() === paddleDecreaseKeyRight.toLowerCase()) {
-      clearInterval(paddleIntervalRight);
-      rightPaddleSpeed = 0;
-    }    
-  });
-
-
-  /******************************************************/
-  /**************** SENDING ON WEBSOCKET ****************/
-  /******************************************************/
-
-  // SENDING DATA TO WEBSOCKET
-  function sendMatchInfo() {
-    var matchInfo = {
-      command: "match_info",
-      mode: "end",
-      score: {
-        player1: scorePlayer1,
-        player2: scorePlayer2,
-      },
-      winner: winnerName
-    };
-    gameSocket.send(JSON.stringify(matchInfo));
-  }
-
-
-  /******************************************************/
-  /************ CLOSING & ERROR ON WEBSOCKET ************/
-  /******************************************************/
 
   // Event handler for connection closure
   function handleWebSocketClose(event) {
     console.log("WebSocket connection closed! (code: " + event.code + ")");
+
+    /*********************************************************/
+    /***************** CHANGES STARTING HERE *****************/
+    /*********************************************************/
 
     setTimeout(function () {
       document.getElementById('game_board').style.display = 'none';
@@ -621,6 +483,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
       document.getElementById('game_info').style.display = 'none';
       document.getElementById('game_message').style.display = 'none';
+      //document.getElementById('tournament_info').style.display = 'none';
 
       if (event.code === 3001 || event.code === 3002) {
         //document.getElementById('closing_message').innerHTML = "GAME OVER";
@@ -633,9 +496,16 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         document.getElementById('closing_message').innerHTML = "The room is full.";
       }
       else if (event.code === 4005 || event.code === 4006) {
+        removeGameElements();
+        removeTable();
         document.getElementById('closing_message').innerHTML = "The connection has been lost.";
       }
     }, 1000);
+
+    /*********************************************************/
+    /****************** CHANGES ENDING HERE ******************/
+    /*********************************************************/
+
   };
 
   // Error handler for WebSocket errors
@@ -644,12 +514,19 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     // Handle WebSocket errors
   };
 
-  function displayResultMessage() {
-    document.getElementById('img_win').style.display = "block";
-    document.getElementById('closing_message').innerHTML = "🌴🎉 Congratulations, \"" + winnerName + "\" won! 🎉🌴"; 
-    winnerName = undefined;
-  }
 
+  document.getElementById("end_closing_message").addEventListener("click", function () {
+    document.getElementById('restartPongSection').style.display = 'block';
+    document.getElementById('closing_message').style.display = 'none';
+    document.getElementById('end_closing_message').style.display = 'none';
+    document.getElementById('img_win').style.display = 'none';
+    document.getElementById('img_loss').style.display = 'none';
+    document.getElementById('closing_message_ranking').style.display = 'none';
+  });
+
+  document.getElementById("refreshLink").addEventListener("click", function () {
+    event.preventDefault(); // Prevent the default behavior of the link
+    location.reload(); // Reload the page
+  });
 
 });
-

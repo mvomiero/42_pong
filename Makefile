@@ -2,11 +2,16 @@
 
 all: compose
 
-compose:
+eval:
+	docker compose up --build
+
+compose: 
 	docker compose up --remove-orphans --build -d
 
 decompose:
 	docker compose down
+
+recompose: decompose all
 
 exec_transcendence:
 	docker compose exec transcendence /bin/bash
