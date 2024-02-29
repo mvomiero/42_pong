@@ -263,7 +263,7 @@
   
   .game {
     width: 750px;
-    height: 2rem;
+    min-height: 3rem;
     border: 0px solid #001aff;
     border: 0px solid #b744ff;
     padding: 0rem;
@@ -300,3 +300,11 @@
     font-weight: 800;
   }
   
+  #player_info, #mode_info {
+  margin-top: 1.5rem;
+}
+
+#countdownText {
+  font-size: 2em !important;
+  font-weight: 800;
+}
