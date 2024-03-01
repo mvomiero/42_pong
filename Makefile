@@ -1,6 +1,9 @@
 # keys are in /goinfre/docker/volumes
 
-all: compose
+all: up_only
+
+up_only:
+	docker compose up
 
 eval:
 	docker compose up --build

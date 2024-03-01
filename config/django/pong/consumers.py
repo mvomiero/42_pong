@@ -7,8 +7,15 @@ from pong.match_setup import *
 from pong.tournament_setup import *
 from pong.views import add_game_data, add_tournament_data
 from datetime import datetime
+from pong.logger import logger
+
+logger = logger()
 
 class PongConsumer(AsyncWebsocketConsumer):
+    logger.debug('ghdsghjgdf')
+    logger.warning('ddddddffffdd')
+    logger.error('dddddssssssssssssssddd')
+    logger.critical('dddddsssddd')
     game_loop_sleep_time = 0.01
     tournament_loop_sleep_time = 0.4
     sleep_delay_end_msg = 0.3

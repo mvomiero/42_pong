@@ -13,8 +13,8 @@ RUN pip3 install -r requirements.txt --break-system-packages \
     && pip install psycopg2
 RUN pip install pytz -r requirements.txt
 RUN mkdir logs
-COPY ./certs/127.0.0.1-key.pem ./certs/127.0.0.1-key.pem
-COPY ./certs/127.0.0.1-cert.pem ./certs/127.0.0.1-cert.pem
+COPY ./certs/10.15.202.4-key.pem ./certs/10.15.202.4-key.pem
+COPY ./certs/10.15.202.4-cert.pem ./certs/10.15.202.4-cert.pem
 RUN django-admin startproject transcendence
 WORKDIR /transcendence
 RUN python manage.py startapp pong
@@ -31,6 +31,7 @@ COPY ./config/django/pong/urls.py ./pong/
 COPY ./config/django/pong/views.py ./pong/
 COPY ./config/django/pong/webSocket_msg_create.py ./pong/
 COPY ./config/django/pong/consumers.py ./pong/
+COPY ./config/django/pong/logger.py ./pong/
 COPY ./config/django/pong/consumers_local.py ./pong/
 COPY ./config/django/pong/match_setup.py ./pong/
 COPY ./config/django/pong/tournament_setup.py ./pong/

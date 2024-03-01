@@ -4,7 +4,7 @@ SSL_PATH="/etc/elasticsearch/ssl"
 
 #localhost CA
 mkcert -install
-mkcert -key-file $SSL_PATH/localhost_key.pem -cert-file $SSL_PATH/localhost_cert.crt 127.0.0.1
+mkcert -key-file $SSL_PATH/localhost_key.pem -cert-file $SSL_PATH/localhost_cert.crt 10.15.202.4
 chmod 644 $SSL_PATH/localhost_key.pem
 cp /root/.local/share/mkcert/rootCA.pem $SSL_PATH
 
