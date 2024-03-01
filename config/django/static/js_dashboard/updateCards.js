@@ -59,7 +59,7 @@ function updateCardsMatch(cardsData) {
     const bestPlayerAliasElement = document.getElementById('ma-bestPlayerAlias');
     bestPlayerAliasElement.textContent = cardsData.bestPlayer.alias;
     const bestPlayerWinsElement = document.getElementById('ma-bestPlayerWins');
-    bestPlayerWinsElement.textContent = 'is the most successfull Player (won ' + cardsData.bestPlayer.wins.toString() + ' matches).';
+    bestPlayerWinsElement.textContent = 'is the most successful Player (won ' + cardsData.bestPlayer.wins.toString() + ' matches).';
 
     const highestPlayingTimeAliasElement = document.getElementById('ma-highestPlayingTimeAlias');
     highestPlayingTimeAliasElement.textContent = cardsData.bestPlayer.alias;
@@ -92,7 +92,7 @@ function updateCardsTournament(cardsData) {
     const bestPlayerAliasElement = document.getElementById('tn-bestPlayerAlias');
     bestPlayerAliasElement.textContent = cardsData.bestPlayer.alias;
     const bestPlayerWinsElement = document.getElementById('tn-bestPlayerWins');
-    bestPlayerWinsElement.textContent = 'is the most successfull Player (won ' + cardsData.bestPlayer.wins.toString() + ' tournaments).';
+    bestPlayerWinsElement.textContent = 'is the most successful Player (won ' + cardsData.bestPlayer.wins.toString() + ' tournaments).';
 
     const highestPlayingTimeAliasElement = document.getElementById('tn-highestPlayingTimeAlias');
     highestPlayingTimeAliasElement.textContent = cardsData.bestPlayer.alias;
