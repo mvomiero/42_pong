@@ -1,5 +1,7 @@
-
+from pong.logger import logger
 import json
+
+logger = logger()
 
 def match_data(ball, score, paddleLeft, paddleRight):
     list = {
@@ -19,6 +21,7 @@ def match_data(ball, score, paddleLeft, paddleRight):
     return json.dumps(list)
 
 def set_player(player_name):        # send after accepting the WebSocket connection
+    logger.info(f"Setting player name {player_name}")
     list = {
         'command': 'set_player',
         'player': player_name,      # player name
@@ -31,6 +34,10 @@ def set_player(player_name):        # send after accepting the WebSocket connect
 # Remote Match:
     # -broadcast to the players in the match
 def match_info(mode, players, score=None, winner=None):
+    if mode == 'start':
+        logger.warn(f'Match start for players {players[0]}, {players[1]}')
+    elif mode == 'end':
+        logger.info(f'Match end for players {players[0]}, {players[1]}')
     list = {
         'command': 'match_info',
         'mode': mode, # 'start' || 'update' || 'end',
@@ -43,9 +50,11 @@ def match_info(mode, players, score=None, winner=None):
         'winner': None,
     }
     if score is not None:
+        logger.info(f'Score updated to {players[0]}, {score[0]} - {players[1]}, {score[1]}')
         list['score']['player1'] = score[0]
         list['score']['player2'] = score[1]
     if winner is not None:
+        logger.warn(f'Player {winner} won the game')
         list['winner'] = winner
 
     return json.dumps(list)

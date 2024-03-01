@@ -1,6 +1,9 @@
 import os
 import json
 from web3 import Web3
+from pong.logger import logger
+
+logger = logger()
 
 async def deploy_sepo(result):
     with open('./pong/trans.abi', 'r') as abi_file:
@@ -21,13 +24,15 @@ async def deploy_sepo(result):
     trans = web3.eth.contract(abi=abi, bytecode=bytecode)
     binary_result = result.encode('utf-8')
     count = web3.eth.get_transaction_count(account_from["address"])
-    print(f"the count0 is {count}!!!!!")
+    logger.info(f"The current count is {count}!")
     latest_nonce = web3.eth.get_transaction_count(account_from["address"], 'pending')
     if latest_nonce == count:
         count += 1
-    print(f"the count1 is {count}!!!!!")
+    logger.info(f"The after check count is {count}!")
     current_gas_price = web3.eth.gas_price
+    logger.warn(f'The current gas price is {current_gas_price}')
     new_gas_price = int(current_gas_price * 1.2)
+    logger.warn(f'The new gas price is {new_gas_price}')
     construct_txn = trans.functions.save(binary_result).build_transaction(
         {
             "from": Web3.to_checksum_address(account_from["address"]),
@@ -52,6 +57,7 @@ async def deploy_sepo(result):
 
     tx_hash = web3.eth.send_raw_transaction(tx_create.rawTransaction)
     if tx_hash:
+        logger.info(f'Transaction hash is complete: {tx_hash}')
         return tx_hash.hex()
     else:
         return "Pending"

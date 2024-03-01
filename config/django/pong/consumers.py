@@ -12,10 +12,6 @@ from pong.logger import logger
 logger = logger()
 
 class PongConsumer(AsyncWebsocketConsumer):
-    logger.debug('ghdsghjgdf')
-    logger.warning('ddddddffffdd')
-    logger.error('dddddssssssssssssssddd')
-    logger.critical('dddddsssddd')
     game_loop_sleep_time = 0.01
     tournament_loop_sleep_time = 0.4
     sleep_delay_end_msg = 0.3
@@ -106,6 +102,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             
     async def disconnect(self, close_code):
         # check if self.match is in self.matches
+        logger.warn(f'Player {self.player} disconnected from the game')
         if self.mode == "match" and hasattr(self, 'match') and isinstance(self.match, Match):
             try:
                 self.match.player_quit = True
@@ -132,8 +129,10 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.paddle.paddle_keyPress(received_data['direction'], received_data['action'])
         
         if hasattr(self, 'match') and not self.match.finished and command and command == 'move_info' and mode == 'pause':
+            logger.debug('Game is paused')
             self.match.pause_start(self)
         elif hasattr(self, 'match') and not self.match.finished and command and command == 'move_info' and mode == 'resume':
+            logger.debug('Game is resumed')
             self.match.pause_end(self)
 
 

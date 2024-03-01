@@ -16,5 +16,6 @@ ENV PATH=/usr/share/kibana/bin:$PATH
 COPY kibana.yml /etc/kibana/kibana.yml
 
 RUN mkdir /etc/kibana/ssl
+RUN mkdir /etc/kibana/certs
 
 CMD ["kibana", "--allow-root"]

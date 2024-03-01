@@ -41,6 +41,8 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+    depends_on:
+      - transcendence
     volumes:
       - ssl_data:/etc/elasticsearch/ssl
     restart: always
@@ -58,6 +60,7 @@ services:
       - elasticsearch
     volumes:
       - ssl_data:/etc/kibana/ssl
+      - ./certs:/etc/kibana/certs
     networks:
       - network
 

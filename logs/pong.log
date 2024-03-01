@@ -1,4 +1,49 @@
-2024-03-01 18:48:07,993 - consumers.py - DEBUG - ghdsghjgdf
-2024-03-01 18:48:07,993 - consumers.py - WARNING - ddddddffffdd
-2024-03-01 18:48:07,994 - consumers.py - ERROR - dddddssssssssssssssddd
-2024-03-01 18:48:07,994 - consumers.py - CRITICAL - dddddsssddd
+2024-03-01 20:19:53,511 - deploy_sepo.py - INFO - The current count is 397!
+2024-03-01 20:19:53,722 - deploy_sepo.py - INFO - The after check count is 398!
+2024-03-01 20:19:53,938 - deploy_sepo.py - WARNING - The current gas price is 1095655743
+2024-03-01 20:19:53,938 - deploy_sepo.py - WARNING - The newgas price is 1314786891
+2024-03-01 20:19:54,430 - deploy_sepo.py - INFO - Transaction hash is complete: b'a\xeb\x91\x0f\xdb\xc9\xcbTb\x11\x0cN3\x18Zm\xfe\x10Hx\xaf\xd2]d\xf1\x82\xc0s\xbd#c\xb3'
+2024-03-01 20:19:54,704 - deploy_sepo.py - INFO - The current count is 397!
+2024-03-01 20:19:54,979 - deploy_sepo.py - INFO - The after check count is 397!
+2024-03-01 20:19:55,186 - deploy_sepo.py - WARNING - The current gas price is 1095655743
+2024-03-01 20:19:55,187 - deploy_sepo.py - WARNING - The newgas price is 1314786891
+2024-03-01 20:19:55,627 - deploy_sepo.py - INFO - Transaction hash is complete: b'/\x1a\xc4\xf4\x99O\xb4i\xe1\xacna\xcc\xd9\xfc\xe0\x90"C`\x7f\xcb\xd7\xa7\x84\xca\xcf6\x90=:\xf5'
+2024-03-01 20:21:04,857 - webSocket_msg_create.py - INFO - Setting player name sss
+2024-03-01 20:21:04,857 - webSocket_msg_create.py - INFO - Setting player name sss
+2024-03-01 20:21:04,857 - webSocket_msg_create.py - INFO - Setting player name sss
+2024-03-01 20:21:07,710 - webSocket_msg_create.py - INFO - Setting player name www
+2024-03-01 20:21:07,710 - webSocket_msg_create.py - INFO - Setting player name www
+2024-03-01 20:21:07,710 - webSocket_msg_create.py - INFO - Setting player name www
+2024-03-01 20:21:07,710 - webSocket_msg_create.py - WARNING - Match start for players sss, www
+2024-03-01 20:21:07,710 - webSocket_msg_create.py - WARNING - Match start for players sss, www
+2024-03-01 20:21:07,710 - webSocket_msg_create.py - WARNING - Match start for players sss, www
+2024-03-01 20:21:07,748 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:21:07,748 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:21:07,748 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:21:07,778 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:21:07,778 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:21:07,778 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:21:11,778 - consumers.py - DEBUG - Game is resumed
+2024-03-01 20:21:11,778 - consumers.py - DEBUG - Game is resumed
+2024-03-01 20:21:11,778 - consumers.py - DEBUG - Game is resumed
+2024-03-01 20:21:11,999 - consumers.py - DEBUG - Game is resumed
+2024-03-01 20:21:11,999 - consumers.py - DEBUG - Game is resumed
+2024-03-01 20:21:11,999 - consumers.py - DEBUG - Game is resumed
+2024-03-01 20:21:13,584 - webSocket_msg_create.py - INFO - Score updated to sss, 0 - www, 1
+2024-03-01 20:21:13,584 - webSocket_msg_create.py - INFO - Score updated to sss, 0 - www, 1
+2024-03-01 20:21:13,584 - webSocket_msg_create.py - INFO - Score updated to sss, 0 - www, 1
+2024-03-01 20:21:13,595 - webSocket_msg_create.py - INFO - Match end for players sss, www
+2024-03-01 20:21:13,595 - webSocket_msg_create.py - INFO - Match end for players sss, www
+2024-03-01 20:21:13,595 - webSocket_msg_create.py - INFO - Match end for players sss, www
+2024-03-01 20:21:13,595 - webSocket_msg_create.py - INFO - Score updated to sss, 0 - www, 1
+2024-03-01 20:21:13,595 - webSocket_msg_create.py - INFO - Score updated to sss, 0 - www, 1
+2024-03-01 20:21:13,595 - webSocket_msg_create.py - INFO - Score updated to sss, 0 - www, 1
+2024-03-01 20:21:13,595 - webSocket_msg_create.py - WARNING - Player www won the game
+2024-03-01 20:21:13,595 - webSocket_msg_create.py - WARNING - Player www won the game
+2024-03-01 20:21:13,595 - webSocket_msg_create.py - WARNING - Player www won the game
+2024-03-01 20:21:13,926 - consumers.py - WARNING - Player sss dropped from the game
+2024-03-01 20:21:13,926 - consumers.py - WARNING - Player sss dropped from the game
+2024-03-01 20:21:13,926 - consumers.py - WARNING - Player sss dropped from the game
+2024-03-01 20:21:13,926 - consumers.py - WARNING - Player www dropped from the game
+2024-03-01 20:21:13,926 - consumers.py - WARNING - Player www dropped from the game
+2024-03-01 20:21:13,926 - consumers.py - WARNING - Player www dropped from the game
