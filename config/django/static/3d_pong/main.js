@@ -482,12 +482,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           createP2NameText();
           createBall();
           renderer.render(scene, camera);
-          gameSocket.send(JSON.stringify({ command: "move_info", mode: "pause" }));
-          const countdownDisplay = document.querySelector('#countdownText');
-          startCountdown(4, countdownDisplay); // 4 seconds total for "3, 2, 1, go!"
-          setTimeout(() => {
-            gameSocket.send(JSON.stringify({ command: "move_info", mode: "resume" }));
-          }, 4000); // 4000 milliseconds = 4 seconds
+          // gameSocket.send(JSON.stringify({ command: "move_info", mode: "pause" }));
+          // const countdownDisplay = document.querySelector('#countdownText');
+          // startCountdown(4, countdownDisplay); // 4 seconds total for "3, 2, 1, go!"
+          // setTimeout(() => {
+          //   gameSocket.send(JSON.stringify({ command: "move_info", mode: "resume" }));
+          // }, 4000); // 4000 milliseconds = 4 seconds
           // listen to keyboard events to move the paddles
           document.addEventListener("keydown", keyDownEventListener);
           document.addEventListener("keyup", keyUpEventListener);

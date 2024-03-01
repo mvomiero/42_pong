@@ -47,3 +47,149 @@
 2024-03-01 20:21:13,926 - consumers.py - WARNING - Player www dropped from the game
 2024-03-01 20:21:13,926 - consumers.py - WARNING - Player www dropped from the game
 2024-03-01 20:21:13,926 - consumers.py - WARNING - Player www dropped from the game
+2024-03-01 20:35:35,166 - deploy_sepo.py - INFO - The current count is 399!
+2024-03-01 20:35:35,212 - deploy_sepo.py - INFO - The after check count is 400!
+2024-03-01 20:35:35,252 - deploy_sepo.py - WARNING - The current gas price is 1083633220
+2024-03-01 20:35:35,252 - deploy_sepo.py - WARNING - The newgas price is 1300359864
+2024-03-01 20:35:35,337 - deploy_sepo.py - INFO - Transaction hash is complete: b"\x0c\xc4\x13Q\xaaX(k\xf3\xd3'n/\x8d}\xc6\xfdG\xaf\xb3wt@wDI\x066\xff\x90\xe7\xb4"
+2024-03-01 20:35:35,389 - deploy_sepo.py - INFO - The current count is 399!
+2024-03-01 20:35:35,428 - deploy_sepo.py - INFO - The after check count is 399!
+2024-03-01 20:35:35,466 - deploy_sepo.py - WARNING - The current gas price is 1083633220
+2024-03-01 20:35:35,466 - deploy_sepo.py - WARNING - The newgas price is 1300359864
+2024-03-01 20:35:35,558 - deploy_sepo.py - INFO - Transaction hash is complete: b'<\x91\x08N\xd9\xc3S(\xb2\x84\xa9,jt\xca\xec/"I\xe8L\xd5f2a-\x10\xea\x96-2\x06'
+2024-03-01 20:37:39,866 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:37:39,866 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:37:39,866 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:37:39,894 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:37:39,894 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:37:39,894 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:37:39,895 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:37:39,895 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:37:39,895 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:37:39,921 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:37:39,921 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:37:39,921 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:37:43,922 - consumers.py - DEBUG - Game is resumed
+2024-03-01 20:37:43,922 - consumers.py - DEBUG - Game is resumed
+2024-03-01 20:37:43,922 - consumers.py - DEBUG - Game is resumed
+2024-03-01 20:37:45,520 - webSocket_msg_create.py - INFO - Score updated to a, 0 - b, 1
+2024-03-01 20:37:45,520 - webSocket_msg_create.py - INFO - Score updated to a, 0 - b, 1
+2024-03-01 20:37:45,520 - webSocket_msg_create.py - INFO - Score updated to a, 0 - b, 1
+2024-03-01 20:37:45,531 - webSocket_msg_create.py - INFO - Match end for players a, b
+2024-03-01 20:37:45,531 - webSocket_msg_create.py - INFO - Match end for players a, b
+2024-03-01 20:37:45,531 - webSocket_msg_create.py - INFO - Match end for players a, b
+2024-03-01 20:37:45,531 - webSocket_msg_create.py - INFO - Score updated to a, 0 - b, 1
+2024-03-01 20:37:45,531 - webSocket_msg_create.py - INFO - Score updated to a, 0 - b, 1
+2024-03-01 20:37:45,531 - webSocket_msg_create.py - INFO - Score updated to a, 0 - b, 1
+2024-03-01 20:37:45,531 - webSocket_msg_create.py - WARNING - Player b won the game
+2024-03-01 20:37:45,531 - webSocket_msg_create.py - WARNING - Player b won the game
+2024-03-01 20:37:45,531 - webSocket_msg_create.py - WARNING - Player b won the game
+2024-03-01 20:37:45,853 - consumers.py - WARNING - Player b dropped from the game
+2024-03-01 20:37:45,853 - consumers.py - WARNING - Player b dropped from the game
+2024-03-01 20:37:45,853 - consumers.py - WARNING - Player b dropped from the game
+2024-03-01 20:37:45,854 - consumers.py - WARNING - Player a dropped from the game
+2024-03-01 20:37:45,854 - consumers.py - WARNING - Player a dropped from the game
+2024-03-01 20:37:45,854 - consumers.py - WARNING - Player a dropped from the game
+2024-03-01 20:37:51,713 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:37:51,713 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:37:51,713 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:37:51,738 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:37:51,738 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:37:51,738 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:37:51,738 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:37:51,738 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:37:51,738 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:37:51,750 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:37:51,750 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:37:51,750 - consumers.py - DEBUG - Game is paused
+2024-03-01 20:41:28,685 - deploy_sepo.py - INFO - The current count is 401!
+2024-03-01 20:41:28,728 - deploy_sepo.py - INFO - The after check count is 402!
+2024-03-01 20:41:28,768 - deploy_sepo.py - WARNING - The current gas price is 1094393600
+2024-03-01 20:41:28,769 - deploy_sepo.py - WARNING - The new gas price is 1313272320
+2024-03-01 20:41:28,855 - deploy_sepo.py - INFO - Transaction hash is complete: b'\xc7\x7f\x02\x15\xa1\n\xcb\xb0:\xbf\xd2\x9c:\x80\x0e\xe7\xdd\xb0\x19\xa3*\x06\xd6\xba2\x84x\xfa\xbc>m\xa8'
+2024-03-01 20:41:28,912 - deploy_sepo.py - INFO - The current count is 401!
+2024-03-01 20:41:28,954 - deploy_sepo.py - INFO - The after check count is 401!
+2024-03-01 20:41:28,997 - deploy_sepo.py - WARNING - The current gas price is 1094393600
+2024-03-01 20:41:28,997 - deploy_sepo.py - WARNING - The new gas price is 1313272320
+2024-03-01 20:41:29,150 - deploy_sepo.py - INFO - Transaction hash is complete: b'\xe4\xd4\xb2\x1c\xf9\xf5\xb5\xf1\xfa\xf7\xc8=nz+\x98\xd1V\xfe\xd5\xda\x0b=\x14\xd4|\x1baY\xc9K,'
+2024-03-01 20:42:02,686 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:42:02,686 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:42:02,686 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:42:02,713 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:42:02,713 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:42:02,713 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:42:02,714 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:42:02,714 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:42:02,714 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:42:04,219 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:04,219 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:04,219 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:04,231 - webSocket_msg_create.py - INFO - Match end for players a, b
+2024-03-01 20:42:04,231 - webSocket_msg_create.py - INFO - Match end for players a, b
+2024-03-01 20:42:04,231 - webSocket_msg_create.py - INFO - Match end for players a, b
+2024-03-01 20:42:04,231 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:04,231 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:04,231 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:04,231 - webSocket_msg_create.py - WARNING - Player a won the game
+2024-03-01 20:42:04,231 - webSocket_msg_create.py - WARNING - Player a won the game
+2024-03-01 20:42:04,231 - webSocket_msg_create.py - WARNING - Player a won the game
+2024-03-01 20:42:04,553 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-01 20:42:04,553 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-01 20:42:04,553 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-01 20:42:04,553 - consumers.py - WARNING - Player b disconnected from the game
+2024-03-01 20:42:04,553 - consumers.py - WARNING - Player b disconnected from the game
+2024-03-01 20:42:04,553 - consumers.py - WARNING - Player b disconnected from the game
+2024-03-01 20:42:19,256 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:42:19,256 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:42:19,256 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-01 20:42:19,280 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:42:19,280 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:42:19,280 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-01 20:42:19,280 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:42:19,280 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:42:19,280 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-01 20:42:20,980 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:20,980 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:20,980 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:20,991 - webSocket_msg_create.py - INFO - Match end for players a, b
+2024-03-01 20:42:20,991 - webSocket_msg_create.py - INFO - Match end for players a, b
+2024-03-01 20:42:20,991 - webSocket_msg_create.py - INFO - Match end for players a, b
+2024-03-01 20:42:20,992 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:20,992 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:20,992 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-01 20:42:20,992 - webSocket_msg_create.py - WARNING - Player a won the game
+2024-03-01 20:42:20,992 - webSocket_msg_create.py - WARNING - Player a won the game
+2024-03-01 20:42:20,992 - webSocket_msg_create.py - WARNING - Player a won the game
+2024-03-01 20:42:21,301 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-01 20:42:21,301 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-01 20:42:21,301 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-01 20:42:21,301 - consumers.py - WARNING - Player b disconnected from the game
+2024-03-01 20:42:21,301 - consumers.py - WARNING - Player b disconnected from the game
+2024-03-01 20:42:21,301 - consumers.py - WARNING - Player b disconnected from the game
+2024-03-01 20:42:29,753 - webSocket_msg_create.py - INFO - Setting player name av
+2024-03-01 20:42:29,753 - webSocket_msg_create.py - INFO - Setting player name av
+2024-03-01 20:42:29,753 - webSocket_msg_create.py - INFO - Setting player name av
+2024-03-01 20:42:29,777 - webSocket_msg_create.py - INFO - Setting player name bv
+2024-03-01 20:42:29,777 - webSocket_msg_create.py - INFO - Setting player name bv
+2024-03-01 20:42:29,777 - webSocket_msg_create.py - INFO - Setting player name bv
+2024-03-01 20:42:29,777 - webSocket_msg_create.py - WARNING - Match start for players av, bv
+2024-03-01 20:42:29,777 - webSocket_msg_create.py - WARNING - Match start for players av, bv
+2024-03-01 20:42:29,777 - webSocket_msg_create.py - WARNING - Match start for players av, bv
+2024-03-01 20:42:31,522 - webSocket_msg_create.py - INFO - Score updated to av, 0 - bv, 1
+2024-03-01 20:42:31,522 - webSocket_msg_create.py - INFO - Score updated to av, 0 - bv, 1
+2024-03-01 20:42:31,522 - webSocket_msg_create.py - INFO - Score updated to av, 0 - bv, 1
+2024-03-01 20:42:31,533 - webSocket_msg_create.py - INFO - Match end for players av, bv
+2024-03-01 20:42:31,533 - webSocket_msg_create.py - INFO - Match end for players av, bv
+2024-03-01 20:42:31,533 - webSocket_msg_create.py - INFO - Match end for players av, bv
+2024-03-01 20:42:31,533 - webSocket_msg_create.py - INFO - Score updated to av, 0 - bv, 1
+2024-03-01 20:42:31,533 - webSocket_msg_create.py - INFO - Score updated to av, 0 - bv, 1
+2024-03-01 20:42:31,533 - webSocket_msg_create.py - INFO - Score updated to av, 0 - bv, 1
+2024-03-01 20:42:31,533 - webSocket_msg_create.py - WARNING - Player bv won the game
+2024-03-01 20:42:31,533 - webSocket_msg_create.py - WARNING - Player bv won the game
+2024-03-01 20:42:31,533 - webSocket_msg_create.py - WARNING - Player bv won the game
+2024-03-01 20:42:31,842 - consumers.py - WARNING - Player av disconnected from the game
+2024-03-01 20:42:31,842 - consumers.py - WARNING - Player av disconnected from the game
+2024-03-01 20:42:31,842 - consumers.py - WARNING - Player av disconnected from the game
+2024-03-01 20:42:31,842 - consumers.py - WARNING - Player bv disconnected from the game
+2024-03-01 20:42:31,842 - consumers.py - WARNING - Player bv disconnected from the game
+2024-03-01 20:42:31,842 - consumers.py - WARNING - Player bv disconnected from the game
