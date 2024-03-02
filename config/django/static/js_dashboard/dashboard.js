@@ -21,9 +21,10 @@ fetchPlayerDashboardList();
 /***************************************************/
 
 function createMatchDashboard() {
-    if (Object.keys(globalMatchData).length === 0)
+    // check if globalMatchData is null
+    if (globalMatchData !== null && typeof globalMatchData === 'object' && Object.keys(globalMatchData).length === 0)
         return;
-
+    
     // Update cards
     if ('cards' in globalMatchData && globalMatchData.cards !== null) {
         updateCardsMatch(globalMatchData.cards);
@@ -46,9 +47,10 @@ function createMatchDashboard() {
 }
 
 function createTournamentDashboard() {
-    if (Object.keys(globalTournamentData).length === 0)
+    // check if globalMatchData is null
+    if (globalTournamentData !== null && typeof globalTournamentData === 'object' && Object.keys(globalTournamentData).length === 0)
         return;
-
+    
     // Update cards
     if ('cards' in globalTournamentData && globalTournamentData.cards !== null) {
         updateCardsTournament(globalTournamentData.cards);

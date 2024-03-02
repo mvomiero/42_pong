@@ -224,6 +224,9 @@ def get_dashboardMatch_data(request):
     # Data for NON tournament games
     game_data = GameData.objects.filter(is_tournament_game=False)
 
+    if not game_data:
+        return JsonResponse({})
+
     """ Chart data: Matches per Day """
     bar_chart_data = chart_entriesPerDay(game_data, 'game_end_timestamp')
     
@@ -330,6 +333,8 @@ def get_dashboardTournament_data(request):
     game_data = GameData.objects.all().filter(is_tournament_game=True)
     tournament_data = TournamentData.objects.all()
 
+    if not tournament_data:
+        return JsonResponse({})
 
     """ Chart data: Tournaments per Day """
     chart_TournamentsPerDay = chart_entriesPerDay(tournament_data, 'tournament_end_timestamp')
@@ -510,9 +515,6 @@ def get_dashboard_data_player(request):
     avg_points = totalPoints / player_matches.count()
 
     """ Data for number of perfect matches """
-    #nbr_perfect_matches = player_matches.filter(
-    #    Q(player1_points=11, player2_points=0, player1_name=playerAlias) | Q(player1_points=0, player2_points=11, player2_name=playerAlias)
-    #).count()
     nbr_perfect_matches = player_matches.filter(
         Q(player2_points=0, player1_name=playerAlias) | Q(player1_points=0, player2_name=playerAlias)
     ).count()
