@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .models import GameData, TournamentData
 import time
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.http import JsonResponse    # NEW FOR CHARTS (http response)
 from django.db.models import Avg, Count, CharField, Case, F, FloatField, IntegerField, Max, Q, Sum, Value, When  # NEW FOR CHARTS (database query)
 from django.db.models.functions import ExtractWeekDay, TruncHour   # NEW FOR CHARTS (database query)
@@ -88,6 +88,8 @@ def error_disconnection(request):
 def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
     if p1n is not None and p2n is not None and p1s is not None and p2s is not None:
         gend = (pytz.timezone('Europe/Paris')).localize(gend)
+        gend = gend + timedelta(hours=2)
+            
         game_data = GameData(
             player1_name=p1n,
             player1_points=p1s,
@@ -109,6 +111,8 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     durations (e.g. tdur) = number (e.g. 10)
 def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur, blockchain=True):
     tend = (pytz.timezone('Europe/Paris')).localize(tend)
+    tend = tend + timedelta(hours=2)
+        
     if blockchain:
         tourID = random.randint(0, 9999)
         tour_result = str(tourID) + " " + str(playersRank)
