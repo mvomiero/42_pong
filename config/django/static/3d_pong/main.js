@@ -432,14 +432,14 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         display.textContent = 'Go!';
       } else {
         clearInterval(countdownInterval);
-        display.parentNode.removeChild(display);
+        display.textContent = ''; // Set display to have no content
       }
     }, 1000);
   }
 
   function displayTournamentMatches(data) {
     document.getElementById('tournament_info').style.display = 'inline-flex';
-    document.getElementById('semiFinal1').innerHTML = data.matchSemi1.player1 + " vs. " + data.matchSemi2.player2;
+    document.getElementById('semiFinal1').innerHTML = data.matchSemi1.player1 + " vs. " + data.matchSemi1.player2;
     document.getElementById('semiFinal2').innerHTML = data.matchSemi2.player1 + " vs. " + data.matchSemi2.player2;
 
     if (data.matchFinal.player1 === undefined || data.matchFinal.player2 === undefined)
@@ -482,12 +482,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           createP2NameText();
           createBall();
           renderer.render(scene, camera);
-          // gameSocket.send(JSON.stringify({ command: "move_info", mode: "pause" }));
-          // const countdownDisplay = document.querySelector('#countdownText');
-          // startCountdown(4, countdownDisplay); // 4 seconds total for "3, 2, 1, go!"
-          // setTimeout(() => {
-          //   gameSocket.send(JSON.stringify({ command: "move_info", mode: "resume" }));
-          // }, 4000); // 4000 milliseconds = 4 seconds
+          gameSocket.send(JSON.stringify({ command: "move_info", mode: "pause" }));
+          const countdownDisplay = document.querySelector('#countdownText');
+          startCountdown(4, countdownDisplay); // 4 seconds total for "3, 2, 1, go!"
+          setTimeout(() => {
+            gameSocket.send(JSON.stringify({ command: "move_info", mode: "resume" }));
+          }, 4000); // 4000 milliseconds = 4 seconds
           // listen to keyboard events to move the paddles
           document.addEventListener("keydown", keyDownEventListener);
           document.addEventListener("keyup", keyUpEventListener);
