@@ -45,7 +45,8 @@ function drawPiePlayers(chartData, chartId, color, titleTxt) {
                     color: bs_body_color,
                     boxWidth: 20,
                     padding: 20
-                }
+                },
+                onClick: function(event, legendItem) {}
             },
         },
         maintainAspectRatio: false,
