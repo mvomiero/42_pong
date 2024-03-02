@@ -104,7 +104,10 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     tournaments (tend) = datetime object (e.g. datetime.fromtimestamp(time.time())
 #     durations (e.g. tdur) = number (e.g. 10)
 def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur, blockchain=True):
-    hash = '#hash'
+    if blockchain:
+        hash = 'WRONG_hash'
+    else:
+        hash = '#hash'
     tend = (pytz.timezone('Europe/Paris')).localize(tend)
     tournament_data = TournamentData(
         match_id_semi_1=matchIdSemi1,
@@ -207,6 +210,9 @@ def chart_avgDuration(data, end_timestamp, duration_secs):
 def get_dashboardMatch_data(request):
     # Data for NON tournament games
     game_data = GameData.objects.filter(is_tournament_game=False)
+
+    if not game_data:
+        return JsonResponse({})
 
     """ Chart data: Matches per Day """
     bar_chart_data = chart_entriesPerDay(game_data, 'game_end_timestamp')
@@ -314,6 +320,8 @@ def get_dashboardTournament_data(request):
     game_data = GameData.objects.all().filter(is_tournament_game=True)
     tournament_data = TournamentData.objects.all()
 
+    if not tournament_data:
+        return JsonResponse({})
 
     """ Chart data: Tournaments per Day """
     chart_TournamentsPerDay = chart_entriesPerDay(tournament_data, 'tournament_end_timestamp')

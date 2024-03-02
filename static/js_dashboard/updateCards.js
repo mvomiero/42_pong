@@ -42,8 +42,7 @@ setEqualHeight(cardElements, maxHeight);
 /************** UPDATE VALUES MATCH ****************/
 /***************************************************/
 function updateCardsMatch(cardsData) {
-    // console.log('Data for cards (Matches):', cardsData);
-
+    
     const playerRegistrationsElement = document.getElementById('ma-playerRegistrations');
     playerRegistrationsElement.textContent = cardsData.uniquePlayers;
 
