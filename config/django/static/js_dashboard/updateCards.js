@@ -62,7 +62,7 @@ function updateCardsMatch(cardsData) {
     bestPlayerWinsElement.textContent = 'is the most successful Player (won ' + cardsData.bestPlayer.wins.toString() + ' matches).';
 
     const highestPlayingTimeAliasElement = document.getElementById('ma-highestPlayingTimeAlias');
-    highestPlayingTimeAliasElement.textContent = cardsData.bestPlayer.alias;
+    highestPlayingTimeAliasElement.textContent = cardsData.highestTimePlayer.alias;
 
     // if (cardsData.highestTimePlayer.time) {
         const highestPlayingTimeElement = document.getElementById('ma-highestPlayingTimeTime');

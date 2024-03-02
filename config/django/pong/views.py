@@ -267,8 +267,8 @@ def get_dashboardMatch_data(request):
     """ Player with most wins """
     winner_names = game_data.annotate(
         winner_name=Case(
-            When(player1_points=11, then=F('player1_name')),
-            When(player2_points=11, then=F('player2_name')),
+            When(player1_points__gt=F('player2_points'), then=F('player1_name')),
+            When(player2_points__gt=F('player1_points'), then=F('player2_name')),
             output_field=CharField(),
         )
     ).values_list('winner_name', flat=True)
@@ -510,8 +510,11 @@ def get_dashboard_data_player(request):
     avg_points = totalPoints / player_matches.count()
 
     """ Data for number of perfect matches """
+    #nbr_perfect_matches = player_matches.filter(
+    #    Q(player1_points=11, player2_points=0, player1_name=playerAlias) | Q(player1_points=0, player2_points=11, player2_name=playerAlias)
+    #).count()
     nbr_perfect_matches = player_matches.filter(
-        Q(player1_points=11, player2_points=0, player1_name=playerAlias) | Q(player1_points=0, player2_points=11, player2_name=playerAlias)
+        Q(player2_points=0, player1_name=playerAlias) | Q(player1_points=0, player2_name=playerAlias)
     ).count()
 
     """ Data for number of tournaments """
