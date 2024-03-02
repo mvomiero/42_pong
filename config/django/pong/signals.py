@@ -12,8 +12,8 @@ import asyncio
 @receiver(post_migrate)
 def initialize_database(sender, **kwargs):
 
-    GameData.objects.all().delete()
-    TournamentData.objects.all().delete()
+    # GameData.objects.all().delete()
+    # TournamentData.objects.all().delete()
 
     print(f"Database initialization (nbr objects match: {GameData.objects.count()} | nbr objects tournament: {TournamentData.objects.count()})")
 
