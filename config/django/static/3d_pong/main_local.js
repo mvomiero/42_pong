@@ -520,7 +520,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         document.getElementById('closing_message').innerHTML = "A duplicate has been detected.";
       }
       else if (event.code === 4002) {
-        document.getElementById('closing_message').innerHTML = "The room is full.";
+        document.getElementById('closing_message').innerHTML = "Player name wrong (only a-z, A-Z and 0-9 allowed).";
       }
       else if (event.code === 4005 || event.code === 4006) {
         removeGameElements();

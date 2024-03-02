@@ -21,6 +21,10 @@ class PongConsumerLocal(AsyncJsonWebsocketConsumer):
         
         await self.accept()
 
+        if not self.player1.isalnum() or not self.player1.isalnum():
+            await self.close(4002)
+            return
+        
 
     # ************************************************************ #
     # ******************* DISCONNECT WEBSOCKET ******************* #

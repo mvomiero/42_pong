@@ -26,6 +26,11 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.player = self.scope['url_route']['kwargs']['player']
         
         await self.accept()
+        
+        if not self.player.isalnum():
+            await self.close(4002)
+            return
+        
         await self.send_to_self(set_player(self.player))
 
         # Setup match or tournament
