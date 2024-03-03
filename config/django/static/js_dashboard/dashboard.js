@@ -99,13 +99,13 @@ window.addEventListener('DOMContentLoaded', event => {
             truncatePager: true,    // Truncate the page links to prevent overflow with large datasets.
             pagerDelta: 1,          // Number of page links to display before and after the current page
         });
-        console.log('dataTableTournament: ', dataTableTournament);
+        // console.log('dataTableTournament: ', dataTableTournament);
     }
 });
 
 function initDataTableTournament(tournamentList) {
     for (const [key, value] of Object.entries(tournamentList)) {
-        console.log(`${key}: ${value}`);
+        // console.log(`${key}: ${value}`);
         var newRow = [key, `<a class="btn btn-vaporwave btn-choose" href="https://sepolia.etherscan.io/tx/${value}" target="_blank">${value}</a>`];
         
         dataTableTournament.rows.add(newRow);

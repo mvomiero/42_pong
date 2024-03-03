@@ -1,13 +1,3 @@
-// # Converting main.js to main_local.js 
-// - make sure button names are changed to their local versions
-// - we adapt submitNameAndStartGame to refer to setup both players (player1, player2) and their associated websockets (p1gameSocket, p2gameSocket)
-// - we only receive from backend on one of the sockets (p1gameSocket.onmessage)
-// - what about onclose and onerror?
-// - we define extra keys for the second player ("I K"), so now we have
-// 	- p1PaddleIncreaseKey, p1PaddleDecreaseKey, p2PaddleIncreaseKey, p2PaddleDecreaseKey
-// - we refer to both p1Paddle and p2Paddle in keyDownEventListener and keyUpEventListener
-// - we remove all reference to paddlecam - as there is no 'leading player view'
-
 import * as THREE from 'three';
 import { FontLoader } from 'three/FontLoader';
 import { TextGeometry } from 'three/TextGeometry';
@@ -88,9 +78,9 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   function submitNameAndStartGame() {
     playerName1 = document.getElementById('playerName1').value.trim();  // Get the player name and remove leading and trailing whitespace
     playerName2 = document.getElementById('playerName2').value.trim();  // Get the player name and remove leading and trailing whitespace  
-    var disallowedChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    var disallowedChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
     if (disallowedChars.test(playerName1) || disallowedChars.test(playerName2)) {
-      alert('Please do not use special characters like !@#$%^&*()_+-=[]{};:\\|,.<>/?');
+      alert('Please do not use special characters like !@#$%^&*()_+-=[]{};:\\|,.<>/?~');
     } else if ((playerName1 !== '' && playerName1.length <= 10) 
         && (playerName2 !== '' && playerName2.length <= 10)) { // Check if names are not empty and have max 10 characters
           document.getElementById('nameInputSectionLocal').style.display = 'none';
@@ -100,11 +90,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           var player1ConnectionString =
             "wss://" + window.location.host + "/ws/play/" + roomCode + "/" + encodeURIComponent(playerName1) + "/";
           player1GameSocket = new WebSocket(player1ConnectionString);
-          console.log("[WebSocket started] connectionString: ", player1ConnectionString);
+          // console.log("[WebSocket started] connectionString: ", player1ConnectionString);
           var player2ConnectionString =
             "wss://" + window.location.host + "/ws/play/" + roomCode + "/" + encodeURIComponent(playerName2) + "/";
           player2GameSocket = new WebSocket(player2ConnectionString);
-          console.log("[WebSocket started] connectionString: ", player2ConnectionString);
+          // console.log("[WebSocket started] connectionString: ", player2ConnectionString);
           displayPlayersAndMode();
           player1PaddleIncreaseKey = "W";
           player1PaddleDecreaseKey = "S";
@@ -132,32 +122,24 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   document.getElementById('submitNameButtonLocal').addEventListener('click', submitNameAndStartGame);
   document.getElementById('restartGameButton').addEventListener('click', showNameInput2);
 
-  // // Function to check if an element is in the viewport
-  // function isInViewport(element) {
-  //   const rect = element.getBoundingClientRect();
-  //   return (
-  //     rect.top >= 0 &&
-  //     rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-  //   );
-  // }
-
   /**************************************************/
   /**************** END NEW PART ********************/
   /**************************************************/
 
   function initGame() {
+    minBallZ = ballSize;
+    maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     initCamera();
     initTable();
     createTable();
     paddleWidth = sceneProperties.zoomedCanvasWidth * 0.02;
     paddleHeight = tableHeight / 4; // must match with self.height = 1/5 in consumers.py
     paddleDepth = sceneProperties.zoomedCanvasHeight * 0.05;
-    minBallZ = ballSize;
-    maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     renderer.render(scene, camera);
   }
 
   function handleMouseMove() {
+    // console.log("rotation", camera.rotation);
     renderer.render(scene, camera);
   }
 
@@ -166,15 +148,13 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     controls.enableDamping = true; // an animation loop is required when damping is enabled
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
-    controls.minAzimuthAngle = -Math.PI / 2; // left limit
-    controls.maxAzimuthAngle = Math.PI / 2; // right limit
-    controls.maxPolarAngle = Math.PI / 1; // vertical rotation limit
+    controls.minAzimuthAngle = -Math.PI / 2.15; // left limit
+    controls.maxAzimuthAngle = Math.PI / 2.15; // right limit
+    controls.minPolarAngle = Math.PI / 16.05; // vertical min rotation limit
+    controls.maxPolarAngle = Math.PI / 1.05; // vertical max rotation limit
+    controls.minDistance = 5
+    controls.maxDistance = 30
     document.addEventListener('mousemove', handleMouseMove);
-    var onWindowResize = function () { // Handle resize events
-      sceneProperties.camera.aspect = window.innerWidth / window.innerHeight;
-      sceneProperties.camera.updateProjectionMatrix();
-    };
-    window.addEventListener('resize', onWindowResize, false);
     sceneProperties.camera.position.set(0, 0, 11);
     sceneProperties.camera.rotation.set(0, 0, 0);
   }
@@ -234,7 +214,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     var tableWallGeometry = new THREE.BoxGeometry(tableWidth, sceneProperties.zoomedCanvasHeight * 0.02, maxBallZ);
     var tableWallMaterial = new THREE.MeshPhongMaterial({
       color: sceneProperties.tableWallsColour,
-      opacity: 0.5,
+      opacity: 0.2,
       transparent: true
     });
     tableUpperWallMesh = new THREE.Mesh(tableWallGeometry, tableWallMaterial);
@@ -385,7 +365,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   function startCountdown(duration, display) {
     let timer = duration;
-    display.textContent = timer;
 
     const countdownInterval = setInterval(function () {
       timer--;
@@ -416,10 +395,11 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     try {
       var data = JSON.parse(event.data);
       if (data.command != "match_data")
-        console.log("Received data:", data);
+        // console.log("Received data:", data);
 
       if (data.command === "match_info") {
         if (data.mode === "start") {
+          player1GameSocket.send(JSON.stringify({ command: "move_info", mode: "pause" }));
           document.getElementById('message_info').style.display = 'none';
           document.removeEventListener('mousemove', handleMouseMove)
           createLeftPaddle();
@@ -431,12 +411,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           createP2NameText();
           createBall();
           renderer.render(scene, camera);
-          player1GameSocket.send(JSON.stringify({ command: "move_info", mode: "pause" }));
           const countdownDisplay = document.querySelector('#countdownText');
           startCountdown(4, countdownDisplay); // 4 seconds total for "3, 2, 1, go!"
           setTimeout(() => {
             player1GameSocket.send(JSON.stringify({ command: "move_info", mode: "resume" }));
           }, 4000); // 4000 milliseconds = 4 seconds
+          document.addEventListener('mousemove', handleMouseMove);
           // listen to keyboard events to move the paddles
           document.addEventListener("keydown", keyDownEventListener);
           document.addEventListener("keyup", keyUpEventListener);
@@ -483,7 +463,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       }
     } catch (error) {
       console.error("Error parsing received data:", error);
-      console.log("Received data:", event.data);
+      // console.log("Received data:", event.data);
     }
   };
 
@@ -497,7 +477,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // Event handler for connection closure
   function handleWebSocketClose(event) {
-    console.log("WebSocket connection closed! (code: " + event.code + ")");
+    // console.log("WebSocket connection closed! (code: " + event.code + ")");
 
     /*********************************************************/
     /***************** CHANGES STARTING HERE *****************/

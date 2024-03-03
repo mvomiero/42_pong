@@ -40,12 +40,12 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   var paddleIncreaseKey, paddleDecreaseKey;
   var textHeight, textDepth, textYpos, leftScoreXpos, rightScoreXpos, leftNameOffset, rightNameOffset;
   var player1ScoreMesh, player2ScoreMesh, namePlayer1Mesh, namePlayer2Mesh;
-  var controls;
+  var controls, heldCameraPosition, heldCameraRotation;
   var player1, player2;
   var player = 0;
   var char_choice;
   var gameSocket;
-  var paddleCam = false;
+  var paddleCam;
 
   // variables for message at the end of the game:
   var winMessage = {
@@ -94,7 +94,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
       var connectionString =
         "wss://" + window.location.host + "/ws/play/" + roomCode + "/" + encodeURIComponent(char_choice) + "/";
       gameSocket = new WebSocket(connectionString);
-      console.log("[WebSocket started] connectionString: ", connectionString);
+      // console.log("[WebSocket started] connectionString: ", connectionString);
       displayPlayerAndMode(char_choice, roomCode);
       document.getElementById('message_info').innerHTML = "Info: Waiting for opponent to connect...";
       initGame();
@@ -119,33 +119,25 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
   document.getElementById('submitNameButton').addEventListener('click', submitNameAndStartGame);
   document.getElementById('restartGameButton').addEventListener('click', showNameInput2);
 
-  // // Function to check if an element is in the viewport
-  // function isInViewport(element) {
-  //   const rect = element.getBoundingClientRect();
-  //   return (
-  //     rect.top >= 0 &&
-  //     rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-  //   );
-  // }
-
   /**************************************************/
   /**************** END NEW PART ********************/
   /**************************************************/
 
   function initGame() {
+    minBallZ = ballSize;
+    maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     initCamera();
     initTable();
     createTable();
     paddleWidth = sceneProperties.zoomedCanvasWidth * 0.02;
     paddleHeight = tableHeight / 4; // must match with self.height = 1/5 in consumers.py
     paddleDepth = sceneProperties.zoomedCanvasHeight * 0.05;
-    minBallZ = ballSize;
-    maxBallZ = sceneProperties.zoomedCanvasWidth * 0.075;
     renderer.render(scene, camera);
   }
 
   function handleMouseMove() {
-    renderer.render(scene, camera);
+    // console.log("rotation", camera.rotation);
+    // renderer.render(scene, camera);
   }
 
   function initCamera() {
@@ -153,27 +145,30 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     controls.enableDamping = true; // an animation loop is required when damping is enabled
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
-    controls.minAzimuthAngle = -Math.PI / 2; // left limit
-    controls.maxAzimuthAngle = Math.PI / 2; // right limit
-    controls.maxPolarAngle = Math.PI / 1; // vertical rotation limit
-    document.addEventListener('mousemove', handleMouseMove);
-    var onWindowResize = function () { // Handle resize events
-      sceneProperties.camera.aspect = window.innerWidth / window.innerHeight;
-      sceneProperties.camera.updateProjectionMatrix();
-    };
-    window.addEventListener('resize', onWindowResize, false);
+    controls.minAzimuthAngle = -Math.PI / 2.15; // left limit
+    controls.maxAzimuthAngle = Math.PI / 2.15; // right limit
+    controls.minPolarAngle = Math.PI / 16.05; // vertical min rotation limit
+    controls.maxPolarAngle = Math.PI / 1.05; // vertical max rotation limit
+    controls.minDistance = 5
+    controls.maxDistance = 30
+    sceneProperties.camera.position.set(0, 0, 11);
+    sceneProperties.camera.rotation.set(0, 0, 0);
+    heldCameraPosition = sceneProperties.camera.position.clone();
+    heldCameraRotation = sceneProperties.camera.rotation.clone();
     setNormalCam();
   }
 
   // normalCam, paddleCam
 
   function setNormalCam() {
+    document.addEventListener('mousemove', handleMouseMove);
     paddleCam = false
     controls.enabled = true;
+    controls.update();
     paddleIncreaseKey = "W";
     paddleDecreaseKey = "S";
-    sceneProperties.camera.position.set(0, 0, 11);
-    sceneProperties.camera.rotation.set(0, 0, 0);
+    sceneProperties.camera.position.copy(heldCameraPosition);
+    sceneProperties.camera.rotation.copy(heldCameraRotation);
   }
 
   function setPaddleCam(player) {
@@ -181,16 +176,24 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     if (player === 1) {
       paddleCam = true
       controls.enabled = false;
+      controls.update();
+      document.removeEventListener('mousemove', handleMouseMove);
       paddleIncreaseKey = "A";
       paddleDecreaseKey = "D";
+      heldCameraPosition = sceneProperties.camera.position.clone();
+      heldCameraRotation = sceneProperties.camera.rotation.clone();
       sceneProperties.camera.position.set(leftPaddleMesh.position.x, leftPaddleMesh.position.y, halfPaddleDepth);
       sceneProperties.camera.rotation.set(Math.PI / 2, -Math.PI / 2, 0);
     }
     if (player === 2) {
       paddleCam = true
       controls.enabled = false;
+      controls.update();
+      document.removeEventListener('mousemove', handleMouseMove);
       paddleIncreaseKey = "D";
       paddleDecreaseKey = "A";
+      heldCameraPosition = sceneProperties.camera.position.clone();
+      heldCameraRotation = sceneProperties.camera.rotation.clone();
       sceneProperties.camera.position.set(rightPaddleMesh.position.x, rightPaddleMesh.position.y, halfPaddleDepth);
       sceneProperties.camera.rotation.set(Math.PI / 2, Math.PI / 2, 0);
     } 
@@ -207,19 +210,22 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   function setPaddleCamForLeadingPlayer() {
     if (player1Score > player2Score) {
-      if (player === 1)
+      if (player === 1 && paddleCam == false)
         setPaddleCam(player);
-      if (player === 2)
+      if (player === 2 && paddleCam == true)
         setNormalCam();
     }
     else if (player1Score < player2Score) {
-      if (player === 1)
+      if (player === 1 && paddleCam == true)
         setNormalCam();
-      if (player === 2)
+      if (player === 2 && paddleCam == false)
         setPaddleCam(player);
     }
     else if (player1Score == player2Score) {
-      setNormalCam(); // both players
+      if (player === 1 && paddleCam == true)
+        setNormalCam();
+      if (player === 2 && paddleCam == true)
+        setNormalCam(player);
     }
   }
 
@@ -278,7 +284,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     var tableWallGeometry = new THREE.BoxGeometry(tableWidth, sceneProperties.zoomedCanvasHeight * 0.02, maxBallZ);
     var tableWallMaterial = new THREE.MeshPhongMaterial({
       color: sceneProperties.tableWallsColour,
-      opacity: 0.5,
+      opacity: 0.2,
       transparent: true
     });
     tableUpperWallMesh = new THREE.Mesh(tableWallGeometry, tableWallMaterial);
@@ -421,7 +427,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   function startCountdown(duration, display) {
     let timer = duration;
-    display.textContent = timer;
 
     const countdownInterval = setInterval(function () {
       timer--;
@@ -452,7 +457,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
     try {
       var data = JSON.parse(event.data);
       if (data.command != "match_data")
-        console.log("Received data:", data);
+        // console.log("Received data:", data);
 
       if (data.command === "set_player") {
         char_choice = data.player;
@@ -460,6 +465,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
       if (data.command === "match_info") {
         if (data.mode === "start") {
+          gameSocket.send(JSON.stringify({ command: "move_info", mode: "pause" }));
           document.getElementById('message_info').style.display = 'none';
           player1 = data.player1;
           player2 = data.player2;
@@ -482,7 +488,6 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
           createP2NameText();
           createBall();
           renderer.render(scene, camera);
-          gameSocket.send(JSON.stringify({ command: "move_info", mode: "pause" }));
           const countdownDisplay = document.querySelector('#countdownText');
           startCountdown(4, countdownDisplay); // 4 seconds total for "3, 2, 1, go!"
           setTimeout(() => {
@@ -519,25 +524,25 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         ballMesh.position.z = scaleFloatToRange(data.ball.z, minBallZ, maxBallZ);
         leftPaddleMesh.position.y = data.paddleLeft * tableHeight;
         rightPaddleMesh.position.y = data.paddleRight * tableHeight;
-        updatePaddleCam(); // only when y changes?
+        updatePaddleCam();
         if (data.score.player1 != player1Score) {
           player1Score = data.score.player1;
           removeAndDisposeAndMakeUndefined(player1ScoreMesh);
           createP1ScoreText();
-          // setPaddleCamForLeadingPlayer();
+          setPaddleCamForLeadingPlayer();
         }
         else if (data.score.player2 != player2Score) {
           player2Score = data.score.player2;
           removeAndDisposeAndMakeUndefined(player2ScoreMesh);
           createP2ScoreText();
-          // setPaddleCamForLeadingPlayer();
+          setPaddleCamForLeadingPlayer();
         }
         
         renderer.render(scene, camera);
       }
     } catch (error) {
       console.error("Error parsing received data:", error);
-      console.log("Received data:", event.data);
+      // console.log("Received data:", event.data);
     }
   };
 
@@ -571,7 +576,7 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
 
   // Event handler for connection closure
   function handleWebSocketClose(event) {
-    console.log("WebSocket connection closed! (code: " + event.code + ")");
+    // console.log("WebSocket connection closed! (code: " + event.code + ")");
 
     /*********************************************************/
     /***************** CHANGES STARTING HERE *****************/

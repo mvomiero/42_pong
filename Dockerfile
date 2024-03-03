@@ -20,7 +20,6 @@ WORKDIR /transcendence
 RUN python manage.py startapp pong
 COPY config/nginx/nginx.conf /etc/nginx/
 
-# would be nice to do this in a less verbose way, but merging using * didn't work with subfolders
 COPY ./config/django/pong/admin.py ./pong/
 COPY ./config/django/pong/routing.py ./pong/
 COPY ./config/django/pong/templates/pong/index.html ./pong/templates/pong/
@@ -78,9 +77,3 @@ COPY ./config/blockchain/deploy_sepo.py ./pong/
 RUN python manage.py collectstatic --noinput
 COPY ./config/entrypoint.sh .
 CMD ./entrypoint.sh
-
-# COPY ./config/django/pong/ ./pong/
-# COPY ./config/django/requirements.txt ./
-# COPY ./config/django/transcendence/ ./transcendence/
-# COPY ./config/django/static/ ./static/
-# COPY ./config/blockchain/ ./pong/

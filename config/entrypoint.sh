@@ -13,4 +13,14 @@ else
 fi
 
 python manage.py runserver 127.0.0.1:8000 &
-nginx -g 'daemon off;'
+nginx -g 'daemon off;' &
+
+# Wait for Django runserver to start
+while ! curl -s http://127.0.0.1:8000 >/dev/null; do
+    sleep 1
+done
+
+echo ">>> SERVER UP AND RUNNING | ∘ | LET'S PLAY SOME PONG! <<<"
+
+# Wait for the background processes to finish (django dev server and nginx shut down)
+wait

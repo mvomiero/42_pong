@@ -12,14 +12,14 @@ function fetchMatchDashboard() {
     return fetch('/dashboardMatches', { method: 'GET', credentials: 'same-origin' }) // or specify 'same-origin' or 'include' for credentials
       .then(response => {
         if (!response.ok) {
-          console.log('[/dashboardMatches] Network response was not ok');
+          // console.log('[/dashboardMatches] Network response was not ok');
           // throw new Error('Network response was not ok');
         }
         return response.json(); // assuming the backend responds with JSON data
       })
       .then(data => {
         // Process the retrieved data
-        console.log('[Match] Data received from backend: ', data);
+        // console.log('[Match] Data received from backend: ', data);
         
         return data;
 
@@ -38,14 +38,14 @@ function fetchTournamentDashboard() {
     return fetch('/dashboardTournaments', { method: 'GET', credentials: 'same-origin' }) // or specify 'same-origin' or 'include' for credentials
       .then(response => {
         if (!response.ok) {
-          console.log('[/dashboardTournaments] Network response was not ok');
+          // console.log('[/dashboardTournaments] Network response was not ok');
           // throw new Error('Network response was not ok');
         }
         return response.json(); // assuming the backend responds with JSON data
       })
       .then(data => {
         // Process the retrieved data
-        console.log('[Tournament] Data received from backend: ', data);
+        // console.log('[Tournament] Data received from backend: ', data);
         
         return data;
 
@@ -65,14 +65,14 @@ function fetchPlayerDashboardList() {
     fetch('/dashboardPlayerList', { method: 'GET', credentials: 'same-origin' }) // or specify 'same-origin' or 'include' for credentials
       .then(response => {
         if (!response.ok) {
-          console.log('[/dashboardPlayerList] Network response was not ok');
+          // console.log('[/dashboardPlayerList] Network response was not ok');
           // throw new Error('Network response was not ok');
         }
         return response.json(); // assuming the backend responds with JSON data
       })
       .then(data => {
         // Process the retrieved data
-        console.log('[Player] Data received from backend (player List): ', data);
+        // console.log('[Player] Data received from backend (player List): ', data);
         
         // wait until 'dataTable' is initialized
         let wait = setInterval(function() {
@@ -102,14 +102,14 @@ function fetchPlayerDashboard(playerAlias) {
     })
       .then(response => {
         if (!response.ok) {
-          console.log('[/dashboardPlayer/] Network response was not ok');
+          // console.log('[/dashboardPlayer/] Network response was not ok');
           // throw new Error('Network response was not ok');
         }
         return response.json(); // assuming the backend responds with JSON data
       })
       .then(data => {
         // Process the retrieved data
-        console.log('[playerDashboard] Data (individual) received from backend: ', data);
+        // console.log('[playerDashboard] Data (individual) received from backend: ', data);
         
         initializePlayerCards(data.cards, playerAlias);
         drawPiePlayers(data.pieWin, 'chartPiePlayer1', [bs_success, bs_gray200], 'Wins of Player');

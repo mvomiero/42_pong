@@ -21,5 +21,4 @@ from pong.views import index
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("pong.urls")),
-	#path("users/", include("users.urls")),
 ]
