@@ -68,6 +68,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         # Start game loop if the match is ready
         if not self.match.player_missing():
+            if await self.player_duplicate([self.match.player1_name, self.match.player2_name]):
+                await self.game_clear(self.match, 4001)
+                return
             print('[remote match] starting game loop')
             asyncio.ensure_future(self.game_loop(self.match))
 
@@ -102,8 +105,23 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         # Start game loop (semi-finals) if the tournament is ready
         if not self.tn.player_missing():
+            if await self.player_duplicate([self.tn.semi1.player1_name, self.tn.semi1.player2_name, self.tn.semi2.player1_name, self.tn.semi2.player2_name]):
+                await self.tournament_clear(self.tn, 4001)
+                return
             asyncio.ensure_future(self.tournament_loop(self.tn))
             
+    
+    async def player_duplicate(self, arr_players):
+        seen = set()
+        
+        for alias in arr_players:
+            if alias in seen:
+                return True
+            else:
+                seen.add(alias)
+        
+        return False
+
             
     async def disconnect(self, close_code):
         # check if self.match is in self.matches
@@ -343,4 +361,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     async def send_message(self, event):
         # Send the message to the WebSocket
-        await self.send(text_data=event['data'])
+        try:
+            await self.send(text_data=event['data'])
+        except Exception as e:
+            print(f'[sending WebSocket] sending on a closed webSocket: {e}')

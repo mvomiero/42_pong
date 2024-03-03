@@ -119,7 +119,7 @@ def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, t
     else:
         tx_hash = "0x0"
     tournament_data = TournamentData(
-        tourid = tourID,
+        tour_id = tourID,
         match_id_semi_1=matchIdSemi1,
         match_id_semi_2=matchIdSemi2,
         match_id_final=matchIdFinal,
