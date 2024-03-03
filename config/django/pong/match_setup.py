@@ -55,11 +55,16 @@ class Ball:
                 self.speed *= self.decrease_speed_multiplier
             else:
                 self.speed += paddle.speed * self.increase_speed_multiplier
-            #     self.dx += random.uniform(-1, 1)
-            # if self.dx > 1:
-            #     self.dx = 1
-            # if self.dx < -1:
-            #     self.dx = -1
+                self.dx += random.uniform(-0.5, 0.5)
+                self.dy += random.uniform(-0.5, 0.5)
+            if self.dx > 0.9:
+                self.dx = 0.9
+            if self.dx < -0.9:
+                self.dx = -0.9
+            if self.dy > 0.9:
+                self.dy = 0.9
+            if self.dy < -0.9:
+                self.dy = -0.9
             if self.speed < self.min_speed:
                 self.speed = self.min_speed
             if self.speed > self.max_speed:
@@ -78,7 +83,7 @@ class Paddle:
         self.speed_init = 0.001
         self.speed_increment = 0.0005
         self.min_speed = 0.001
-        self.max_speed = 0.04
+        self.max_speed = 0.05
         self.up_key_held = False
         self.down_key_held = False
     
