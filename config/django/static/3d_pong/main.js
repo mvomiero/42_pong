@@ -605,6 +605,8 @@ fontLoader.load('https://unpkg.com/three@0.138.3/examples/fonts/droid/droid_seri
         removeGameElements();
         removeTable();
         document.getElementById('closing_message').innerHTML = "The connection has been lost.";
+      } else {
+        document.getElementById('closing_message').innerHTML = "Hola, internal server error.";
       }
     }, 1000);
 
