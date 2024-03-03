@@ -23,9 +23,9 @@ class Ball:
         self.dy = random.uniform(-1, 1)
         self.speed = random.uniform(0.0037, 0.0047)
         self.min_speed = 0.003
-        self.max_speed = 0.06
+        self.max_speed = 0.07
         self.decrease_speed_multiplier = 0.7
-        self.increase_speed_multiplier = 0.085
+        self.increase_speed_multiplier = 0.095
         self.min_z = self.size
         self.max_z = self.randomise_max_z()
     
@@ -55,12 +55,12 @@ class Ball:
                 self.speed *= self.decrease_speed_multiplier
             else:
                 self.speed += paddle.speed * self.increase_speed_multiplier
-                self.dx += random.uniform(-0.5, 0.5)
+                # self.dx += random.uniform(-0.5, 0.5)
                 self.dy += random.uniform(-0.5, 0.5)
-            if self.dx > 0.9:
-                self.dx = 0.9
-            if self.dx < -0.9:
-                self.dx = -0.9
+            # if self.dx > 0.9:
+            #     self.dx = 0.9
+            # if self.dx < -0.9:
+            #     self.dx = -0.9
             if self.dy > 0.9:
                 self.dy = 0.9
             if self.dy < -0.9:

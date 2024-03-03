@@ -520,7 +520,10 @@ def get_dashboard_data_player(request):
     ).count()
 
     """ Data for number of tournaments """
-    nbr_tournaments = player_tournaments.count()
+    if player_tournaments.count() > 0:
+        nbr_tournaments = player_tournaments.count()
+    else:
+        nbr_tournaments = 0
 
     """ Data for longest match """
     longest_game = GameData.objects.order_by('-game_duration_secs').first()
