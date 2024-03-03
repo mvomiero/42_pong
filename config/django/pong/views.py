@@ -111,15 +111,15 @@ def add_game_data(p1n, p1s, p2n, p2s, gend, gdur, itg):
 #     durations (e.g. tdur) = number (e.g. 10)
 def add_tournament_data(matchIdSemi1, matchIdSemi2, matchIdFinal, playersRank, tend, tdur, blockchain=True):
     tend = (pytz.timezone('Europe/Paris')).localize(tend)
-    tend = tend + timedelta(hours=2)
-        
+    tend = tend + timedelta(hours=2)    
+    tourID = random.randint(0, 9999)
     if blockchain:
-        tourID = random.randint(0, 9999)
         tour_result = str(tourID) + " " + str(playersRank)
         tx_hash = asyncio.run(deploy_sepo(tour_result))
     else:
         tx_hash = "0x0"
     tournament_data = TournamentData(
+        tourid = tourID,
         match_id_semi_1=matchIdSemi1,
         match_id_semi_2=matchIdSemi2,
         match_id_final=matchIdFinal,

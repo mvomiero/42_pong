@@ -25,10 +25,10 @@ async def deploy_sepo(result):
     binary_result = result.encode('utf-8')
     count = web3.eth.get_transaction_count(account_from["address"])
     logger.info(f"The current count is {count}!")
-    latest_nonce = web3.eth.get_transaction_count(account_from["address"], 'pending')
-    if latest_nonce == count:
-        count += 1
-    logger.info(f"The after check count is {count}!")
+    # latest_nonce = web3.eth.get_transaction_count(account_from["address"], 'pending')
+    # if latest_nonce == count:
+    #     count += 1
+    # logger.info(f"The after check count is {count}!")
     current_gas_price = web3.eth.gas_price
     logger.warn(f'The current gas price is {current_gas_price}')
     new_gas_price = int(current_gas_price * 1.2)

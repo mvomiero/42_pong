@@ -7060,3 +7060,390 @@
 2024-03-03 12:53:28,626 - webSocket_msg_create.py - INFO - Score updated to a, 10 - b, 5
 2024-03-03 12:53:28,626 - webSocket_msg_create.py - INFO - Score updated to a, 10 - b, 5
 2024-03-03 12:53:28,626 - webSocket_msg_create.py - INFO - Score updated to a, 10 - b, 5
+2024-03-03 13:10:15,779 - webSocket_msg_create.py - INFO - Setting player name graham
+2024-03-03 13:10:15,779 - webSocket_msg_create.py - INFO - Setting player name graham
+2024-03-03 13:10:15,779 - webSocket_msg_create.py - INFO - Setting player name graham
+2024-03-03 13:10:15,814 - consumers.py - WARNING - Player kfjg df disconnected from the game
+2024-03-03 13:10:15,814 - consumers.py - WARNING - Player kfjg df disconnected from the game
+2024-03-03 13:10:15,814 - consumers.py - WARNING - Player kfjg df disconnected from the game
+2024-03-03 13:10:41,784 - consumers.py - WARNING - Player graham disconnected from the game
+2024-03-03 13:10:41,784 - consumers.py - WARNING - Player graham disconnected from the game
+2024-03-03 13:10:41,784 - consumers.py - WARNING - Player graham disconnected from the game
+2024-03-03 13:10:50,617 - consumers.py - WARNING - Player dfg fghfgh disconnected from the game
+2024-03-03 13:10:50,617 - consumers.py - WARNING - Player dfg fghfgh disconnected from the game
+2024-03-03 13:10:50,617 - consumers.py - WARNING - Player dfg fghfgh disconnected from the game
+2024-03-03 13:12:31,589 - webSocket_msg_create.py - INFO - Setting player name vbn
+2024-03-03 13:12:31,589 - webSocket_msg_create.py - INFO - Setting player name vbn
+2024-03-03 13:12:31,589 - webSocket_msg_create.py - INFO - Setting player name vbn
+2024-03-03 13:12:31,603 - webSocket_msg_create.py - INFO - Setting player name vbna
+2024-03-03 13:12:31,603 - webSocket_msg_create.py - INFO - Setting player name vbna
+2024-03-03 13:12:31,603 - webSocket_msg_create.py - INFO - Setting player name vbna
+2024-03-03 13:12:31,603 - webSocket_msg_create.py - WARNING - Match start for players vbn, vbna
+2024-03-03 13:12:31,603 - webSocket_msg_create.py - WARNING - Match start for players vbn, vbna
+2024-03-03 13:12:31,603 - webSocket_msg_create.py - WARNING - Match start for players vbn, vbna
+2024-03-03 13:12:31,605 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:12:31,605 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:12:31,605 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:12:35,636 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:12:35,636 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:12:35,636 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:12:36,824 - webSocket_msg_create.py - INFO - Score updated to vbn, 1 - vbna, 0
+2024-03-03 13:12:36,824 - webSocket_msg_create.py - INFO - Score updated to vbn, 1 - vbna, 0
+2024-03-03 13:12:36,824 - webSocket_msg_create.py - INFO - Score updated to vbn, 1 - vbna, 0
+2024-03-03 13:12:38,141 - webSocket_msg_create.py - INFO - Score updated to vbn, 2 - vbna, 0
+2024-03-03 13:12:38,141 - webSocket_msg_create.py - INFO - Score updated to vbn, 2 - vbna, 0
+2024-03-03 13:12:38,141 - webSocket_msg_create.py - INFO - Score updated to vbn, 2 - vbna, 0
+2024-03-03 13:12:54,115 - webSocket_msg_create.py - INFO - Score updated to vbn, 3 - vbna, 0
+2024-03-03 13:12:54,115 - webSocket_msg_create.py - INFO - Score updated to vbn, 3 - vbna, 0
+2024-03-03 13:12:54,115 - webSocket_msg_create.py - INFO - Score updated to vbn, 3 - vbna, 0
+2024-03-03 13:12:55,445 - webSocket_msg_create.py - INFO - Score updated to vbn, 4 - vbna, 0
+2024-03-03 13:12:55,445 - webSocket_msg_create.py - INFO - Score updated to vbn, 4 - vbna, 0
+2024-03-03 13:12:55,445 - webSocket_msg_create.py - INFO - Score updated to vbn, 4 - vbna, 0
+2024-03-03 13:13:04,034 - webSocket_msg_create.py - INFO - Score updated to vbn, 5 - vbna, 0
+2024-03-03 13:13:04,034 - webSocket_msg_create.py - INFO - Score updated to vbn, 5 - vbna, 0
+2024-03-03 13:13:04,034 - webSocket_msg_create.py - INFO - Score updated to vbn, 5 - vbna, 0
+2024-03-03 13:13:05,337 - webSocket_msg_create.py - INFO - Score updated to vbn, 6 - vbna, 0
+2024-03-03 13:13:05,337 - webSocket_msg_create.py - INFO - Score updated to vbn, 6 - vbna, 0
+2024-03-03 13:13:05,337 - webSocket_msg_create.py - INFO - Score updated to vbn, 6 - vbna, 0
+2024-03-03 13:13:43,041 - webSocket_msg_create.py - INFO - Score updated to vbn, 6 - vbna, 1
+2024-03-03 13:13:43,041 - webSocket_msg_create.py - INFO - Score updated to vbn, 6 - vbna, 1
+2024-03-03 13:13:43,041 - webSocket_msg_create.py - INFO - Score updated to vbn, 6 - vbna, 1
+2024-03-03 13:13:44,376 - webSocket_msg_create.py - INFO - Score updated to vbn, 7 - vbna, 1
+2024-03-03 13:13:44,376 - webSocket_msg_create.py - INFO - Score updated to vbn, 7 - vbna, 1
+2024-03-03 13:13:44,376 - webSocket_msg_create.py - INFO - Score updated to vbn, 7 - vbna, 1
+2024-03-03 13:13:45,588 - webSocket_msg_create.py - INFO - Score updated to vbn, 8 - vbna, 1
+2024-03-03 13:13:45,588 - webSocket_msg_create.py - INFO - Score updated to vbn, 8 - vbna, 1
+2024-03-03 13:13:45,588 - webSocket_msg_create.py - INFO - Score updated to vbn, 8 - vbna, 1
+2024-03-03 13:13:46,934 - webSocket_msg_create.py - INFO - Score updated to vbn, 8 - vbna, 2
+2024-03-03 13:13:46,934 - webSocket_msg_create.py - INFO - Score updated to vbn, 8 - vbna, 2
+2024-03-03 13:13:46,934 - webSocket_msg_create.py - INFO - Score updated to vbn, 8 - vbna, 2
+2024-03-03 13:13:54,060 - webSocket_msg_create.py - INFO - Score updated to vbn, 8 - vbna, 3
+2024-03-03 13:13:54,060 - webSocket_msg_create.py - INFO - Score updated to vbn, 8 - vbna, 3
+2024-03-03 13:13:54,060 - webSocket_msg_create.py - INFO - Score updated to vbn, 8 - vbna, 3
+2024-03-03 13:13:55,231 - webSocket_msg_create.py - INFO - Score updated to vbn, 9 - vbna, 3
+2024-03-03 13:13:55,231 - webSocket_msg_create.py - INFO - Score updated to vbn, 9 - vbna, 3
+2024-03-03 13:13:55,231 - webSocket_msg_create.py - INFO - Score updated to vbn, 9 - vbna, 3
+2024-03-03 13:13:56,402 - webSocket_msg_create.py - INFO - Score updated to vbn, 9 - vbna, 4
+2024-03-03 13:13:56,402 - webSocket_msg_create.py - INFO - Score updated to vbn, 9 - vbna, 4
+2024-03-03 13:13:56,402 - webSocket_msg_create.py - INFO - Score updated to vbn, 9 - vbna, 4
+2024-03-03 13:14:04,106 - webSocket_msg_create.py - INFO - Score updated to vbn, 10 - vbna, 4
+2024-03-03 13:14:04,106 - webSocket_msg_create.py - INFO - Score updated to vbn, 10 - vbna, 4
+2024-03-03 13:14:04,106 - webSocket_msg_create.py - INFO - Score updated to vbn, 10 - vbna, 4
+2024-03-03 13:14:05,537 - webSocket_msg_create.py - INFO - Score updated to vbn, 10 - vbna, 5
+2024-03-03 13:14:05,537 - webSocket_msg_create.py - INFO - Score updated to vbn, 10 - vbna, 5
+2024-03-03 13:14:05,537 - webSocket_msg_create.py - INFO - Score updated to vbn, 10 - vbna, 5
+2024-03-03 13:14:06,829 - webSocket_msg_create.py - INFO - Score updated to vbn, 11 - vbna, 5
+2024-03-03 13:14:06,829 - webSocket_msg_create.py - INFO - Score updated to vbn, 11 - vbna, 5
+2024-03-03 13:14:06,829 - webSocket_msg_create.py - INFO - Score updated to vbn, 11 - vbna, 5
+2024-03-03 13:14:06,840 - webSocket_msg_create.py - INFO - Match end for players vbn, vbna
+2024-03-03 13:14:06,840 - webSocket_msg_create.py - INFO - Match end for players vbn, vbna
+2024-03-03 13:14:06,840 - webSocket_msg_create.py - INFO - Match end for players vbn, vbna
+2024-03-03 13:14:06,840 - webSocket_msg_create.py - INFO - Score updated to vbn, 11 - vbna, 5
+2024-03-03 13:14:06,840 - webSocket_msg_create.py - INFO - Score updated to vbn, 11 - vbna, 5
+2024-03-03 13:14:06,840 - webSocket_msg_create.py - INFO - Score updated to vbn, 11 - vbna, 5
+2024-03-03 13:14:06,840 - webSocket_msg_create.py - WARNING - Player vbn won the game
+2024-03-03 13:14:06,840 - webSocket_msg_create.py - WARNING - Player vbn won the game
+2024-03-03 13:14:06,840 - webSocket_msg_create.py - WARNING - Player vbn won the game
+2024-03-03 13:14:07,167 - consumers.py - WARNING - Player vbna disconnected from the game
+2024-03-03 13:14:07,167 - consumers.py - WARNING - Player vbna disconnected from the game
+2024-03-03 13:14:07,167 - consumers.py - WARNING - Player vbna disconnected from the game
+2024-03-03 13:14:07,167 - consumers.py - WARNING - Player vbn disconnected from the game
+2024-03-03 13:14:07,167 - consumers.py - WARNING - Player vbn disconnected from the game
+2024-03-03 13:14:07,167 - consumers.py - WARNING - Player vbn disconnected from the game
+2024-03-03 13:15:43,342 - webSocket_msg_create.py - INFO - Setting player name aaa
+2024-03-03 13:15:43,342 - webSocket_msg_create.py - INFO - Setting player name aaa
+2024-03-03 13:15:43,342 - webSocket_msg_create.py - INFO - Setting player name aaa
+2024-03-03 13:15:43,356 - webSocket_msg_create.py - INFO - Setting player name aaa
+2024-03-03 13:15:43,356 - webSocket_msg_create.py - INFO - Setting player name aaa
+2024-03-03 13:15:43,356 - webSocket_msg_create.py - INFO - Setting player name aaa
+2024-03-03 13:15:43,357 - webSocket_msg_create.py - WARNING - Match start for players aaa, aaa
+2024-03-03 13:15:43,357 - webSocket_msg_create.py - WARNING - Match start for players aaa, aaa
+2024-03-03 13:15:43,357 - webSocket_msg_create.py - WARNING - Match start for players aaa, aaa
+2024-03-03 13:15:43,358 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:15:43,358 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:15:43,358 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:15:47,387 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:15:47,387 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:15:47,387 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:15:48,766 - webSocket_msg_create.py - INFO - Score updated to aaa, 1 - aaa, 0
+2024-03-03 13:15:48,766 - webSocket_msg_create.py - INFO - Score updated to aaa, 1 - aaa, 0
+2024-03-03 13:15:48,766 - webSocket_msg_create.py - INFO - Score updated to aaa, 1 - aaa, 0
+2024-03-03 13:15:50,096 - webSocket_msg_create.py - INFO - Score updated to aaa, 2 - aaa, 0
+2024-03-03 13:15:50,096 - webSocket_msg_create.py - INFO - Score updated to aaa, 2 - aaa, 0
+2024-03-03 13:15:50,096 - webSocket_msg_create.py - INFO - Score updated to aaa, 2 - aaa, 0
+2024-03-03 13:15:51,267 - webSocket_msg_create.py - INFO - Score updated to aaa, 2 - aaa, 1
+2024-03-03 13:15:51,267 - webSocket_msg_create.py - INFO - Score updated to aaa, 2 - aaa, 1
+2024-03-03 13:15:51,267 - webSocket_msg_create.py - INFO - Score updated to aaa, 2 - aaa, 1
+2024-03-03 13:15:52,668 - webSocket_msg_create.py - INFO - Score updated to aaa, 3 - aaa, 1
+2024-03-03 13:15:52,668 - webSocket_msg_create.py - INFO - Score updated to aaa, 3 - aaa, 1
+2024-03-03 13:15:52,668 - webSocket_msg_create.py - INFO - Score updated to aaa, 3 - aaa, 1
+2024-03-03 13:15:53,817 - webSocket_msg_create.py - INFO - Score updated to aaa, 3 - aaa, 2
+2024-03-03 13:15:53,817 - webSocket_msg_create.py - INFO - Score updated to aaa, 3 - aaa, 2
+2024-03-03 13:15:53,817 - webSocket_msg_create.py - INFO - Score updated to aaa, 3 - aaa, 2
+2024-03-03 13:15:55,238 - webSocket_msg_create.py - INFO - Score updated to aaa, 3 - aaa, 3
+2024-03-03 13:15:55,238 - webSocket_msg_create.py - INFO - Score updated to aaa, 3 - aaa, 3
+2024-03-03 13:15:55,238 - webSocket_msg_create.py - INFO - Score updated to aaa, 3 - aaa, 3
+2024-03-03 13:16:05,190 - webSocket_msg_create.py - INFO - Score updated to aaa, 4 - aaa, 3
+2024-03-03 13:16:05,190 - webSocket_msg_create.py - INFO - Score updated to aaa, 4 - aaa, 3
+2024-03-03 13:16:05,190 - webSocket_msg_create.py - INFO - Score updated to aaa, 4 - aaa, 3
+2024-03-03 13:16:06,631 - webSocket_msg_create.py - INFO - Score updated to aaa, 4 - aaa, 4
+2024-03-03 13:16:06,631 - webSocket_msg_create.py - INFO - Score updated to aaa, 4 - aaa, 4
+2024-03-03 13:16:06,631 - webSocket_msg_create.py - INFO - Score updated to aaa, 4 - aaa, 4
+2024-03-03 13:16:07,840 - webSocket_msg_create.py - INFO - Score updated to aaa, 5 - aaa, 4
+2024-03-03 13:16:07,840 - webSocket_msg_create.py - INFO - Score updated to aaa, 5 - aaa, 4
+2024-03-03 13:16:07,840 - webSocket_msg_create.py - INFO - Score updated to aaa, 5 - aaa, 4
+2024-03-03 13:16:09,133 - webSocket_msg_create.py - INFO - Score updated to aaa, 6 - aaa, 4
+2024-03-03 13:16:09,133 - webSocket_msg_create.py - INFO - Score updated to aaa, 6 - aaa, 4
+2024-03-03 13:16:09,133 - webSocket_msg_create.py - INFO - Score updated to aaa, 6 - aaa, 4
+2024-03-03 13:16:10,401 - webSocket_msg_create.py - INFO - Score updated to aaa, 7 - aaa, 4
+2024-03-03 13:16:10,401 - webSocket_msg_create.py - INFO - Score updated to aaa, 7 - aaa, 4
+2024-03-03 13:16:10,401 - webSocket_msg_create.py - INFO - Score updated to aaa, 7 - aaa, 4
+2024-03-03 13:16:11,595 - webSocket_msg_create.py - INFO - Score updated to aaa, 8 - aaa, 4
+2024-03-03 13:16:11,595 - webSocket_msg_create.py - INFO - Score updated to aaa, 8 - aaa, 4
+2024-03-03 13:16:11,595 - webSocket_msg_create.py - INFO - Score updated to aaa, 8 - aaa, 4
+2024-03-03 13:16:12,834 - webSocket_msg_create.py - INFO - Score updated to aaa, 9 - aaa, 4
+2024-03-03 13:16:12,834 - webSocket_msg_create.py - INFO - Score updated to aaa, 9 - aaa, 4
+2024-03-03 13:16:12,834 - webSocket_msg_create.py - INFO - Score updated to aaa, 9 - aaa, 4
+2024-03-03 13:16:14,029 - webSocket_msg_create.py - INFO - Score updated to aaa, 9 - aaa, 5
+2024-03-03 13:16:14,029 - webSocket_msg_create.py - INFO - Score updated to aaa, 9 - aaa, 5
+2024-03-03 13:16:14,029 - webSocket_msg_create.py - INFO - Score updated to aaa, 9 - aaa, 5
+2024-03-03 13:16:19,399 - webSocket_msg_create.py - INFO - Score updated to aaa, 10 - aaa, 5
+2024-03-03 13:16:19,399 - webSocket_msg_create.py - INFO - Score updated to aaa, 10 - aaa, 5
+2024-03-03 13:16:19,399 - webSocket_msg_create.py - INFO - Score updated to aaa, 10 - aaa, 5
+2024-03-03 13:16:20,657 - webSocket_msg_create.py - INFO - Score updated to aaa, 10 - aaa, 6
+2024-03-03 13:16:20,657 - webSocket_msg_create.py - INFO - Score updated to aaa, 10 - aaa, 6
+2024-03-03 13:16:20,657 - webSocket_msg_create.py - INFO - Score updated to aaa, 10 - aaa, 6
+2024-03-03 13:16:21,906 - webSocket_msg_create.py - INFO - Score updated to aaa, 10 - aaa, 7
+2024-03-03 13:16:21,906 - webSocket_msg_create.py - INFO - Score updated to aaa, 10 - aaa, 7
+2024-03-03 13:16:21,906 - webSocket_msg_create.py - INFO - Score updated to aaa, 10 - aaa, 7
+2024-03-03 13:16:23,359 - webSocket_msg_create.py - INFO - Score updated to aaa, 11 - aaa, 7
+2024-03-03 13:16:23,359 - webSocket_msg_create.py - INFO - Score updated to aaa, 11 - aaa, 7
+2024-03-03 13:16:23,359 - webSocket_msg_create.py - INFO - Score updated to aaa, 11 - aaa, 7
+2024-03-03 13:16:23,371 - webSocket_msg_create.py - INFO - Match end for players aaa, aaa
+2024-03-03 13:16:23,371 - webSocket_msg_create.py - INFO - Match end for players aaa, aaa
+2024-03-03 13:16:23,371 - webSocket_msg_create.py - INFO - Match end for players aaa, aaa
+2024-03-03 13:16:23,371 - webSocket_msg_create.py - INFO - Score updated to aaa, 11 - aaa, 7
+2024-03-03 13:16:23,371 - webSocket_msg_create.py - INFO - Score updated to aaa, 11 - aaa, 7
+2024-03-03 13:16:23,371 - webSocket_msg_create.py - INFO - Score updated to aaa, 11 - aaa, 7
+2024-03-03 13:16:23,371 - webSocket_msg_create.py - WARNING - Player aaa won the game
+2024-03-03 13:16:23,371 - webSocket_msg_create.py - WARNING - Player aaa won the game
+2024-03-03 13:16:23,371 - webSocket_msg_create.py - WARNING - Player aaa won the game
+2024-03-03 13:16:23,674 - consumers.py - WARNING - Player aaa disconnected from the game
+2024-03-03 13:16:23,674 - consumers.py - WARNING - Player aaa disconnected from the game
+2024-03-03 13:16:23,674 - consumers.py - WARNING - Player aaa disconnected from the game
+2024-03-03 13:16:23,674 - consumers.py - WARNING - Player aaa disconnected from the game
+2024-03-03 13:16:23,674 - consumers.py - WARNING - Player aaa disconnected from the game
+2024-03-03 13:16:23,674 - consumers.py - WARNING - Player aaa disconnected from the game
+2024-03-03 13:16:41,430 - webSocket_msg_create.py - INFO - Setting player name bb
+2024-03-03 13:16:41,430 - webSocket_msg_create.py - INFO - Setting player name bb
+2024-03-03 13:16:41,430 - webSocket_msg_create.py - INFO - Setting player name bb
+2024-03-03 13:16:41,443 - webSocket_msg_create.py - INFO - Setting player name bb
+2024-03-03 13:16:41,443 - webSocket_msg_create.py - INFO - Setting player name bb
+2024-03-03 13:16:41,443 - webSocket_msg_create.py - INFO - Setting player name bb
+2024-03-03 13:16:41,443 - webSocket_msg_create.py - WARNING - Match start for players bb, bb
+2024-03-03 13:16:41,443 - webSocket_msg_create.py - WARNING - Match start for players bb, bb
+2024-03-03 13:16:41,443 - webSocket_msg_create.py - WARNING - Match start for players bb, bb
+2024-03-03 13:16:41,444 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:16:41,444 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:16:41,444 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:16:45,466 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:16:45,466 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:16:45,466 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:16:46,663 - webSocket_msg_create.py - INFO - Score updated to bb, 0 - bb, 1
+2024-03-03 13:16:46,663 - webSocket_msg_create.py - INFO - Score updated to bb, 0 - bb, 1
+2024-03-03 13:16:46,663 - webSocket_msg_create.py - INFO - Score updated to bb, 0 - bb, 1
+2024-03-03 13:16:47,941 - webSocket_msg_create.py - INFO - Score updated to bb, 1 - bb, 1
+2024-03-03 13:16:47,941 - webSocket_msg_create.py - INFO - Score updated to bb, 1 - bb, 1
+2024-03-03 13:16:47,941 - webSocket_msg_create.py - INFO - Score updated to bb, 1 - bb, 1
+2024-03-03 13:16:49,244 - webSocket_msg_create.py - INFO - Score updated to bb, 2 - bb, 1
+2024-03-03 13:16:49,244 - webSocket_msg_create.py - INFO - Score updated to bb, 2 - bb, 1
+2024-03-03 13:16:49,244 - webSocket_msg_create.py - INFO - Score updated to bb, 2 - bb, 1
+2024-03-03 13:16:50,534 - webSocket_msg_create.py - INFO - Score updated to bb, 3 - bb, 1
+2024-03-03 13:16:50,534 - webSocket_msg_create.py - INFO - Score updated to bb, 3 - bb, 1
+2024-03-03 13:16:50,534 - webSocket_msg_create.py - INFO - Score updated to bb, 3 - bb, 1
+2024-03-03 13:16:51,687 - webSocket_msg_create.py - INFO - Score updated to bb, 3 - bb, 2
+2024-03-03 13:16:51,687 - webSocket_msg_create.py - INFO - Score updated to bb, 3 - bb, 2
+2024-03-03 13:16:51,687 - webSocket_msg_create.py - INFO - Score updated to bb, 3 - bb, 2
+2024-03-03 13:16:57,119 - webSocket_msg_create.py - INFO - Score updated to bb, 4 - bb, 2
+2024-03-03 13:16:57,119 - webSocket_msg_create.py - INFO - Score updated to bb, 4 - bb, 2
+2024-03-03 13:16:57,119 - webSocket_msg_create.py - INFO - Score updated to bb, 4 - bb, 2
+2024-03-03 13:17:02,075 - webSocket_msg_create.py - INFO - Score updated to bb, 4 - bb, 3
+2024-03-03 13:17:02,075 - webSocket_msg_create.py - INFO - Score updated to bb, 4 - bb, 3
+2024-03-03 13:17:02,075 - webSocket_msg_create.py - INFO - Score updated to bb, 4 - bb, 3
+2024-03-03 13:17:03,418 - webSocket_msg_create.py - INFO - Score updated to bb, 5 - bb, 3
+2024-03-03 13:17:03,418 - webSocket_msg_create.py - INFO - Score updated to bb, 5 - bb, 3
+2024-03-03 13:17:03,418 - webSocket_msg_create.py - INFO - Score updated to bb, 5 - bb, 3
+2024-03-03 13:17:04,685 - webSocket_msg_create.py - INFO - Score updated to bb, 6 - bb, 3
+2024-03-03 13:17:04,685 - webSocket_msg_create.py - INFO - Score updated to bb, 6 - bb, 3
+2024-03-03 13:17:04,685 - webSocket_msg_create.py - INFO - Score updated to bb, 6 - bb, 3
+2024-03-03 13:17:05,942 - webSocket_msg_create.py - INFO - Score updated to bb, 6 - bb, 4
+2024-03-03 13:17:05,942 - webSocket_msg_create.py - INFO - Score updated to bb, 6 - bb, 4
+2024-03-03 13:17:05,942 - webSocket_msg_create.py - INFO - Score updated to bb, 6 - bb, 4
+2024-03-03 13:17:11,373 - webSocket_msg_create.py - INFO - Score updated to bb, 7 - bb, 4
+2024-03-03 13:17:11,373 - webSocket_msg_create.py - INFO - Score updated to bb, 7 - bb, 4
+2024-03-03 13:17:11,373 - webSocket_msg_create.py - INFO - Score updated to bb, 7 - bb, 4
+2024-03-03 13:17:16,457 - webSocket_msg_create.py - INFO - Score updated to bb, 8 - bb, 4
+2024-03-03 13:17:16,457 - webSocket_msg_create.py - INFO - Score updated to bb, 8 - bb, 4
+2024-03-03 13:17:16,457 - webSocket_msg_create.py - INFO - Score updated to bb, 8 - bb, 4
+2024-03-03 13:17:17,832 - webSocket_msg_create.py - INFO - Score updated to bb, 8 - bb, 5
+2024-03-03 13:17:17,832 - webSocket_msg_create.py - INFO - Score updated to bb, 8 - bb, 5
+2024-03-03 13:17:17,832 - webSocket_msg_create.py - INFO - Score updated to bb, 8 - bb, 5
+2024-03-03 13:17:18,905 - consumers.py - WARNING - Player bb disconnected from the game
+2024-03-03 13:17:18,905 - consumers.py - WARNING - Player bb disconnected from the game
+2024-03-03 13:17:18,905 - consumers.py - WARNING - Player bb disconnected from the game
+2024-03-03 13:17:18,905 - consumers.py - WARNING - Player bb disconnected from the game
+2024-03-03 13:17:18,905 - consumers.py - WARNING - Player bb disconnected from the game
+2024-03-03 13:17:18,905 - consumers.py - WARNING - Player bb disconnected from the game
+2024-03-03 13:17:23,671 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:17:23,671 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:17:23,671 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:17:23,685 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-03 13:17:23,685 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-03 13:17:23,685 - webSocket_msg_create.py - INFO - Setting player name b
+2024-03-03 13:17:23,685 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-03 13:17:23,685 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-03 13:17:23,685 - webSocket_msg_create.py - WARNING - Match start for players a, b
+2024-03-03 13:17:23,686 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:17:23,686 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:17:23,686 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:17:27,706 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:17:27,706 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:17:27,706 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:17:28,977 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-03 13:17:28,977 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-03 13:17:28,977 - webSocket_msg_create.py - INFO - Score updated to a, 1 - b, 0
+2024-03-03 13:17:35,678 - consumers.py - WARNING - Player b disconnected from the game
+2024-03-03 13:17:35,678 - consumers.py - WARNING - Player b disconnected from the game
+2024-03-03 13:17:35,678 - consumers.py - WARNING - Player b disconnected from the game
+2024-03-03 13:17:35,678 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-03 13:17:35,678 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-03 13:17:35,678 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-03 13:35:48,417 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:35:48,417 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:35:48,417 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:35:55,308 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:35:55,308 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:35:55,308 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:35:55,308 - webSocket_msg_create.py - WARNING - Match start for players a, a
+2024-03-03 13:35:55,308 - webSocket_msg_create.py - WARNING - Match start for players a, a
+2024-03-03 13:35:55,308 - webSocket_msg_create.py - WARNING - Match start for players a, a
+2024-03-03 13:35:55,318 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:35:55,318 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:35:55,318 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:35:55,352 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:35:55,352 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:35:55,352 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:35:59,344 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:35:59,344 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:35:59,344 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:35:59,376 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:35:59,376 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:35:59,376 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:36:00,682 - webSocket_msg_create.py - INFO - Score updated to a, 0 - a, 1
+2024-03-03 13:36:00,682 - webSocket_msg_create.py - INFO - Score updated to a, 0 - a, 1
+2024-03-03 13:36:00,682 - webSocket_msg_create.py - INFO - Score updated to a, 0 - a, 1
+2024-03-03 13:36:01,984 - webSocket_msg_create.py - INFO - Score updated to a, 1 - a, 1
+2024-03-03 13:36:01,984 - webSocket_msg_create.py - INFO - Score updated to a, 1 - a, 1
+2024-03-03 13:36:01,984 - webSocket_msg_create.py - INFO - Score updated to a, 1 - a, 1
+2024-03-03 13:36:03,368 - webSocket_msg_create.py - INFO - Score updated to a, 1 - a, 2
+2024-03-03 13:36:03,368 - webSocket_msg_create.py - INFO - Score updated to a, 1 - a, 2
+2024-03-03 13:36:03,368 - webSocket_msg_create.py - INFO - Score updated to a, 1 - a, 2
+2024-03-03 13:36:04,771 - webSocket_msg_create.py - INFO - Score updated to a, 2 - a, 2
+2024-03-03 13:36:04,771 - webSocket_msg_create.py - INFO - Score updated to a, 2 - a, 2
+2024-03-03 13:36:04,771 - webSocket_msg_create.py - INFO - Score updated to a, 2 - a, 2
+2024-03-03 13:36:05,986 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 2
+2024-03-03 13:36:05,986 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 2
+2024-03-03 13:36:05,986 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 2
+2024-03-03 13:36:07,221 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 3
+2024-03-03 13:36:07,221 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 3
+2024-03-03 13:36:07,221 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 3
+2024-03-03 13:36:08,470 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 4
+2024-03-03 13:36:08,470 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 4
+2024-03-03 13:36:08,470 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 4
+2024-03-03 13:36:09,655 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 5
+2024-03-03 13:36:09,655 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 5
+2024-03-03 13:36:09,655 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 5
+2024-03-03 13:36:11,054 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 6
+2024-03-03 13:36:11,054 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 6
+2024-03-03 13:36:11,054 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 6
+2024-03-03 13:36:12,225 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 7
+2024-03-03 13:36:12,225 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 7
+2024-03-03 13:36:12,225 - webSocket_msg_create.py - INFO - Score updated to a, 3 - a, 7
+2024-03-03 13:36:17,471 - webSocket_msg_create.py - INFO - Score updated to a, 4 - a, 7
+2024-03-03 13:36:17,471 - webSocket_msg_create.py - INFO - Score updated to a, 4 - a, 7
+2024-03-03 13:36:17,471 - webSocket_msg_create.py - INFO - Score updated to a, 4 - a, 7
+2024-03-03 13:36:18,718 - webSocket_msg_create.py - INFO - Score updated to a, 5 - a, 7
+2024-03-03 13:36:18,718 - webSocket_msg_create.py - INFO - Score updated to a, 5 - a, 7
+2024-03-03 13:36:18,718 - webSocket_msg_create.py - INFO - Score updated to a, 5 - a, 7
+2024-03-03 13:36:23,897 - webSocket_msg_create.py - INFO - Score updated to a, 6 - a, 7
+2024-03-03 13:36:23,897 - webSocket_msg_create.py - INFO - Score updated to a, 6 - a, 7
+2024-03-03 13:36:23,897 - webSocket_msg_create.py - INFO - Score updated to a, 6 - a, 7
+2024-03-03 13:36:25,248 - webSocket_msg_create.py - INFO - Score updated to a, 7 - a, 7
+2024-03-03 13:36:25,248 - webSocket_msg_create.py - INFO - Score updated to a, 7 - a, 7
+2024-03-03 13:36:25,248 - webSocket_msg_create.py - INFO - Score updated to a, 7 - a, 7
+2024-03-03 13:36:26,440 - webSocket_msg_create.py - INFO - Score updated to a, 7 - a, 8
+2024-03-03 13:36:26,440 - webSocket_msg_create.py - INFO - Score updated to a, 7 - a, 8
+2024-03-03 13:36:26,440 - webSocket_msg_create.py - INFO - Score updated to a, 7 - a, 8
+2024-03-03 13:36:27,619 - webSocket_msg_create.py - INFO - Score updated to a, 8 - a, 8
+2024-03-03 13:36:27,619 - webSocket_msg_create.py - INFO - Score updated to a, 8 - a, 8
+2024-03-03 13:36:27,619 - webSocket_msg_create.py - INFO - Score updated to a, 8 - a, 8
+2024-03-03 13:36:28,777 - webSocket_msg_create.py - INFO - Score updated to a, 9 - a, 8
+2024-03-03 13:36:28,777 - webSocket_msg_create.py - INFO - Score updated to a, 9 - a, 8
+2024-03-03 13:36:28,777 - webSocket_msg_create.py - INFO - Score updated to a, 9 - a, 8
+2024-03-03 13:36:29,984 - webSocket_msg_create.py - INFO - Score updated to a, 9 - a, 9
+2024-03-03 13:36:29,984 - webSocket_msg_create.py - INFO - Score updated to a, 9 - a, 9
+2024-03-03 13:36:29,984 - webSocket_msg_create.py - INFO - Score updated to a, 9 - a, 9
+2024-03-03 13:36:31,328 - webSocket_msg_create.py - INFO - Score updated to a, 9 - a, 10
+2024-03-03 13:36:31,328 - webSocket_msg_create.py - INFO - Score updated to a, 9 - a, 10
+2024-03-03 13:36:31,328 - webSocket_msg_create.py - INFO - Score updated to a, 9 - a, 10
+2024-03-03 13:36:36,656 - webSocket_msg_create.py - INFO - Score updated to a, 10 - a, 10
+2024-03-03 13:36:36,656 - webSocket_msg_create.py - INFO - Score updated to a, 10 - a, 10
+2024-03-03 13:36:36,656 - webSocket_msg_create.py - INFO - Score updated to a, 10 - a, 10
+2024-03-03 13:36:38,043 - webSocket_msg_create.py - INFO - Score updated to a, 11 - a, 10
+2024-03-03 13:36:38,043 - webSocket_msg_create.py - INFO - Score updated to a, 11 - a, 10
+2024-03-03 13:36:38,043 - webSocket_msg_create.py - INFO - Score updated to a, 11 - a, 10
+2024-03-03 13:36:38,054 - webSocket_msg_create.py - INFO - Match end for players a, a
+2024-03-03 13:36:38,054 - webSocket_msg_create.py - INFO - Match end for players a, a
+2024-03-03 13:36:38,054 - webSocket_msg_create.py - INFO - Match end for players a, a
+2024-03-03 13:36:38,054 - webSocket_msg_create.py - INFO - Score updated to a, 11 - a, 10
+2024-03-03 13:36:38,054 - webSocket_msg_create.py - INFO - Score updated to a, 11 - a, 10
+2024-03-03 13:36:38,054 - webSocket_msg_create.py - INFO - Score updated to a, 11 - a, 10
+2024-03-03 13:36:38,054 - webSocket_msg_create.py - WARNING - Player a won the game
+2024-03-03 13:36:38,054 - webSocket_msg_create.py - WARNING - Player a won the game
+2024-03-03 13:36:38,054 - webSocket_msg_create.py - WARNING - Player a won the game
+2024-03-03 13:36:38,387 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-03 13:36:38,387 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-03 13:36:38,387 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-03 13:36:38,387 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-03 13:36:38,387 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-03 13:36:38,387 - consumers.py - WARNING - Player a disconnected from the game
+2024-03-03 13:36:58,993 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:36:58,993 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:36:58,993 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:37:00,050 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:37:00,050 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:37:00,050 - webSocket_msg_create.py - INFO - Setting player name a
+2024-03-03 13:37:00,050 - webSocket_msg_create.py - WARNING - Match start for players a, a
+2024-03-03 13:37:00,050 - webSocket_msg_create.py - WARNING - Match start for players a, a
+2024-03-03 13:37:00,050 - webSocket_msg_create.py - WARNING - Match start for players a, a
+2024-03-03 13:37:00,052 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:37:00,052 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:37:00,052 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:37:00,069 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:37:00,069 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:37:00,069 - consumers.py - DEBUG - Game is paused
+2024-03-03 13:37:04,062 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:37:04,062 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:37:04,062 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:37:04,079 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:37:04,079 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:37:04,079 - consumers.py - DEBUG - Game is resumed
+2024-03-03 13:37:13,292 - webSocket_msg_create.py - INFO - Score updated to a, 0 - a, 1
+2024-03-03 13:37:13,292 - webSocket_msg_create.py - INFO - Score updated to a, 0 - a, 1
+2024-03-03 13:37:13,292 - webSocket_msg_create.py - INFO - Score updated to a, 0 - a, 1
+2024-03-03 13:37:14,434 - webSocket_msg_create.py - INFO - Score updated to a, 1 - a, 1
+2024-03-03 13:37:14,434 - webSocket_msg_create.py - INFO - Score updated to a, 1 - a, 1
+2024-03-03 13:37:14,434 - webSocket_msg_create.py - INFO - Score updated to a, 1 - a, 1
+2024-03-03 13:37:15,837 - webSocket_msg_create.py - INFO - Score updated to a, 2 - a, 1
+2024-03-03 13:37:15,837 - webSocket_msg_create.py - INFO - Score updated to a, 2 - a, 1
+2024-03-03 13:37:15,837 - webSocket_msg_create.py - INFO - Score updated to a, 2 - a, 1
