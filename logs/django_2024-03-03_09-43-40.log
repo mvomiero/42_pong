@@ -1,1 +1,0 @@
-DEBUG 2024-03-03 09:43:41,628 utils (0.001) SELECT 1 AS "a" FROM "auth_user" WHERE "auth_user"."username" = 'admin' LIMIT 1; args=(1, 'admin'); alias=default

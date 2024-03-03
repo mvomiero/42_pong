@@ -1,0 +1,25 @@
+{
+  "index": {
+    "lifecycle": {
+      "name": "pong-index-policy",
+        "rollover_alias": "pong"
+    },
+    "number_of_replicas": 0
+  }
+}
+
+PUT pong-000001
+{
+  "aliases": {
+    "pong": {
+      "is_write_index": true
+    }
+  }
+}
+
+PUT pong-000002/_settings
+{
+    "index": {
+        "number_of_replicas": 0
+    }
+}

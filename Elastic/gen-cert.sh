@@ -2,12 +2,6 @@
 
 SSL_PATH="/etc/elasticsearch/ssl"
 
-#localhost CA
-mkcert -install
-mkcert -key-file $SSL_PATH/localhost_key.pem -cert-file $SSL_PATH/localhost_cert.crt 10.15.202.4
-chmod 644 $SSL_PATH/localhost_key.pem
-cp /root/.local/share/mkcert/rootCA.pem $SSL_PATH
-
 #CA
 openssl genpkey -algorithm RSA -out $SSL_PATH/ca_private_key.pem
 openssl req -x509 -new -key $SSL_PATH/ca_private_key.pem -days 365 -out $SSL_PATH/ca_cert.crt -subj "/C=DE/L=Berlin/O=42School/CN=elasticsearch"

@@ -13,6 +13,7 @@ RUN apt-get update
 RUN apt-get install logstash
 
 COPY logstash.conf /etc/logstash/conf.d/
+COPY ilm.txt /etc/logstash/ilm.txt
 
 ENV PATH=/usr/share/logstash/bin:$PATH
 
